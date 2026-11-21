@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="লুডু লাইভ" />
-  <title>লুডু টুর্নামেন্ট লাইভ ম্যানেজার</title>
+  <title>লুডু চ্যাম্পিয়নশিপ ২০২৬ - লাইভ ফলাফল</title>
 
   <!-- Inline 4-Color Ludo App Icon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%230f172a'/%3E%3Crect x='14' y='14' width='32' height='32' rx='8' fill='%23ef4444'/%3E%3Crect x='54' y='14' width='32' height='32' rx='8' fill='%2322c55e'/%3E%3Crect x='14' y='54' width='32' height='32' rx='8' fill='%233b82f6'/%3E%3Crect x='54' y='54' width='32' height='32' rx='8' fill='%23eab308'/%3E%3Ccircle cx='50' cy='50' r='12' fill='%23ffffff'/%3E%3C/svg%3E" />
@@ -60,9 +60,9 @@
   <div class="h-1.5 w-full ludo-gradient no-print"></div>
 
   <!-- Toast Notification Container -->
-  <div id="toast-container" class="fixed top-16 right-4 left-4 sm:left-auto sm:right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toast-container" class="fixed top-16 right-3 left-3 sm:left-auto sm:right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- Custom Confirmation Modal (Replaces browser alert/confirm) -->
+  <!-- Custom Confirmation Modal -->
   <div id="confirm-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 fade-in">
       <div class="flex items-center gap-3 text-amber-600 mb-3">
@@ -81,7 +81,7 @@
     </div>
   </div>
 
-  <!-- Team Match History Modal (Opens when clicking any team name/row in Leaderboard) -->
+  <!-- Team Match History Modal (Opens when clicking any team row/name) -->
   <div id="team-history-modal" class="fixed inset-0 z-50 hidden bg-slate-900/65 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-slate-200 fade-in overflow-hidden">
       <!-- Modal Header -->
@@ -90,7 +90,7 @@
           <span id="modal-team-color" class="w-4 h-4 rounded-full ring-2 ring-white/40 shrink-0"></span>
           <div class="min-w-0">
             <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300 block">দলের বিস্তারিত ফলাফল</span>
-            <h3 id="modal-team-name" class="text-lg sm:text-xl font-bold truncate">দলের নাম</h3>
+            <h3 id="modal-team-name" class="text-lg sm:text-xl font-bold break-words">দলের নাম</h3>
           </div>
         </div>
         <button id="close-team-modal-btn" type="button" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition shrink-0" title="বন্ধ করুন">
@@ -101,9 +101,7 @@
       </div>
 
       <!-- Team Summary Stats Bar -->
-      <div id="modal-team-stats" class="grid grid-cols-5 gap-1.5 sm:gap-2 p-3.5 sm:p-4 bg-slate-50 border-b border-slate-200 shrink-0 text-center">
-        <!-- Populated dynamically -->
-      </div>
+      <div id="modal-team-stats" class="grid grid-cols-5 gap-1.5 sm:gap-2 p-3.5 sm:p-4 bg-slate-50 border-b border-slate-200 shrink-0 text-center"></div>
 
       <!-- Chronological Match List -->
       <div class="p-4 sm:p-5 overflow-y-auto flex-1 space-y-3 bg-slate-100/60">
@@ -111,9 +109,7 @@
           <h4 class="text-sm font-bold text-slate-700">🎲 খেলার পূর্ণাঙ্গ বিবরণ ও সময়সূচি</h4>
           <span id="modal-match-count" class="text-xs font-semibold text-slate-500"></span>
         </div>
-        <div id="modal-team-matches-list" class="space-y-3">
-          <!-- Match cards rendered here -->
-        </div>
+        <div id="modal-team-matches-list" class="space-y-3"></div>
       </div>
 
       <!-- Modal Footer -->
@@ -127,7 +123,7 @@
 
   <!-- App Header -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-    <div class="max-w-5xl mx-auto px-3.5 sm:px-4 py-3 flex items-center justify-between gap-2">
+    <div class="max-w-5xl mx-auto px-3 sm:px-4 py-3 flex items-center justify-between gap-2">
       <!-- Brand & Title -->
       <div class="flex items-center gap-2.5 min-w-0">
         <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-sm shrink-0">
@@ -143,10 +139,9 @@
           <h1 id="header-tournament-name" class="text-base sm:text-xl font-bold text-slate-900 truncate">
             লুডু চ্যাম্পিয়নশিপ ২০২৬
           </h1>
-          <!-- Sync Status Indicator -->
           <div class="flex items-center gap-1.5 mt-0.5">
-            <span id="sync-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-            <span id="sync-status-text" class="text-xs font-semibold text-slate-500">লাইভ সিঙ্ক সংযুক্ত হচ্ছে...</span>
+            <span id="sync-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            <span id="sync-status-text" class="text-xs font-semibold text-slate-600">লাইভ সিঙ্ক সংযোগ হচ্ছে...</span>
           </div>
         </div>
       </div>
@@ -173,25 +168,25 @@
       <button
         id="download-index-btn"
         type="button"
-        title="GitHub Pages-এ আপলোডের জন্য সরাসরি index.html ডাউনলোড করুন"
+        title="GitHub Pages-এ আপলোডের জন্য index.html ডাউনলোড করুন"
         class="no-print flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition active:scale-95 shrink-0"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
         </svg>
-        <span class="hidden md:inline">অ্যাপ সেভ করুন (index.html)</span>
-        <span class="md:hidden">ডাউনলোড</span>
+        <span class="hidden md:inline">অ্যাপ সেভ (index.html)</span>
+        <span class="md:hidden">index.html</span>
       </button>
     </div>
   </header>
 
   <!-- Main Content Area -->
-  <main class="flex-1 max-w-5xl w-full mx-auto px-3.5 sm:px-4 py-5 sm:py-7">
+  <main class="flex-1 max-w-5xl w-full mx-auto px-2.5 sm:px-4 py-4 sm:py-7">
 
     <!-- ========================================================= -->
     <!-- VIEW 1: PUBLIC LEADERBOARD (ফলাফল শিট)                    -->
     <!-- ========================================================= -->
-    <section id="page-results" class="fade-in space-y-5">
+    <section id="page-results" class="fade-in space-y-4 sm:space-y-5">
 
       <!-- Permanent Link Share Banner -->
       <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -199,7 +194,7 @@
           <div class="flex flex-wrap items-center gap-2 mb-1">
             <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
               <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              সবার জন্য উন্মুক্ত ফলাফল শিট
+              সবার জন্য উন্মুক্ত লাইভ ফলাফল শিট
             </span>
           </div>
           <h2 class="text-xl sm:text-2xl font-bold text-slate-900">পয়েন্ট টেবিল ও রান রেট</h2>
@@ -217,24 +212,24 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
-            <span>ফলাফলের লিংক কপি করুন</span>
+            <span>স্থায়ী লিংক কপি করুন</span>
           </button>
           <button
+            id="manual-refresh-btn"
             type="button"
-            onclick="window.print()"
-            title="প্রিন্ট বা পিডিএফ সেভ করুন"
+            title="লাইভ ডাটা রিফ্রেশ করুন"
             class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl transition"
           >
-            🖨️ প্রিন্ট
+            🔄 রিফ্রেশ
           </button>
         </div>
       </div>
 
       <!-- Quick Stats Summary Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
         <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
           <p class="text-xs font-semibold text-slate-500">মোট দল</p>
-          <p id="stat-total-teams" class="text-2xl font-bold text-slate-900 mt-0.5">০</p>
+          <p id="stat-total-teams" class="text-2xl font-bold text-slate-900 mt-0.5">৮</p>
         </div>
         <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
           <p class="text-xs font-semibold text-slate-500">মোট ম্যাচ</p>
@@ -242,7 +237,7 @@
         </div>
         <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
           <p class="text-xs font-semibold text-slate-500">শীর্ষ দল (১ম)</p>
-          <p id="stat-top-team" class="text-base sm:text-lg font-bold text-amber-600 mt-1 truncate">-</p>
+          <p id="stat-top-team" class="text-sm sm:text-base font-bold text-amber-600 mt-1 leading-snug break-words">-</p>
         </div>
         <div class="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
           <p class="text-xs font-semibold text-slate-500">সর্বোচ্চ রান রেট</p>
@@ -250,9 +245,9 @@
         </div>
       </div>
 
-      <!-- Standings Table -->
+      <!-- Standings Table (Full Team Names Guaranteed Without Truncation) -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div class="px-4 sm:px-5 py-3.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/70">
+        <div class="px-3.5 sm:px-5 py-3.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/70">
           <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
             <span>🏆 দলীয় পয়েন্ট তালিকা</span>
           </h3>
@@ -264,19 +259,17 @@
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-900 text-white text-xs sm:text-sm">
-                <th class="py-3 px-2.5 sm:px-4 font-bold text-center w-14">অবস্থান</th>
-                <th class="py-3 px-2.5 sm:px-4 font-bold">দলের নাম</th>
-                <th class="py-3 px-2 sm:px-3 font-bold text-center">ম্যাচ</th>
-                <th class="py-3 px-2 sm:px-3 font-bold text-center text-emerald-300">জয়</th>
-                <th class="py-3 px-2 sm:px-3 font-bold text-center text-rose-300">হার</th>
-                <th class="py-3 px-2.5 sm:px-4 font-bold text-center bg-slate-800 text-amber-300">পয়েন্ট</th>
-                <th class="py-3 px-2.5 sm:px-4 font-bold text-center">রান রেট</th>
+              <tr class="bg-slate-900 text-white text-[11px] sm:text-sm">
+                <th class="py-3 px-1.5 sm:px-3 font-bold text-center w-11 sm:w-14">অবস্থান</th>
+                <th class="py-3 px-2 sm:px-4 font-bold min-w-[145px] sm:min-w-[210px]">দলের নাম</th>
+                <th class="py-3 px-1.5 sm:px-3 font-bold text-center">ম্যাচ</th>
+                <th class="py-3 px-1.5 sm:px-3 font-bold text-center text-emerald-300">জয়</th>
+                <th class="py-3 px-1.5 sm:px-3 font-bold text-center text-rose-300">হার</th>
+                <th class="py-3 px-1.5 sm:px-4 font-bold text-center bg-slate-800 text-amber-300">পয়েন্ট</th>
+                <th class="py-3 px-1.5 sm:px-4 font-bold text-center">রান রেট</th>
               </tr>
             </thead>
-            <tbody id="standings-tbody" class="divide-y divide-slate-100 text-sm sm:text-base">
-              <!-- Live team rows rendered here -->
-            </tbody>
+            <tbody id="standings-tbody" class="divide-y divide-slate-100 text-xs sm:text-base"></tbody>
           </table>
         </div>
         <div id="empty-teams-msg" class="hidden p-8 text-center text-slate-500 text-sm">
@@ -292,9 +285,7 @@
           </h3>
           <span id="public-match-count-badge" class="text-xs font-bold px-2.5 py-1 bg-slate-200 text-slate-700 rounded-full">০টি ম্যাচ</span>
         </div>
-        <div id="public-matches-list" class="divide-y divide-slate-100">
-          <!-- Match results rendered here -->
-        </div>
+        <div id="public-matches-list" class="divide-y divide-slate-100"></div>
         <div id="empty-public-matches" class="p-8 text-center text-slate-500 text-sm">
           এখনো কোনো ম্যাচ খেলা হয়নি। অ্যাডমিন প্যানেল থেকে ফলাফল দিলে এখানে দেখা যাবে।
         </div>
@@ -303,18 +294,18 @@
 
 
     <!-- ========================================================= -->
-    <!-- VIEW 2: ADMIN PANEL (DIRECT INLINE VIEW - NEVER FREEZES)  -->
+    <!-- VIEW 2: ADMIN PANEL                                       -->
     <!-- ========================================================= -->
     <section id="page-admin" class="hidden fade-in space-y-5">
 
-      <!-- SUB-VIEW 2A: INLINE PIN UNLOCK SCREEN (Shown when locked) -->
+      <!-- SUB-VIEW 2A: INLINE PIN UNLOCK SCREEN -->
       <div id="admin-lock-screen" class="max-w-md mx-auto bg-white rounded-2xl border border-slate-200 shadow-lg p-6 sm:p-8 text-center my-4">
         <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-3xl shadow-xs">
           🔐
         </div>
         <h2 class="text-2xl font-bold text-slate-900 mb-1">অ্যাডমিন প্যানেল প্রবেশ</h2>
         <p class="text-sm text-slate-600 mb-5">
-          ম্যাচের ফলাফল ও দল পরিচালনা করতে আপনার ৪ সংখ্যার গোপন পিন কোডটি দিন।
+          ম্যাচের ফলাফল ও দল পরিচালনা করতে আপনার গোপন পিন কোডটি দিন।
           <span id="pin-hint-box" class="block mt-1 text-xs font-semibold text-indigo-600">
             (প্রাথমিক পিন: 1234 — ভেতরে গিয়ে পরিবর্তন করতে পারবেন)
           </span>
@@ -361,10 +352,10 @@
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="px-2.5 py-0.5 text-xs font-bold bg-amber-400 text-slate-900 rounded-full">অ্যাডমিন প্যানেল</span>
-              <span class="text-xs text-emerald-300 font-semibold">● অটো ক্যালকুলেশন চালু</span>
+              <span class="text-xs text-emerald-300 font-semibold">● লাইভ অটো ক্যালকুলেশন ও ক্লাউড সিঙ্ক</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-bold">ম্যাচের ফলাফল ও দল পরিচালনা</h2>
-            <p class="text-xs sm:text-sm text-slate-300 mt-0.5">এখানে ফলাফল সেভ করলেই ফলাফল শিটে পয়েন্ট ও রান রেট অটো আপডেট হবে।</p>
+            <p class="text-xs sm:text-sm text-slate-300 mt-0.5">এখানে ফলাফল সেভ করলেই সবার ফোনে থাকা স্থায়ী লিংকে পয়েন্ট ও রান রেট অটো আপডেট হবে।</p>
           </div>
           <div class="flex flex-wrap gap-2">
             <button
@@ -372,7 +363,7 @@
               type="button"
               class="flex items-center gap-1.5 px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs sm:text-sm rounded-xl transition"
             >
-              <span>🔗 ফলাফলের লিংক কপি</span>
+              <span>🔗 স্থায়ী লিংক কপি</span>
             </button>
             <button
               id="lock-admin-btn"
@@ -438,7 +429,7 @@
                     >
                       <div class="flex items-center gap-2.5 min-w-0">
                         <input type="radio" name="winner_choice" value="A" id="radio-winner-a" class="w-5 h-5 text-emerald-600 focus:ring-emerald-500 shrink-0" />
-                        <span id="label-winner-a" class="font-bold text-slate-800 truncate">দল ১</span>
+                        <span id="label-winner-a" class="font-bold text-slate-800 break-words">দল ১</span>
                       </div>
                       <span id="badge-winner-a" class="hidden px-2.5 py-0.5 text-xs font-bold bg-emerald-600 text-white rounded-full shrink-0">
                         ✓ বিজয়ী
@@ -451,7 +442,7 @@
                     >
                       <div class="flex items-center gap-2.5 min-w-0">
                         <input type="radio" name="winner_choice" value="B" id="radio-winner-b" class="w-5 h-5 text-emerald-600 focus:ring-emerald-500 shrink-0" />
-                        <span id="label-winner-b" class="font-bold text-slate-800 truncate">দল ২</span>
+                        <span id="label-winner-b" class="font-bold text-slate-800 break-words">দল ২</span>
                       </div>
                       <span id="badge-winner-b" class="hidden px-2.5 py-0.5 text-xs font-bold bg-emerald-600 text-white rounded-full shrink-0">
                         ✓ বিজয়ী
@@ -481,7 +472,7 @@
                     <button type="button" data-token="6" class="token-btn py-2.5 rounded-xl font-bold border border-slate-300 bg-slate-50 text-slate-800 transition">৬</button>
                   </div>
 
-                  <!-- Custom Number Input for >6 tokens -->
+                  <!-- Custom Number Input for >6 tokens (e.g., 7 or 8 tokens in 2-player team Ludo) -->
                   <div class="flex items-center gap-2.5">
                     <span class="text-xs text-slate-500">৬-এর বেশি হলে লিখুন:</span>
                     <input
@@ -509,7 +500,7 @@
                   id="submit-match-btn"
                   class="w-full py-3.5 px-5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold text-base rounded-xl shadow-md transition active:scale-[0.99]"
                 >
-                  ✅ ফলাফল সেভ ও আপডেট করুন
+                  ✅ ফলাফল সেভ করুন ও লাইভ আপডেট দিন
                 </button>
               </form>
             </div>
@@ -517,8 +508,8 @@
             <!-- Match History with Delete/Undo -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
               <div class="px-4 sm:px-5 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <h3 class="font-bold text-slate-800 text-base">📋 ম্যাচ ইতিহাস</h3>
-                <span class="text-xs text-slate-500">ভুল হলে মুছলে পয়েন্ট অটো ঠিক হবে</span>
+                <h3 class="font-bold text-slate-800 text-base">📋 ম্যাচ ইতিহাস ও সংশোধন</h3>
+                <span class="text-xs text-slate-500">মুছলে পয়েন্ট অটো ঠিক হবে</span>
               </div>
               <div id="admin-matches-list" class="divide-y divide-slate-100"></div>
               <div id="empty-admin-matches" class="p-6 text-center text-sm text-slate-500">
@@ -532,19 +523,22 @@
 
             <!-- Team Management Card -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-6">
-              <div class="flex items-center gap-2.5 pb-3.5 mb-4 border-b border-slate-100">
-                <div class="p-2 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-lg">👥</div>
-                <div>
-                  <h3 class="text-lg font-bold text-slate-900">দল পরিচালনা</h3>
-                  <p class="text-xs text-slate-500">টুর্নামেন্টের নতুন দল যোগ বা মুছুন</p>
+              <div class="flex items-center justify-between gap-2 pb-3.5 mb-4 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                  <div class="p-2 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-lg">👥</div>
+                  <div>
+                    <h3 class="text-lg font-bold text-slate-900">দল ব্যবস্থাপনা</h3>
+                    <p class="text-xs text-slate-500">নতুন দল যোগ, নাম পরিবর্তন বা মুছুন</p>
+                  </div>
                 </div>
+                <span id="admin-team-count-pill" class="text-xs font-bold px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full">৮টি দল</span>
               </div>
 
               <form id="add-team-form" class="flex gap-2 mb-4">
                 <input
                   type="text"
                   id="new-team-name"
-                  placeholder="দলের নাম লিখুন..."
+                  placeholder="নতুন দলের নাম লিখুন..."
                   class="flex-1 px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   required
                 />
@@ -556,7 +550,7 @@
                 </button>
               </form>
 
-              <div id="admin-teams-list" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+              <div id="admin-teams-list" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
             </div>
 
             <!-- Tournament & PIN Security Settings -->
@@ -568,7 +562,7 @@
 
               <!-- Tournament Name -->
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">টুর্নামেন্টের শিরোনাম</label>
+                <label class="block text-xs font-bold text-slate-600 mb-1">টুর্নামেন্টের নাম পরিবর্তন</label>
                 <div class="flex gap-2">
                   <input
                     type="text"
@@ -587,7 +581,7 @@
 
               <!-- Admin PIN Change -->
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">নতুন পিন সেট করুন (কমপক্ষে ৪ সংখ্যা)</label>
+                <label class="block text-xs font-bold text-slate-600 mb-1">অ্যাডমিন পিন পরিবর্তন (কমপক্ষে ৪ সংখ্যা)</label>
                 <div class="flex gap-2">
                   <input
                     type="text"
@@ -607,21 +601,28 @@
                 </div>
               </div>
 
-              <!-- Reset Controls -->
+              <!-- Reset & Restore Controls -->
               <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
                 <button
                   id="reset-matches-btn"
                   type="button"
                   class="w-full py-2.5 px-4 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold text-xs rounded-xl transition"
                 >
-                  🔄 শুধু ম্যাচগুলো মুছে পয়েন্ট ০ করুন
+                  🔄 সব ম্যাচ রিসেট করুন (৮টি দল রাখুন)
+                </button>
+                <button
+                  id="restore-default-teams-btn"
+                  type="button"
+                  class="w-full py-2.5 px-4 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 font-bold text-xs rounded-xl transition"
+                >
+                  📋 ডিফল্ট ৮টি দল ফিরিয়ে আনুন
                 </button>
                 <button
                   id="reset-all-btn"
                   type="button"
                   class="w-full py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl transition"
                 >
-                  🗑️ সব ডাটা রিসেট করুন (নতুন টুর্নামেন্ট)
+                  🗑️ সব ডাটা মুছে খালি করুন
                 </button>
               </div>
             </div>
@@ -656,1251 +657,1243 @@
   </nav>
 
   <!-- ========================================================= -->
-  <!-- FIREBASE REAL-TIME SYNC & COMPLETE APP LOGIC              -->
+  <!-- ZERO-CONFIG REAL-TIME CLOUD REST SYNC + LOCAL FALLBACK    -->
   <!-- ========================================================= -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      setDoc,
-      getDoc,
-      addDoc,
-      deleteDoc,
-      onSnapshot,
-      collection,
-      getDocs
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  <script>
+    (function () {
+      'use strict';
 
-    // Environment variables
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'ludo-tournament-bangla-v1';
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+      // Dedicated Public Cloud REST Endpoint for Cross-Device Live Sync on GitHub Pages
+      const CLOUD_PRIMARY_URL = 'https://ludo-tournament-live-default-rtdb.firebaseio.com/mohon000_ludo_2026.json';
+      const CLOUD_BACKUP_URL = 'https://kvdb.io/A9x7kL2mP4qR8wT1vN5zB3/mohon000_ludo_2026';
 
-    let db = null;
-    let auth = null;
-    let currentUser = null;
-    let isCloudReady = false;
+      const LOCAL_STORAGE_KEY = 'ludo_champ_2026_mohon000_cache_v2';
+      const AUTH_SESSION_KEY = 'ludo_champ_2026_admin_unlocked_v2';
+      const TEAM_COLORS = ['#ef4444', '#22c55e', '#eab308', '#3b82f6', '#8b5cf6', '#ec4899', '#f97316', '#06b6d4'];
 
-    // Local Storage Keys
-    const LOCAL_STATE_KEY = 'ludo_tournament_local_state_v2';
-    const AUTH_SESSION_KEY = 'ludo_admin_unlocked_session_v2';
+      // Official 8 Teams List
+      const DEFAULT_TEAM_NAMES = [
+        'চেল্লু ও গালিব',
+        'নওশাদ ও ছোটন',
+        'নয়ন ও নাঈম',
+        'মারুফ ও মাসুম',
+        'মোহন ও নান্টু',
+        'রনি ও মিশু',
+        'রাবু ও মিলন',
+        'রোমান ও তনু'
+      ];
 
-    const TEAM_COLORS = ['#ef4444', '#22c55e', '#eab308', '#3b82f6', '#8b5cf6', '#ec4899', '#f97316', '#06b6d4'];
-
-    // Default Initial Teams (Seeded only if database is completely empty on first launch)
-    const SAMPLE_TEAMS = [
-      { id: 'team_1', name: 'রয়েল স্ট্রাইকার্স', color: '#ef4444', createdAt: 1001 },
-      { id: 'team_2', name: 'লুডু কিংস', color: '#22c55e', createdAt: 1002 },
-      { id: 'team_3', name: 'ডাইস মাস্টার্স', color: '#eab308', createdAt: 1003 },
-      { id: 'team_4', name: 'সুপার সিক্সার্স', color: '#3b82f6', createdAt: 1004 }
-    ];
-
-    // Central Application State
-    let appState = {
-      tournamentName: 'লুডু চ্যাম্পিয়নশিপ ২০২৬',
-      adminPin: '1234',
-      teams: [],
-      matches: []
-    };
-
-    let activeTab = 'results';
-    let selectedWinnerSide = 'A';
-
-    // Convert English digits to Bengali digits
-    function toBn(num) {
-      const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-      return String(num).replace(/\d/g, (d) => bnDigits[Number(d)]);
-    }
-
-    // Format Net Run Rate with +/- sign in Bengali
-    function formatNRR(nrr) {
-      const val = Number(nrr) || 0;
-      if (val > 0) return `+${toBn(val)}`;
-      if (val < 0) return `-${toBn(Math.abs(val))}`;
-      return '০';
-    }
-
-    // Format Live Bengali Date & Time (e.g., "২১ নভেম্বর ২০২৬, বিকাল ৩:৪২")
-    function formatBengaliDateTime(timestamp) {
-      if (!timestamp) return '';
-      try {
-        const dateObj = new Date(timestamp);
-        const datePart = new Intl.DateTimeFormat('bn-BD', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
-        }).format(dateObj);
-        const timePart = new Intl.DateTimeFormat('bn-BD', {
-          hour: 'numeric',
-          minute: '2-digit',
-          hour12: true
-        }).format(dateObj);
-        return `${datePart}, ${timePart}`;
-      } catch (e) {
-        return new Date(timestamp).toLocaleString('bn-BD');
-      }
-    }
-
-    // Save state snapshot to localStorage for instant offline/reload fallback
-    function saveLocalBackup() {
-      try {
-        localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify({
-          tournamentName: appState.tournamentName,
-          adminPin: appState.adminPin,
-          teams: appState.teams,
-          matches: appState.matches
+      function buildDefaultTeamsList() {
+        const baseTime = 1770000000000;
+        return DEFAULT_TEAM_NAMES.map((name, idx) => ({
+          id: `team_official_${idx + 1}`,
+          name,
+          color: TEAM_COLORS[idx % TEAM_COLORS.length],
+          createdAt: baseTime + idx * 1000
         }));
-      } catch (e) {
-        // Ignore storage errors in restricted iframes
       }
-    }
 
-    // Load local backup immediately on startup so UI is never blank
-    function loadLocalBackup() {
-      try {
-        const raw = localStorage.getItem(LOCAL_STATE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed.tournamentName) appState.tournamentName = parsed.tournamentName;
-          if (parsed.adminPin) appState.adminPin = String(parsed.adminPin);
-          if (Array.isArray(parsed.teams)) appState.teams = parsed.teams;
-          if (Array.isArray(parsed.matches)) appState.matches = parsed.matches;
-          return true;
-        }
-      } catch (e) {}
-      return false;
-    }
-
-    // Toast notification helper
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      const bgClass =
-        type === 'error'
-          ? 'bg-rose-600 text-white'
-          : type === 'info'
-          ? 'bg-slate-800 text-white'
-          : 'bg-emerald-600 text-white';
-
-      toast.className = `${bgClass} px-4 py-3 rounded-xl shadow-lg font-semibold text-sm flex items-center justify-between gap-3 fade-in pointer-events-auto`;
-      toast.innerHTML = `<span>${message}</span>`;
-      container.appendChild(toast);
-
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.25s ease';
-        setTimeout(() => toast.remove(), 250);
-      }, 3000);
-    }
-
-    // Custom Confirmation Dialog helper (No browser confirm/alert)
-    let pendingConfirmCallback = null;
-    function openConfirmModal(title, message, onConfirm) {
-      document.getElementById('confirm-title').textContent = title;
-      document.getElementById('confirm-message').textContent = message;
-      pendingConfirmCallback = onConfirm;
-      document.getElementById('confirm-modal').classList.remove('hidden');
-    }
-
-    document.getElementById('confirm-cancel-btn').addEventListener('click', () => {
-      document.getElementById('confirm-modal').classList.add('hidden');
-      pendingConfirmCallback = null;
-    });
-
-    document.getElementById('confirm-ok-btn').addEventListener('click', () => {
-      document.getElementById('confirm-modal').classList.add('hidden');
-      if (typeof pendingConfirmCallback === 'function') {
-        pendingConfirmCallback();
-      }
-      pendingConfirmCallback = null;
-    });
-
-    // Update Sync Status Badge in Header
-    function setSyncStatus(connected, label) {
-      isCloudReady = connected;
-      const dot = document.getElementById('sync-dot');
-      const text = document.getElementById('sync-status-text');
-      if (connected) {
-        dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-      } else {
-        dot.className = 'w-2 h-2 rounded-full bg-amber-400';
-      }
-      text.textContent = label;
-    }
-
-    // =========================================================
-    // TAB NAVIGATION & DIRECT INLINE ADMIN UNLOCK
-    // =========================================================
-    function switchTab(tabName) {
-      activeTab = tabName;
-      const resultsPage = document.getElementById('page-results');
-      const adminPage = document.getElementById('page-admin');
-
-      const dRes = document.getElementById('nav-results-desktop');
-      const dAdm = document.getElementById('nav-admin-desktop');
-      const mRes = document.getElementById('nav-results-mobile');
-      const mAdm = document.getElementById('nav-admin-mobile');
-
-      if (tabName === 'admin') {
-        resultsPage.classList.add('hidden');
-        adminPage.classList.remove('hidden');
-
-        dRes.classList.replace('tab-active', 'tab-inactive');
-        dAdm.classList.replace('tab-inactive', 'tab-active');
-        mRes.classList.replace('tab-active', 'tab-inactive');
-        mAdm.classList.replace('tab-inactive', 'tab-active');
-
-        updateAdminLockVisibility();
-      } else {
-        adminPage.classList.add('hidden');
-        resultsPage.classList.remove('hidden');
-
-        dAdm.classList.replace('tab-active', 'tab-inactive');
-        dRes.classList.replace('tab-inactive', 'tab-active');
-        mAdm.classList.replace('tab-active', 'tab-inactive');
-        mRes.classList.replace('tab-inactive', 'tab-active');
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function isAdminUnlocked() {
-      try {
-        return sessionStorage.getItem(AUTH_SESSION_KEY) === 'true';
-      } catch (e) {
-        return false;
-      }
-    }
-
-    function updateAdminLockVisibility() {
-      const lockScreen = document.getElementById('admin-lock-screen');
-      const unlockedContent = document.getElementById('admin-unlocked-content');
-      const hintBox = document.getElementById('pin-hint-box');
-
-      if (isAdminUnlocked()) {
-        lockScreen.classList.add('hidden');
-        unlockedContent.classList.remove('hidden');
-        renderAdminView();
-      } else {
-        unlockedContent.classList.add('hidden');
-        lockScreen.classList.remove('hidden');
-        document.getElementById('inline-pin-error').classList.add('hidden');
-        const activePin = String(appState.adminPin || '1234');
-        hintBox.textContent =
-          activePin === '1234'
-            ? '(প্রাথমিক পিন: 1234 — ভেতরে গিয়ে পরিবর্তন করতে পারবেন)'
-            : '(আপনার সেট করা গোপন পিন কোডটি দিয়ে আনলক করুন)';
-      }
-    }
-
-    // Bind Navigation Buttons
-    document.getElementById('nav-results-desktop').addEventListener('click', () => switchTab('results'));
-    document.getElementById('nav-admin-desktop').addEventListener('click', () => switchTab('admin'));
-    document.getElementById('nav-results-mobile').addEventListener('click', () => switchTab('results'));
-    document.getElementById('nav-admin-mobile').addEventListener('click', () => switchTab('admin'));
-
-    // Inline PIN Unlock Form Submit
-    document.getElementById('inline-pin-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const inputEl = document.getElementById('inline-pin-input');
-      const entered = inputEl.value.trim();
-      const expected = String(appState.adminPin || '1234').trim();
-
-      if (entered === expected) {
-        try {
-          sessionStorage.setItem(AUTH_SESSION_KEY, 'true');
-        } catch (err) {}
-        inputEl.value = '';
-        document.getElementById('inline-pin-error').classList.add('hidden');
-        updateAdminLockVisibility();
-        showToast('অ্যাডমিন প্যানেল আনলক হয়েছে!', 'success');
-      } else {
-        document.getElementById('inline-pin-error').classList.remove('hidden');
-        inputEl.focus();
-      }
-    });
-
-    // Lock Admin Button
-    document.getElementById('lock-admin-btn').addEventListener('click', () => {
-      try {
-        sessionStorage.removeItem(AUTH_SESSION_KEY);
-      } catch (err) {}
-      updateAdminLockVisibility();
-      showToast('অ্যাডমিন প্যানেল লক করা হয়েছে।', 'info');
-    });
-
-    // Forgot PIN Fallback Reset to 1234
-    document.getElementById('forgot-pin-reset-btn').addEventListener('click', () => {
-      openConfirmModal(
-        'পিন রিসেট করুন',
-        'আপনি কি অ্যাডমিন পিনটি পুনরায় ডিফল্ট "1234"-এ ফিরিয়ে আনতে চান?',
-        async () => {
-          appState.adminPin = '1234';
-          saveLocalBackup();
-          if (currentUser && db) {
-            try {
-              const metaRef = doc(db, 'artifacts', appId, 'public', 'data', 'ludo_meta', 'config');
-              await setDoc(metaRef, { tournamentName: appState.tournamentName, adminPin: '1234' }, { merge: true });
-            } catch (err) {}
-          }
-          updateAdminLockVisibility();
-          showToast('পিন রিসেট হয়ে "1234" হয়েছে। এখন 1234 দিয়ে আনলক করুন।', 'success');
-        }
-      );
-    });
-
-    // =========================================================
-    // AUTOMATIC STATS CALCULATION FROM MATCHES
-    // =========================================================
-    function computeStandings() {
-      const statsMap = {};
-      appState.teams.forEach((t, idx) => {
-        statsMap[t.id] = {
-          id: t.id,
-          name: t.name,
-          color: t.color || TEAM_COLORS[idx % TEAM_COLORS.length],
-          played: 0,
-          won: 0,
-          lost: 0,
-          points: 0,
-          nrr: 0
+      function createDefaultState(keepPin) {
+        return {
+          tournamentName: 'লুডু চ্যাম্পিয়নশিপ ২০২৬',
+          adminPin: keepPin || '1234',
+          teams: buildDefaultTeamsList(),
+          matches: [],
+          updatedAt: Date.now()
         };
-      });
-
-      appState.matches.forEach((m) => {
-        const winner = statsMap[m.winnerId];
-        const loser = statsMap[m.loserId];
-        const margin = Math.max(1, Number(m.remainingTokens) || 1);
-
-        if (winner) {
-          winner.played += 1;
-          winner.won += 1;
-          winner.points += 2;
-          winner.nrr += margin;
-        }
-        if (loser) {
-          loser.played += 1;
-          loser.lost += 1;
-          loser.nrr -= margin;
-        }
-      });
-
-      return Object.values(statsMap).sort((a, b) => {
-        if (b.points !== a.points) return b.points - a.points;
-        if (b.nrr !== a.nrr) return b.nrr - a.nrr;
-        if (b.won !== a.won) return b.won - a.won;
-        return a.name.localeCompare(b.name, 'bn');
-      });
-    }
-
-    // =========================================================
-    // RENDER PUBLIC LEADERBOARD & MATCH HISTORY
-    // =========================================================
-    function renderPublicView() {
-      document.getElementById('header-tournament-name').textContent = appState.tournamentName;
-      const standings = computeStandings();
-
-      // Summary stats
-      document.getElementById('stat-total-teams').textContent = toBn(standings.length);
-      document.getElementById('stat-total-matches').textContent = toBn(appState.matches.length);
-
-      if (standings.length > 0 && standings[0].played > 0) {
-        document.getElementById('stat-top-team').textContent = standings[0].name;
-        const maxNrr = Math.max(...standings.map((s) => s.nrr));
-        document.getElementById('stat-top-nrr').textContent = formatNRR(maxNrr);
-      } else {
-        document.getElementById('stat-top-team').textContent = standings.length > 0 ? standings[0].name : '-';
-        document.getElementById('stat-top-nrr').textContent = '০';
       }
 
-      // Standings table
-      const tbody = document.getElementById('standings-tbody');
-      const emptyMsg = document.getElementById('empty-teams-msg');
+      // Application State
+      let appState = createDefaultState('1234');
+      let activeTab = 'results';
+      let selectedWinnerSide = 'A';
+      let currentlyViewedTeamId = null;
+      let isSavingToCloud = false;
+      let lastKnownSignature = '';
 
-      if (standings.length === 0) {
-        tbody.innerHTML = '';
-        emptyMsg.classList.remove('hidden');
-      } else {
-        emptyMsg.classList.add('hidden');
-        tbody.innerHTML = standings
-          .map((team, idx) => {
-            const rank = idx + 1;
-            let rankBadge = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-100 text-slate-700 font-bold text-xs">${toBn(rank)}</span>`;
-            if (rank === 1 && team.played > 0) {
-              rankBadge = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-amber-100 text-amber-800 border border-amber-300 font-bold text-xs">🥇 ১</span>`;
-            } else if (rank === 2 && team.played > 0) {
-              rankBadge = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-200 text-slate-800 font-bold text-xs">🥈 ২</span>`;
-            } else if (rank === 3 && team.played > 0) {
-              rankBadge = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-orange-100 text-orange-800 font-bold text-xs">🥉 ৩</span>`;
+      // =========================================================
+      // HELPER FUNCTIONS (BENGALI DIGITS & DATE/TIME)
+      // =========================================================
+      function toBn(num) {
+        const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+        return String(num).replace(/\d/g, (d) => bnDigits[Number(d)]);
+      }
+
+      function formatNRR(nrr) {
+        const val = Number(nrr) || 0;
+        if (val > 0) return `+${toBn(val)}`;
+        if (val < 0) return `-${toBn(Math.abs(val))}`;
+        return '০';
+      }
+
+      function formatBengaliDateTime(timestamp) {
+        if (!timestamp) return '';
+        try {
+          const dateObj = new Date(timestamp);
+          const datePart = new Intl.DateTimeFormat('bn-BD', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          }).format(dateObj);
+          const timePart = new Intl.DateTimeFormat('bn-BD', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          }).format(dateObj);
+          return `${datePart}, ${timePart}`;
+        } catch (e) {
+          return new Date(timestamp).toLocaleString('bn-BD');
+        }
+      }
+
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function getTeamNameById(id, fallbackName) {
+        const found = appState.teams.find((t) => t.id === id);
+        return found ? found.name : fallbackName || 'অজানা দল';
+      }
+
+      function setSyncStatus(status) {
+        const dotEl = document.getElementById('sync-dot');
+        const textEl = document.getElementById('sync-status-text');
+        if (!dotEl || !textEl) return;
+
+        if (status === 'live') {
+          dotEl.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+          textEl.className = 'text-xs font-semibold text-emerald-700';
+          textEl.textContent = '🟢 লাইভ অনলাইন সিঙ্ক চালু';
+        } else if (status === 'saving') {
+          dotEl.className = 'w-2 h-2 rounded-full bg-indigo-500 animate-ping';
+          textEl.className = 'text-xs font-semibold text-indigo-700';
+          textEl.textContent = 'ক্লাউডে আপডেট হচ্ছে...';
+        } else {
+          dotEl.className = 'w-2 h-2 rounded-full bg-amber-500';
+          textEl.className = 'text-xs font-semibold text-amber-700';
+          textEl.textContent = 'অফলাইন লোকাল ক্যাশ চালু';
+        }
+      }
+
+      // =========================================================
+      // CLOUD REST SYNC ENGINE (FETCH GET / PUT + 4s POLLING)
+      // =========================================================
+      function saveLocalCache(stateObj) {
+        try {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateObj));
+        } catch (e) {}
+      }
+
+      function loadLocalCache() {
+        try {
+          const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && Array.isArray(parsed.teams)) {
+              return {
+                tournamentName: parsed.tournamentName || 'লুডু চ্যাম্পিয়নশিপ ২০২৬',
+                adminPin: parsed.adminPin ? String(parsed.adminPin) : '1234',
+                teams: parsed.teams,
+                matches: Array.isArray(parsed.matches) ? parsed.matches : [],
+                updatedAt: parsed.updatedAt || 0
+              };
             }
+          }
+        } catch (e) {}
+        return null;
+      }
 
-            const nrrColor =
-              team.nrr > 0
-                ? 'text-emerald-600 bg-emerald-50 border-emerald-200'
-                : team.nrr < 0
-                ? 'text-rose-600 bg-rose-50 border-rose-200'
-                : 'text-slate-600 bg-slate-100 border-slate-200';
-
-            return `
-              <tr data-team-id="${team.id}" class="team-row-clickable cursor-pointer hover:bg-indigo-50/60 active:bg-indigo-100/70 transition group">
-                <td class="py-3.5 px-2.5 sm:px-4 text-center">${rankBadge}</td>
-                <td class="py-3.5 px-2.5 sm:px-4 font-bold text-slate-900">
-                  <div class="flex items-center justify-between gap-2">
-                    <div class="flex items-center gap-2 min-w-0">
-                      <span class="w-3 h-3 rounded-full shrink-0" style="background-color:${team.color}"></span>
-                      <span class="truncate max-w-[130px] sm:max-w-none group-hover:text-indigo-700 underline decoration-slate-300 group-hover:decoration-indigo-500 underline-offset-4 transition">${escapeHtml(team.name)}</span>
-                    </div>
-                    <span class="text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded opacity-80 group-hover:opacity-100 shrink-0">বিস্তারিত ›</span>
-                  </div>
-                </td>
-                <td class="py-3.5 px-2 sm:px-3 text-center font-semibold text-slate-700">${toBn(team.played)}</td>
-                <td class="py-3.5 px-2 sm:px-3 text-center font-bold text-emerald-600">${toBn(team.won)}</td>
-                <td class="py-3.5 px-2 sm:px-3 text-center font-bold text-rose-500">${toBn(team.lost)}</td>
-                <td class="py-3.5 px-2.5 sm:px-4 text-center font-extrabold text-indigo-700 bg-indigo-50/40 text-base sm:text-lg">${toBn(team.points)}</td>
-                <td class="py-3.5 px-2.5 sm:px-4 text-center">
-                  <span class="inline-block px-2.5 py-0.5 rounded-lg border text-xs sm:text-sm font-bold ${nrrColor}">
-                    ${formatNRR(team.nrr)}
-                  </span>
-                </td>
-              </tr>
-            `;
-          })
-          .join('');
-
-        // Bind click events to each team row to open Team Match History modal
-        tbody.querySelectorAll('.team-row-clickable').forEach((row) => {
-          row.addEventListener('click', () => {
-            const teamId = row.getAttribute('data-team-id');
-            openTeamHistoryModal(teamId);
-          });
+      function computeSignature(stateObj) {
+        return JSON.stringify({
+          t: stateObj.tournamentName,
+          p: stateObj.adminPin,
+          tm: stateObj.teams,
+          m: stateObj.matches
         });
       }
 
-      // Public Match Results Feed
-      const publicMatchesEl = document.getElementById('public-matches-list');
-      const emptyPublicMatches = document.getElementById('empty-public-matches');
-      document.getElementById('public-match-count-badge').textContent = `${toBn(appState.matches.length)}টি ম্যাচ`;
+      async function pushStateToCloud(newState) {
+        newState.updatedAt = Date.now();
+        appState = newState;
+        lastKnownSignature = computeSignature(appState);
+        saveLocalCache(appState);
+        renderAll();
 
-      if (appState.matches.length === 0) {
-        publicMatchesEl.innerHTML = '';
-        emptyPublicMatches.classList.remove('hidden');
-      } else {
-        emptyPublicMatches.classList.add('hidden');
-        const sortedMatches = [...appState.matches].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-        publicMatchesEl.innerHTML = sortedMatches
-          .map((m, idx) => {
-            const matchNo = sortedMatches.length - idx;
-            const winnerName = getTeamNameById(m.winnerId, m.winnerName);
-            const loserName = getTeamNameById(m.loserId, m.loserName);
-            const tokens = Number(m.remainingTokens) || 1;
-            const timeLabel = m.playedAtText || formatBengaliDateTime(m.createdAt);
-            return `
-              <div class="p-3.5 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50/80 transition">
-                <div class="space-y-1">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">ম্যাচ #${toBn(matchNo)}</span>
-                    <span class="font-bold text-emerald-700">🏆 ${escapeHtml(winnerName)}</span>
-                    <span class="text-xs text-slate-400 font-semibold">বনাম</span>
-                    <span class="font-semibold text-slate-600">${escapeHtml(loserName)}</span>
-                  </div>
-                  ${timeLabel ? `<p class="text-[11px] font-medium text-slate-400">🕒 ${escapeHtml(timeLabel)}</p>` : ''}
-                </div>
-                <div class="flex items-center gap-2 text-xs shrink-0">
-                  <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
-                    ${escapeHtml(winnerName)} জয়ী (+২ পয়েন্ট, +${toBn(tokens)} রান রেট)
-                  </span>
-                </div>
-              </div>
-            `;
-          })
-          .join('');
+        isSavingToCloud = true;
+        setSyncStatus('saving');
+
+        let synced = false;
+        // 1. Primary Cloud REST Endpoint (Firebase RTDB public JSON)
+        try {
+          const res = await fetch(CLOUD_PRIMARY_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(appState)
+          });
+          if (res.ok) {
+            synced = true;
+          }
+        } catch (err) {
+          console.warn('Primary cloud PUT fallback triggered:', err);
+        }
+
+        // 2. Backup Cloud REST Endpoint (kvdb.io) if primary is unreachable
+        if (!synced) {
+          try {
+            const resBackup = await fetch(CLOUD_BACKUP_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(appState)
+            });
+            if (resBackup.ok) {
+              synced = true;
+            }
+          } catch (err2) {
+            console.warn('Backup cloud POST fallback triggered:', err2);
+          }
+        }
+
+        isSavingToCloud = false;
+        setSyncStatus(synced ? 'live' : 'offline');
+        return synced;
       }
-    }
 
-    // =========================================================
-    // TEAM MATCH HISTORY MODAL LOGIC (CLICK TEAM NAME IN TABLE)
-    // =========================================================
-    let currentlyViewedTeamId = null;
+      async function fetchStateFromCloud(isInitialBoot = false) {
+        if (isSavingToCloud) return;
 
-    function openTeamHistoryModal(teamId) {
-      currentlyViewedTeamId = teamId;
-      const standings = computeStandings();
-      const teamStats = standings.find((t) => t.id === teamId);
-      const teamObj = appState.teams.find((t) => t.id === teamId);
+        let remoteData = null;
+        let fetchedOk = false;
 
-      if (!teamStats && !teamObj) return;
+        // Try Primary Cloud REST Endpoint
+        try {
+          const res = await fetch(`${CLOUD_PRIMARY_URL}?t=${Date.now()}`, {
+            method: 'GET',
+            cache: 'no-store'
+          });
+          if (res.ok) {
+            fetchedOk = true;
+            const json = await res.json();
+            if (json && typeof json === 'object' && Array.isArray(json.teams)) {
+              remoteData = json;
+            }
+          }
+        } catch (err) {
+          // Try Backup Cloud REST Endpoint
+          try {
+            const resBackup = await fetch(`${CLOUD_BACKUP_URL}?t=${Date.now()}`, {
+              method: 'GET',
+              cache: 'no-store'
+            });
+            if (resBackup.ok) {
+              fetchedOk = true;
+              const jsonB = await resBackup.json();
+              if (jsonB && typeof jsonB === 'object' && Array.isArray(jsonB.teams)) {
+                remoteData = jsonB;
+              }
+            }
+          } catch (err2) {}
+        }
 
-      const name = teamStats ? teamStats.name : teamObj.name;
-      const color = teamStats ? teamStats.color : teamObj.color || '#3b82f6';
-      const played = teamStats ? teamStats.played : 0;
-      const won = teamStats ? teamStats.won : 0;
-      const lost = teamStats ? teamStats.lost : 0;
-      const points = teamStats ? teamStats.points : 0;
-      const nrr = teamStats ? teamStats.nrr : 0;
+        if (fetchedOk) {
+          setSyncStatus('live');
+          if (remoteData) {
+            const normalized = {
+              tournamentName: remoteData.tournamentName || 'লুডু চ্যাম্পিয়নশিপ ২০২৬',
+              adminPin: remoteData.adminPin ? String(remoteData.adminPin) : '1234',
+              teams: remoteData.teams || [],
+              matches: Array.isArray(remoteData.matches) ? remoteData.matches : [],
+              updatedAt: remoteData.updatedAt || Date.now()
+            };
+            const newSig = computeSignature(normalized);
+            if (newSig !== lastKnownSignature) {
+              appState = normalized;
+              lastKnownSignature = newSig;
+              saveLocalCache(appState);
+              renderAll();
+            }
+          } else if (isInitialBoot) {
+            // Cloud bucket is completely empty on first-ever visit -> seed the 8 default teams
+            const seedState = loadLocalCache() || createDefaultState('1234');
+            await pushStateToCloud(seedState);
+          }
+        } else {
+          setSyncStatus('offline');
+        }
+      }
 
-      document.getElementById('modal-team-name').textContent = name;
-      document.getElementById('modal-team-color').style.backgroundColor = color;
+      // =========================================================
+      // TOAST & CONFIRMATION MODAL
+      // =========================================================
+      function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        const bgClass =
+          type === 'error'
+            ? 'bg-rose-600 text-white'
+            : type === 'info'
+            ? 'bg-slate-800 text-white'
+            : 'bg-emerald-600 text-white';
 
-      // Render Summary Badges
-      const nrrTextClass = nrr > 0 ? 'text-emerald-600' : nrr < 0 ? 'text-rose-600' : 'text-slate-700';
-      document.getElementById('modal-team-stats').innerHTML = `
-        <div class="bg-white p-2 rounded-xl border border-slate-200">
-          <span class="block text-[11px] font-semibold text-slate-500">মোট ম্যাচ</span>
-          <span class="text-base sm:text-lg font-bold text-slate-900">${toBn(played)}</span>
-        </div>
-        <div class="bg-white p-2 rounded-xl border border-slate-200">
-          <span class="block text-[11px] font-semibold text-slate-500">জয়</span>
-          <span class="text-base sm:text-lg font-bold text-emerald-600">${toBn(won)}</span>
-        </div>
-        <div class="bg-white p-2 rounded-xl border border-slate-200">
-          <span class="block text-[11px] font-semibold text-slate-500">হার</span>
-          <span class="text-base sm:text-lg font-bold text-rose-600">${toBn(lost)}</span>
-        </div>
-        <div class="bg-white p-2 rounded-xl border border-slate-200">
-          <span class="block text-[11px] font-semibold text-slate-500">পয়েন্ট</span>
-          <span class="text-base sm:text-lg font-extrabold text-indigo-700">${toBn(points)}</span>
-        </div>
-        <div class="bg-white p-2 rounded-xl border border-slate-200">
-          <span class="block text-[11px] font-semibold text-slate-500">রান রেট</span>
-          <span class="text-base sm:text-lg font-bold ${nrrTextClass}">${formatNRR(nrr)}</span>
-        </div>
-      `;
+        toast.className = `${bgClass} px-4 py-3 rounded-xl shadow-lg font-semibold text-sm flex items-center justify-between gap-3 fade-in pointer-events-auto`;
+        toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
+        container.appendChild(toast);
 
-      // Filter matches involving this team (newest first)
-      const teamMatches = appState.matches
-        .filter((m) => m.winnerId === teamId || m.loserId === teamId || m.teamAId === teamId || m.teamBId === teamId)
-        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transition = 'opacity 0.25s ease';
+          setTimeout(() => toast.remove(), 250);
+        }, 3000);
+      }
 
-      document.getElementById('modal-match-count').textContent = `মোট ${toBn(teamMatches.length)}টি ম্যাচ`;
+      let pendingConfirmCallback = null;
+      function openConfirmModal(title, message, onConfirm) {
+        document.getElementById('confirm-title').textContent = title;
+        document.getElementById('confirm-message').textContent = message;
+        pendingConfirmCallback = onConfirm;
+        document.getElementById('confirm-modal').classList.remove('hidden');
+      }
 
-      const listContainer = document.getElementById('modal-team-matches-list');
-      if (teamMatches.length === 0) {
-        listContainer.innerHTML = `
-          <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center">
-            <div class="text-3xl mb-2">🎲</div>
-            <p class="font-bold text-slate-700 text-base">এই দলটি এখনো কোনো ম্যাচ খেলেনি</p>
-            <p class="text-xs text-slate-500 mt-1">ম্যাচ খেলা হলে এখানে প্রতিটি ম্যাচের বিস্তারিত ফলাফল ও সময় দেখা যাবে।</p>
+      document.getElementById('confirm-cancel-btn').addEventListener('click', () => {
+        document.getElementById('confirm-modal').classList.add('hidden');
+        pendingConfirmCallback = null;
+      });
+
+      document.getElementById('confirm-ok-btn').addEventListener('click', () => {
+        document.getElementById('confirm-modal').classList.add('hidden');
+        if (typeof pendingConfirmCallback === 'function') {
+          pendingConfirmCallback();
+        }
+        pendingConfirmCallback = null;
+      });
+
+      // =========================================================
+      // NAVIGATION & INLINE ADMIN UNLOCK
+      // =========================================================
+      function switchTab(tabName) {
+        activeTab = tabName;
+        const resultsPage = document.getElementById('page-results');
+        const adminPage = document.getElementById('page-admin');
+
+        const dRes = document.getElementById('nav-results-desktop');
+        const dAdm = document.getElementById('nav-admin-desktop');
+        const mRes = document.getElementById('nav-results-mobile');
+        const mAdm = document.getElementById('nav-admin-mobile');
+
+        if (tabName === 'admin') {
+          resultsPage.classList.add('hidden');
+          adminPage.classList.remove('hidden');
+
+          dRes.classList.replace('tab-active', 'tab-inactive');
+          dAdm.classList.replace('tab-inactive', 'tab-active');
+          mRes.classList.replace('tab-active', 'tab-inactive');
+          mAdm.classList.replace('tab-inactive', 'tab-active');
+
+          updateAdminLockVisibility();
+        } else {
+          adminPage.classList.add('hidden');
+          resultsPage.classList.remove('hidden');
+
+          dAdm.classList.replace('tab-active', 'tab-inactive');
+          dRes.classList.replace('tab-inactive', 'tab-active');
+          mAdm.classList.replace('tab-active', 'tab-inactive');
+          mRes.classList.replace('tab-inactive', 'tab-active');
+          renderPublicView();
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      function isAdminUnlocked() {
+        try {
+          return sessionStorage.getItem(AUTH_SESSION_KEY) === 'true';
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function updateAdminLockVisibility() {
+        const lockScreen = document.getElementById('admin-lock-screen');
+        const unlockedContent = document.getElementById('admin-unlocked-content');
+        const hintBox = document.getElementById('pin-hint-box');
+
+        if (isAdminUnlocked()) {
+          lockScreen.classList.add('hidden');
+          unlockedContent.classList.remove('hidden');
+          renderAdminView();
+        } else {
+          unlockedContent.classList.add('hidden');
+          lockScreen.classList.remove('hidden');
+          document.getElementById('inline-pin-error').classList.add('hidden');
+          const activePin = String(appState.adminPin || '1234');
+          hintBox.textContent =
+            activePin === '1234'
+              ? '(প্রাথমিক পিন: 1234 — ভেতরে গিয়ে পরিবর্তন করতে পারবেন)'
+              : '(আপনার সেট করা গোপন পিন কোডটি দিয়ে আনলক করুন)';
+        }
+      }
+
+      document.getElementById('nav-results-desktop').addEventListener('click', () => switchTab('results'));
+      document.getElementById('nav-admin-desktop').addEventListener('click', () => switchTab('admin'));
+      document.getElementById('nav-results-mobile').addEventListener('click', () => switchTab('results'));
+      document.getElementById('nav-admin-mobile').addEventListener('click', () => switchTab('admin'));
+
+      document.getElementById('inline-pin-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const inputEl = document.getElementById('inline-pin-input');
+        const entered = inputEl.value.trim();
+        const expected = String(appState.adminPin || '1234').trim();
+
+        if (entered === expected) {
+          try {
+            sessionStorage.setItem(AUTH_SESSION_KEY, 'true');
+          } catch (err) {}
+          inputEl.value = '';
+          document.getElementById('inline-pin-error').classList.add('hidden');
+          updateAdminLockVisibility();
+          showToast('অ্যাডমিন প্যানেল আনলক হয়েছে!', 'success');
+        } else {
+          document.getElementById('inline-pin-error').classList.remove('hidden');
+          inputEl.focus();
+        }
+      });
+
+      document.getElementById('lock-admin-btn').addEventListener('click', () => {
+        try {
+          sessionStorage.removeItem(AUTH_SESSION_KEY);
+        } catch (err) {}
+        updateAdminLockVisibility();
+        showToast('অ্যাডমিন প্যানেল লক করা হয়েছে।', 'info');
+      });
+
+      document.getElementById('forgot-pin-reset-btn').addEventListener('click', () => {
+        openConfirmModal(
+          'পিন রিসেট করুন',
+          'আপনি কি অ্যাডমিন পিনটি পুনরায় ডিফল্ট "1234"-এ ফিরিয়ে আনতে চান?',
+          async () => {
+            const nextState = { ...appState, adminPin: '1234' };
+            await pushStateToCloud(nextState);
+            updateAdminLockVisibility();
+            showToast('পিন রিসেট হয়ে "1234" হয়েছে। এখন 1234 দিয়ে আনলক করুন।', 'success');
+          }
+        );
+      });
+
+      // =========================================================
+      // STANDINGS CALCULATION (POINTS -> NRR -> WINS)
+      // =========================================================
+      function computeStandings() {
+        const statsMap = {};
+        appState.teams.forEach((t, idx) => {
+          statsMap[t.id] = {
+            id: t.id,
+            name: t.name,
+            color: t.color || TEAM_COLORS[idx % TEAM_COLORS.length],
+            played: 0,
+            won: 0,
+            lost: 0,
+            points: 0,
+            nrr: 0
+          };
+        });
+
+        appState.matches.forEach((m) => {
+          const winner = statsMap[m.winnerId];
+          const loser = statsMap[m.loserId];
+          const margin = Math.max(1, Number(m.remainingTokens) || 1);
+
+          if (winner) {
+            winner.played += 1;
+            winner.won += 1;
+            winner.points += 2;
+            winner.nrr += margin;
+          }
+          if (loser) {
+            loser.played += 1;
+            loser.lost += 1;
+            loser.nrr -= margin;
+          }
+        });
+
+        return Object.values(statsMap).sort((a, b) => {
+          if (b.points !== a.points) return b.points - a.points;
+          if (b.nrr !== a.nrr) return b.nrr - a.nrr;
+          if (b.won !== a.won) return b.won - a.won;
+          return 0;
+        });
+      }
+
+      // =========================================================
+      // RENDER PUBLIC LEADERBOARD & MATCH FEED
+      // =========================================================
+      function renderPublicView() {
+        document.getElementById('header-tournament-name').textContent = appState.tournamentName;
+        const standings = computeStandings();
+
+        document.getElementById('stat-total-teams').textContent = toBn(standings.length);
+        document.getElementById('stat-total-matches').textContent = toBn(appState.matches.length);
+
+        if (standings.length > 0 && standings[0].played > 0) {
+          document.getElementById('stat-top-team').textContent = standings[0].name;
+          const maxNrr = Math.max(...standings.map((s) => s.nrr));
+          document.getElementById('stat-top-nrr').textContent = formatNRR(maxNrr);
+        } else {
+          document.getElementById('stat-top-team').textContent = standings.length > 0 ? standings[0].name : '-';
+          document.getElementById('stat-top-nrr').textContent = '০';
+        }
+
+        const tbody = document.getElementById('standings-tbody');
+        const emptyMsg = document.getElementById('empty-teams-msg');
+
+        if (standings.length === 0) {
+          tbody.innerHTML = '';
+          emptyMsg.classList.remove('hidden');
+        } else {
+          emptyMsg.classList.add('hidden');
+          tbody.innerHTML = standings
+            .map((team, idx) => {
+              const rank = idx + 1;
+              let rankBadge = `<span class="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-100 text-slate-700 font-bold text-[11px] sm:text-xs">${toBn(rank)}</span>`;
+              if (rank === 1 && team.played > 0) {
+                rankBadge = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-amber-100 text-amber-800 border border-amber-300 font-bold text-xs">🥇১</span>`;
+              } else if (rank === 2 && team.played > 0) {
+                rankBadge = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-200 text-slate-800 font-bold text-xs">🥈২</span>`;
+              } else if (rank === 3 && team.played > 0) {
+                rankBadge = `<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-orange-100 text-orange-800 font-bold text-xs">🥉৩</span>`;
+              }
+
+              const nrrColor =
+                team.nrr > 0
+                  ? 'text-emerald-600 bg-emerald-50 border-emerald-200'
+                  : team.nrr < 0
+                  ? 'text-rose-600 bg-rose-50 border-rose-200'
+                  : 'text-slate-600 bg-slate-100 border-slate-200';
+
+              return `
+                <tr data-team-id="${team.id}" class="team-row-clickable cursor-pointer hover:bg-indigo-50/60 active:bg-indigo-100/70 transition group">
+                  <td class="py-3 px-1.5 sm:px-3 text-center">${rankBadge}</td>
+                  <td class="py-3 px-2 sm:px-4 font-bold text-slate-900">
+                    <div class="flex items-center justify-between gap-1.5">
+                      <div class="flex items-center gap-1.5 sm:gap-2">
+                        <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shrink-0" style="background-color:${team.color}"></span>
+                        <span class="whitespace-nowrap sm:whitespace-normal leading-snug group-hover:text-indigo-700 underline decoration-slate-300 group-hover:decoration-indigo-500 underline-offset-4 transition">${escapeHtml(team.name)}</span>
+                      </div>
+                      <span class="text-[10px] sm:text-xs font-semibold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded shrink-0">›</span>
+                    </div>
+                  </td>
+                  <td class="py-3 px-1.5 sm:px-3 text-center font-semibold text-slate-700">${toBn(team.played)}</td>
+                  <td class="py-3 px-1.5 sm:px-3 text-center font-bold text-emerald-600">${toBn(team.won)}</td>
+                  <td class="py-3 px-1.5 sm:px-3 text-center font-bold text-rose-500">${toBn(team.lost)}</td>
+                  <td class="py-3 px-1.5 sm:px-4 text-center font-extrabold text-indigo-700 bg-indigo-50/40 text-sm sm:text-lg">${toBn(team.points)}</td>
+                  <td class="py-3 px-1.5 sm:px-4 text-center">
+                    <span class="inline-block px-2 py-0.5 rounded-lg border text-[11px] sm:text-sm font-bold ${nrrColor}">
+                      ${formatNRR(team.nrr)}
+                    </span>
+                  </td>
+                </tr>
+              `;
+            })
+            .join('');
+
+          tbody.querySelectorAll('.team-row-clickable').forEach((row) => {
+            row.addEventListener('click', () => {
+              const teamId = row.getAttribute('data-team-id');
+              openTeamHistoryModal(teamId);
+            });
+          });
+        }
+
+        // Public Match Results Feed
+        const publicMatchesEl = document.getElementById('public-matches-list');
+        const emptyPublicMatches = document.getElementById('empty-public-matches');
+        document.getElementById('public-match-count-badge').textContent = `${toBn(appState.matches.length)}টি ম্যাচ`;
+
+        if (appState.matches.length === 0) {
+          publicMatchesEl.innerHTML = '';
+          emptyPublicMatches.classList.remove('hidden');
+        } else {
+          emptyPublicMatches.classList.add('hidden');
+          const sortedMatches = [...appState.matches].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+          publicMatchesEl.innerHTML = sortedMatches
+            .map((m, idx) => {
+              const matchNo = sortedMatches.length - idx;
+              const winnerName = getTeamNameById(m.winnerId, m.winnerName);
+              const loserName = getTeamNameById(m.loserId, m.loserName);
+              const tokens = Number(m.remainingTokens) || 1;
+              const timeLabel = m.playedAtText || formatBengaliDateTime(m.createdAt);
+              return `
+                <div class="p-3.5 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50/80 transition">
+                  <div class="space-y-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">ম্যাচ #${toBn(matchNo)}</span>
+                      <span class="font-bold text-emerald-700">🏆 ${escapeHtml(winnerName)}</span>
+                      <span class="text-xs text-slate-400 font-semibold">বনাম</span>
+                      <span class="font-semibold text-slate-600">${escapeHtml(loserName)}</span>
+                    </div>
+                    ${timeLabel ? `<p class="text-[11px] font-medium text-slate-400">🕒 ${escapeHtml(timeLabel)}</p>` : ''}
+                  </div>
+                  <div class="flex items-center gap-2 text-xs shrink-0">
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
+                      ${escapeHtml(winnerName)} জয়ী (+২ পয়েন্ট, +${toBn(tokens)} রান রেট)
+                    </span>
+                  </div>
+                </div>
+              `;
+            })
+            .join('');
+        }
+      }
+
+      // =========================================================
+      // TEAM MATCH HISTORY MODAL (CLICK TEAM NAME)
+      // =========================================================
+      function openTeamHistoryModal(teamId) {
+        currentlyViewedTeamId = teamId;
+        const standings = computeStandings();
+        const teamStats = standings.find((t) => t.id === teamId);
+        const teamObj = appState.teams.find((t) => t.id === teamId);
+
+        if (!teamStats && !teamObj) return;
+
+        const name = teamStats ? teamStats.name : teamObj.name;
+        const color = teamStats ? teamStats.color : teamObj.color || '#3b82f6';
+        const played = teamStats ? teamStats.played : 0;
+        const won = teamStats ? teamStats.won : 0;
+        const lost = teamStats ? teamStats.lost : 0;
+        const points = teamStats ? teamStats.points : 0;
+        const nrr = teamStats ? teamStats.nrr : 0;
+
+        document.getElementById('modal-team-name').textContent = name;
+        document.getElementById('modal-team-color').style.backgroundColor = color;
+
+        const nrrTextClass = nrr > 0 ? 'text-emerald-600' : nrr < 0 ? 'text-rose-600' : 'text-slate-700';
+        document.getElementById('modal-team-stats').innerHTML = `
+          <div class="bg-white p-2 rounded-xl border border-slate-200">
+            <span class="block text-[11px] font-semibold text-slate-500">মোট ম্যাচ</span>
+            <span class="text-base sm:text-lg font-bold text-slate-900">${toBn(played)}</span>
+          </div>
+          <div class="bg-white p-2 rounded-xl border border-slate-200">
+            <span class="block text-[11px] font-semibold text-slate-500">জয়</span>
+            <span class="text-base sm:text-lg font-bold text-emerald-600">${toBn(won)}</span>
+          </div>
+          <div class="bg-white p-2 rounded-xl border border-slate-200">
+            <span class="block text-[11px] font-semibold text-slate-500">হার</span>
+            <span class="text-base sm:text-lg font-bold text-rose-600">${toBn(lost)}</span>
+          </div>
+          <div class="bg-white p-2 rounded-xl border border-slate-200">
+            <span class="block text-[11px] font-semibold text-slate-500">পয়েন্ট</span>
+            <span class="text-base sm:text-lg font-extrabold text-indigo-700">${toBn(points)}</span>
+          </div>
+          <div class="bg-white p-2 rounded-xl border border-slate-200">
+            <span class="block text-[11px] font-semibold text-slate-500">রান রেট</span>
+            <span class="text-base sm:text-lg font-bold ${nrrTextClass}">${formatNRR(nrr)}</span>
           </div>
         `;
-      } else {
-        listContainer.innerHTML = teamMatches
-          .map((m, idx) => {
-            const isWinner = m.winnerId === teamId;
-            const opponentId = isWinner ? m.loserId : m.winnerId;
-            const opponentFallback = isWinner ? m.loserName : m.winnerName;
-            const opponentName = getTeamNameById(opponentId, opponentFallback);
-            const tokens = Math.max(1, Number(m.remainingTokens) || 1);
-            const timeLabel = m.playedAtText || formatBengaliDateTime(m.createdAt) || 'সময় সংরক্ষিত নেই';
-            const matchSerial = teamMatches.length - idx;
 
-            const cardBorder = isWinner ? 'border-emerald-200 bg-white' : 'border-rose-200 bg-white';
-            const outcomeBadge = isWinner
-              ? `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs sm:text-sm">🏆 জয়ী (+${toBn(tokens)} গুটিতে জিতেছে)</span>`
-              : `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 font-bold text-xs sm:text-sm">❌ পরাজিত (-${toBn(tokens)} গুটিতে হেরেছে)</span>`;
+        const teamMatches = appState.matches
+          .filter((m) => m.winnerId === teamId || m.loserId === teamId || m.teamAId === teamId || m.teamBId === teamId)
+          .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-            const pointBadge = isWinner
-              ? `<span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg">+২ পয়েন্ট</span>`
-              : `<span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">০ পয়েন্ট</span>`;
+        document.getElementById('modal-match-count').textContent = `মোট ${toBn(teamMatches.length)}টি ম্যাচ`;
 
-            return `
-              <div class="rounded-2xl border ${cardBorder} p-4 shadow-xs space-y-2.5">
-                <!-- Top Row: Match Number & Live Timestamp in Corner -->
-                <div class="flex items-center justify-between gap-2 text-xs border-b border-slate-100 pb-2">
-                  <span class="font-bold text-slate-500">ম্যাচ #${toBn(matchSerial)}</span>
-                  <span class="font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                    <span>🕒</span>
-                    <span>${escapeHtml(timeLabel)}</span>
-                  </span>
-                </div>
-
-                <!-- Middle Row: Opponent Name -->
-                <div class="flex items-center justify-between gap-2">
-                  <div>
-                    <span class="text-xs text-slate-400 block">প্রতিপক্ষ দল</span>
-                    <p class="text-base sm:text-lg font-bold text-slate-900">প্রতিপক্ষ: ${escapeHtml(opponentName)}</p>
-                  </div>
-                  ${pointBadge}
-                </div>
-
-                <!-- Bottom Row: Exact Win/Loss Margin -->
-                <div class="pt-1 flex flex-wrap items-center justify-between gap-2">
-                  ${outcomeBadge}
-                  <span class="text-xs font-semibold ${isWinner ? 'text-emerald-600' : 'text-rose-600'}">
-                    রান রেট: ${isWinner ? `+${toBn(tokens)}` : `-${toBn(tokens)}`}
-                  </span>
-                </div>
-              </div>
-            `;
-          })
-          .join('');
-      }
-
-      document.getElementById('team-history-modal').classList.remove('hidden');
-    }
-
-    function closeTeamHistoryModal() {
-      currentlyViewedTeamId = null;
-      document.getElementById('team-history-modal').classList.add('hidden');
-    }
-
-    document.getElementById('close-team-modal-btn').addEventListener('click', closeTeamHistoryModal);
-    document.getElementById('close-team-modal-footer-btn').addEventListener('click', closeTeamHistoryModal);
-    document.getElementById('team-history-modal').addEventListener('click', (e) => {
-      if (e.target.id === 'team-history-modal') {
-        closeTeamHistoryModal();
-      }
-    });
-
-    function getTeamNameById(id, fallbackName) {
-      const found = appState.teams.find((t) => t.id === id);
-      return found ? found.name : fallbackName || 'অজানা দল';
-    }
-
-    function escapeHtml(str) {
-      return String(str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
-    // =========================================================
-    // RENDER ADMIN VIEW (FORM, TEAMS, HISTORY, SETTINGS)
-    // =========================================================
-    function renderAdminView() {
-      if (!isAdminUnlocked()) return;
-
-      // Settings inputs
-      const titleInput = document.getElementById('settings-tournament-name');
-      if (document.activeElement !== titleInput) {
-        titleInput.value = appState.tournamentName;
-      }
-      const pinInput = document.getElementById('settings-admin-pin');
-      if (document.activeElement !== pinInput) {
-        pinInput.value = appState.adminPin;
-      }
-
-      // Team Select Dropdowns
-      const selectA = document.getElementById('select-team-a');
-      const selectB = document.getElementById('select-team-b');
-      const prevA = selectA.value;
-      const prevB = selectB.value;
-
-      if (appState.teams.length === 0) {
-        selectA.innerHTML = `<option value="">আগে দল যোগ করুন</option>`;
-        selectB.innerHTML = `<option value="">আগে দল যোগ করুন</option>`;
-      } else {
-        const optionsHtml = appState.teams
-          .map((t) => `<option value="${t.id}">${escapeHtml(t.name)}</option>`)
-          .join('');
-        selectA.innerHTML = optionsHtml;
-        selectB.innerHTML = optionsHtml;
-
-        if (appState.teams.some((t) => t.id === prevA)) {
-          selectA.value = prevA;
-        }
-        if (appState.teams.some((t) => t.id === prevB) && prevB !== selectA.value) {
-          selectB.value = prevB;
-        } else if (appState.teams.length > 1) {
-          selectB.value = appState.teams[1].id;
-        }
-      }
-
-      updateMatchFormUI();
-
-      // Admin Teams List
-      const teamsListEl = document.getElementById('admin-teams-list');
-      if (appState.teams.length === 0) {
-        teamsListEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">কোনো দল নেই। উপরে নাম লিখে দল যোগ করুন।</p>`;
-      } else {
-        teamsListEl.innerHTML = appState.teams
-          .map((t, idx) => {
-            const color = t.color || TEAM_COLORS[idx % TEAM_COLORS.length];
-            return `
-              <div class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
-                <div class="flex items-center gap-2.5 min-w-0">
-                  <span class="w-3.5 h-3.5 rounded-full shrink-0" style="background-color:${color}"></span>
-                  <span class="font-bold text-sm text-slate-800 truncate">${escapeHtml(t.name)}</span>
-                </div>
-                <button
-                  type="button"
-                  data-delete-team="${t.id}"
-                  class="delete-team-btn px-2.5 py-1 text-xs font-bold text-rose-600 hover:bg-rose-100 rounded-lg transition shrink-0"
-                >
-                  মুছুন
-                </button>
-              </div>
-            `;
-          })
-          .join('');
-
-        teamsListEl.querySelectorAll('.delete-team-btn').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const teamId = btn.getAttribute('data-delete-team');
-            deleteTeam(teamId);
-          });
-        });
-      }
-
-      // Admin Match History List
-      const adminMatchesEl = document.getElementById('admin-matches-list');
-      const emptyAdminMatches = document.getElementById('empty-admin-matches');
-
-      if (appState.matches.length === 0) {
-        adminMatchesEl.innerHTML = '';
-        emptyAdminMatches.classList.remove('hidden');
-      } else {
-        emptyAdminMatches.classList.add('hidden');
-        const sorted = [...appState.matches].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-        adminMatchesEl.innerHTML = sorted
-          .map((m, idx) => {
-            const matchNo = sorted.length - idx;
-            const wName = getTeamNameById(m.winnerId, m.winnerName);
-            const lName = getTeamNameById(m.loserId, m.loserName);
-            const tokens = Number(m.remainingTokens) || 1;
-            const timeLabel = m.playedAtText || formatBengaliDateTime(m.createdAt);
-            return `
-              <div class="p-3.5 sm:px-5 flex items-center justify-between gap-3 hover:bg-slate-50 transition">
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-xs font-bold px-2 py-0.5 bg-slate-200 text-slate-700 rounded">#${toBn(matchNo)}</span>
-                    <span class="font-bold text-sm text-emerald-700 truncate">🏆 ${escapeHtml(wName)}</span>
-                    <span class="text-xs text-slate-400">বনাম</span>
-                    <span class="font-semibold text-sm text-slate-600 truncate">${escapeHtml(lName)}</span>
-                  </div>
-                  <p class="text-xs text-slate-500 mt-1">
-                    বিজয়ী: +২ পয়েন্ট, +${toBn(tokens)} রান রেট &bull; পরাজিত: -${toBn(tokens)} রান রেট
-                  </p>
-                  ${timeLabel ? `<p class="text-[11px] text-slate-400 mt-0.5">🕒 ${escapeHtml(timeLabel)}</p>` : ''}
-                </div>
-                <button
-                  type="button"
-                  data-delete-match="${m.id}"
-                  class="delete-match-btn px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition shrink-0"
-                >
-                  মুছুন
-                </button>
-              </div>
-            `;
-          })
-          .join('');
-
-        adminMatchesEl.querySelectorAll('.delete-match-btn').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const matchId = btn.getAttribute('data-delete-match');
-            deleteMatch(matchId);
-          });
-        });
-      }
-    }
-
-    // Update Winner Cards & Live Auto-Calculation Preview inside Match Form
-    function updateMatchFormUI() {
-      const selectA = document.getElementById('select-team-a');
-      const selectB = document.getElementById('select-team-b');
-      const idA = selectA.value;
-      const idB = selectB.value;
-
-      const nameA = idA ? getTeamNameById(idA, 'দল ১') : 'দল ১';
-      const nameB = idB ? getTeamNameById(idB, 'দল ২') : 'দল ২';
-
-      document.getElementById('label-winner-a').textContent = nameA;
-      document.getElementById('label-winner-b').textContent = nameB;
-
-      const cardA = document.getElementById('winner-card-a');
-      const cardB = document.getElementById('winner-card-b');
-      const badgeA = document.getElementById('badge-winner-a');
-      const badgeB = document.getElementById('badge-winner-b');
-      const radioA = document.getElementById('radio-winner-a');
-      const radioB = document.getElementById('radio-winner-b');
-
-      if (selectedWinnerSide === 'A') {
-        radioA.checked = true;
-        cardA.className = 'cursor-pointer border-2 border-emerald-500 bg-emerald-50/60 rounded-xl p-3.5 flex items-center justify-between transition';
-        cardB.className = 'cursor-pointer border-2 border-slate-200 bg-white rounded-xl p-3.5 flex items-center justify-between transition';
-        badgeA.classList.remove('hidden');
-        badgeB.classList.add('hidden');
-      } else {
-        radioB.checked = true;
-        cardB.className = 'cursor-pointer border-2 border-emerald-500 bg-emerald-50/60 rounded-xl p-3.5 flex items-center justify-between transition';
-        cardA.className = 'cursor-pointer border-2 border-slate-200 bg-white rounded-xl p-3.5 flex items-center justify-between transition';
-        badgeB.classList.remove('hidden');
-        badgeA.classList.add('hidden');
-      }
-
-      // Highlight selected token button
-      const tokensVal = Math.max(1, Number(document.getElementById('remaining-tokens-input').value) || 1);
-      document.querySelectorAll('.token-btn').forEach((btn) => {
-        const val = Number(btn.getAttribute('data-token'));
-        if (val === tokensVal) {
-          btn.className = 'token-btn py-2.5 rounded-xl font-bold border-2 border-indigo-600 bg-indigo-600 text-white shadow-xs transition';
+        const listContainer = document.getElementById('modal-team-matches-list');
+        if (teamMatches.length === 0) {
+          listContainer.innerHTML = `
+            <div class="bg-white rounded-2xl border border-slate-200 p-8 text-center">
+              <div class="text-3xl mb-2">🎲</div>
+              <p class="font-bold text-slate-700 text-base">এই দলটি এখনো কোনো ম্যাচ খেলেনি</p>
+              <p class="text-xs text-slate-500 mt-1">ম্যাচ খেলা হলে এখানে প্রতিটি ম্যাচের বিস্তারিত ফলাফল ও সময় দেখা যাবে।</p>
+            </div>
+          `;
         } else {
-          btn.className = 'token-btn py-2.5 rounded-xl font-bold border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-800 transition';
+          listContainer.innerHTML = teamMatches
+            .map((m, idx) => {
+              const isWinner = m.winnerId === teamId;
+              const opponentId = isWinner ? m.loserId : m.winnerId;
+              const opponentFallback = isWinner ? m.loserName : m.winnerName;
+              const opponentName = getTeamNameById(opponentId, opponentFallback);
+              const tokens = Math.max(1, Number(m.remainingTokens) || 1);
+              const timeLabel = m.playedAtText || formatBengaliDateTime(m.createdAt) || 'সময় সংরক্ষিত নেই';
+              const matchSerial = teamMatches.length - idx;
+
+              const cardBorder = isWinner ? 'border-emerald-200 bg-white' : 'border-rose-200 bg-white';
+              const outcomeBadge = isWinner
+                ? `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs sm:text-sm">🏆 জয়ী (+${toBn(tokens)} গুটিতে জিতেছে)</span>`
+                : `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 font-bold text-xs sm:text-sm">❌ পরাজিত (-${toBn(tokens)} গুটিতে হেরেছে)</span>`;
+
+              const pointBadge = isWinner
+                ? `<span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg">+২ পয়েন্ট</span>`
+                : `<span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">০ পয়েন্ট</span>`;
+
+              return `
+                <div class="rounded-2xl border ${cardBorder} p-4 shadow-xs space-y-2.5">
+                  <div class="flex items-center justify-between gap-2 text-xs border-b border-slate-100 pb-2">
+                    <span class="font-bold text-slate-500">ম্যাচ #${toBn(matchSerial)}</span>
+                    <span class="font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                      <span>🕒</span>
+                      <span>${escapeHtml(timeLabel)}</span>
+                    </span>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-2">
+                    <div>
+                      <span class="text-xs text-slate-400 block">প্রতিপক্ষ দল</span>
+                      <p class="text-base sm:text-lg font-bold text-slate-900">প্রতিপক্ষ: ${escapeHtml(opponentName)}</p>
+                    </div>
+                    ${pointBadge}
+                  </div>
+
+                  <div class="pt-1 flex flex-wrap items-center justify-between gap-2">
+                    ${outcomeBadge}
+                    <span class="text-xs font-semibold ${isWinner ? 'text-emerald-600' : 'text-rose-600'}">
+                      রান রেট: ${isWinner ? `+${toBn(tokens)}` : `-${toBn(tokens)}`}
+                    </span>
+                  </div>
+                </div>
+              `;
+            })
+            .join('');
         }
+
+        document.getElementById('team-history-modal').classList.remove('hidden');
+      }
+
+      function closeTeamHistoryModal() {
+        currentlyViewedTeamId = null;
+        document.getElementById('team-history-modal').classList.add('hidden');
+      }
+
+      document.getElementById('close-team-modal-btn').addEventListener('click', closeTeamHistoryModal);
+      document.getElementById('close-team-modal-footer-btn').addEventListener('click', closeTeamHistoryModal);
+      document.getElementById('team-history-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'team-history-modal') closeTeamHistoryModal();
       });
 
-      // Validate same team
-      const warningEl = document.getElementById('same-team-warning');
-      const submitBtn = document.getElementById('submit-match-btn');
-      const previewEl = document.getElementById('preview-details');
+      // =========================================================
+      // RENDER ADMIN VIEW
+      // =========================================================
+      function renderAdminView() {
+        if (!isAdminUnlocked()) return;
 
-      if (!idA || !idB || appState.teams.length < 2) {
-        warningEl.classList.add('hidden');
-        submitBtn.disabled = true;
-        previewEl.innerHTML = `<p class="text-slate-500">ফলাফল হিসাব করতে কমপক্ষে ২টি দল যোগ করুন।</p>`;
-        return;
-      }
+        document.getElementById('admin-team-count-pill').textContent = `${toBn(appState.teams.length)}টি দল`;
 
-      if (idA === idB) {
-        warningEl.classList.remove('hidden');
-        submitBtn.disabled = true;
-        previewEl.innerHTML = `<p class="text-rose-600 font-semibold">দুটি ভিন্ন দল নির্বাচন করুন।</p>`;
-        return;
-      }
+        const titleInput = document.getElementById('settings-tournament-name');
+        if (document.activeElement !== titleInput) {
+          titleInput.value = appState.tournamentName;
+        }
+        const pinInput = document.getElementById('settings-admin-pin');
+        if (document.activeElement !== pinInput) {
+          pinInput.value = appState.adminPin;
+        }
 
-      warningEl.classList.add('hidden');
-      submitBtn.disabled = false;
+        const selectA = document.getElementById('select-team-a');
+        const selectB = document.getElementById('select-team-b');
+        const prevA = selectA.value;
+        const prevB = selectB.value;
 
-      const winnerName = selectedWinnerSide === 'A' ? nameA : nameB;
-      const loserName = selectedWinnerSide === 'A' ? nameB : nameA;
+        if (appState.teams.length === 0) {
+          selectA.innerHTML = `<option value="">আগে দল যোগ করুন</option>`;
+          selectB.innerHTML = `<option value="">আগে দল যোগ করুন</option>`;
+        } else {
+          const optionsHtml = appState.teams
+            .map((t) => `<option value="${t.id}">${escapeHtml(t.name)}</option>`)
+            .join('');
+          selectA.innerHTML = optionsHtml;
+          selectB.innerHTML = optionsHtml;
 
-      previewEl.innerHTML = `
-        <p class="text-emerald-700 font-bold">✅ ${escapeHtml(winnerName)} (জয়ী): +২ পয়েন্ট এবং +${toBn(tokensVal)} রান রেট পাবে</p>
-        <p class="text-rose-600 font-semibold">❌ ${escapeHtml(loserName)} (পরাজিত): ০ পয়েন্ট এবং -${toBn(tokensVal)} রান রেট পাবে</p>
-      `;
-    }
+          if (appState.teams.some((t) => t.id === prevA)) {
+            selectA.value = prevA;
+          }
+          if (appState.teams.some((t) => t.id === prevB) && prevB !== selectA.value) {
+            selectB.value = prevB;
+          } else if (appState.teams.length > 1) {
+            selectB.value = appState.teams[1].id;
+          }
+        }
 
-    // Bind Match Form Interactive Events
-    document.getElementById('select-team-a').addEventListener('change', updateMatchFormUI);
-    document.getElementById('select-team-b').addEventListener('change', updateMatchFormUI);
-
-    document.getElementById('radio-winner-a').addEventListener('change', () => {
-      selectedWinnerSide = 'A';
-      updateMatchFormUI();
-    });
-    document.getElementById('radio-winner-b').addEventListener('change', () => {
-      selectedWinnerSide = 'B';
-      updateMatchFormUI();
-    });
-
-    document.querySelectorAll('.token-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        document.getElementById('remaining-tokens-input').value = btn.getAttribute('data-token');
         updateMatchFormUI();
-      });
-    });
 
-    document.getElementById('remaining-tokens-input').addEventListener('input', updateMatchFormUI);
-
-    function renderAll() {
-      renderPublicView();
-      renderAdminView();
-      if (currentlyViewedTeamId && !document.getElementById('team-history-modal').classList.contains('hidden')) {
-        openTeamHistoryModal(currentlyViewedTeamId);
-      }
-    }
-
-    // =========================================================
-    // CRUD OPERATIONS (CLOUD FIRESTORE + LOCAL BACKUP)
-    // =========================================================
-
-    // 1. Add New Team
-    document.getElementById('add-team-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const input = document.getElementById('new-team-name');
-      const name = input.value.trim();
-      if (!name) return;
-
-      if (appState.teams.some((t) => t.name.toLowerCase() === name.toLowerCase())) {
-        showToast('এই নামে ইতিমধ্যে একটি দল আছে!', 'error');
-        return;
-      }
-
-      const newTeam = {
-        id: 'team_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-        name,
-        color: TEAM_COLORS[appState.teams.length % TEAM_COLORS.length],
-        createdAt: Date.now()
-      };
-
-      input.value = '';
-      appState.teams.push(newTeam);
-      saveLocalBackup();
-      renderAll();
-      showToast(`"${name}" দলটি যোগ করা হয়েছে!`, 'success');
-
-      if (currentUser && db) {
-        try {
-          const teamRef = doc(db, 'artifacts', appId, 'public', 'data', 'ludo_teams', newTeam.id);
-          await setDoc(teamRef, newTeam);
-        } catch (err) {
-          console.error('Add team cloud sync error:', err);
-        }
-      }
-    });
-
-    // 2. Delete Team
-    function deleteTeam(teamId) {
-      const team = appState.teams.find((t) => t.id === teamId);
-      if (!team) return;
-
-      openConfirmModal(
-        'দল মুছে ফেলুন',
-        `আপনি কি নিশ্চিতভাবে "${team.name}" দলটি মুছে ফেলতে চান?`,
-        async () => {
-          appState.teams = appState.teams.filter((t) => t.id !== teamId);
-          saveLocalBackup();
-          renderAll();
-          showToast(`"${team.name}" দলটি মুছে ফেলা হয়েছে।`, 'info');
-
-          if (currentUser && db) {
-            try {
-              await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ludo_teams', teamId));
-            } catch (err) {
-              console.error('Delete team cloud error:', err);
-            }
-          }
-        }
-      );
-    }
-
-    // 3. Submit Match Result
-    document.getElementById('match-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const idA = document.getElementById('select-team-a').value;
-      const idB = document.getElementById('select-team-b').value;
-      if (!idA || !idB || idA === idB) return;
-
-      const winnerId = selectedWinnerSide === 'A' ? idA : idB;
-      const loserId = selectedWinnerSide === 'A' ? idB : idA;
-      const winnerName = getTeamNameById(winnerId, 'বিজয়ী দল');
-      const loserName = getTeamNameById(loserId, 'পরাজিত দল');
-      const remainingTokens = Math.max(1, Number(document.getElementById('remaining-tokens-input').value) || 1);
-      const nowTimestamp = Date.now();
-      const playedAtText = formatBengaliDateTime(nowTimestamp);
-
-      const newMatch = {
-        id: 'match_' + nowTimestamp + '_' + Math.floor(Math.random() * 1000),
-        teamAId: idA,
-        teamBId: idB,
-        winnerId,
-        loserId,
-        winnerName,
-        loserName,
-        remainingTokens,
-        createdAt: nowTimestamp,
-        playedAtText
-      };
-
-      appState.matches.push(newMatch);
-      saveLocalBackup();
-      renderAll();
-      showToast(`ফলাফল সেভ হয়েছে! ${winnerName} (+২ পয়েন্ট, +${toBn(remainingTokens)} রান রেট)`, 'success');
-
-      if (currentUser && db) {
-        try {
-          const matchRef = doc(db, 'artifacts', appId, 'public', 'data', 'ludo_matches', newMatch.id);
-          await setDoc(matchRef, newMatch);
-        } catch (err) {
-          console.error('Save match cloud error:', err);
-        }
-      }
-    });
-
-    // 4. Delete / Undo Match (Recalculates all standings automatically)
-    function deleteMatch(matchId) {
-      openConfirmModal(
-        'ম্যাচের ফলাফল মুছুন',
-        'এই ম্যাচটি মুছে ফেললে দুটি দলের পয়েন্ট ও রান রেট অটোমেটিক আগের অবস্থায় ফিরে যাবে। আপনি কি নিশ্চিত?',
-        async () => {
-          appState.matches = appState.matches.filter((m) => m.id !== matchId);
-          saveLocalBackup();
-          renderAll();
-          showToast('ম্যাচটি মুছে ফেলা হয়েছে এবং পয়েন্ট টেবিল আপডেট করা হয়েছে।', 'info');
-
-          if (currentUser && db) {
-            try {
-              await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ludo_matches', matchId));
-            } catch (err) {
-              console.error('Delete match cloud error:', err);
-            }
-          }
-        }
-      );
-    }
-
-    // 5. Save Tournament Title
-    document.getElementById('save-title-btn').addEventListener('click', async () => {
-      const newTitle = document.getElementById('settings-tournament-name').value.trim();
-      if (!newTitle) {
-        showToast('টুর্নামেন্টের নাম খালি রাখা যাবে না।', 'error');
-        return;
-      }
-      appState.tournamentName = newTitle;
-      saveLocalBackup();
-      renderAll();
-      showToast('টুর্নামেন্টের শিরোনাম আপডেট হয়েছে!', 'success');
-
-      if (currentUser && db) {
-        try {
-          const metaRef = doc(db, 'artifacts', appId, 'public', 'data', 'ludo_meta', 'config');
-          await setDoc(metaRef, { tournamentName: newTitle, adminPin: appState.adminPin }, { merge: true });
-        } catch (err) {}
-      }
-    });
-
-    // 6. Save New Admin PIN (Reliably persisted to both localStorage & Firestore)
-    document.getElementById('save-pin-btn').addEventListener('click', async () => {
-      const newPin = document.getElementById('settings-admin-pin').value.trim();
-      if (newPin.length < 4) {
-        showToast('পিন কোড কমপক্ষে ৪ সংখ্যার হতে হবে।', 'error');
-        return;
-      }
-
-      appState.adminPin = newPin;
-      saveLocalBackup();
-      showToast(`নতুন পিন (${newPin}) সফলভাবে সেভ হয়েছে!`, 'success');
-
-      if (currentUser && db) {
-        try {
-          const metaRef = doc(db, 'artifacts', appId, 'public', 'data', 'ludo_meta', 'config');
-          await setDoc(metaRef, { tournamentName: appState.tournamentName, adminPin: newPin }, { merge: true });
-        } catch (err) {
-          console.error('Save PIN cloud error:', err);
-        }
-      }
-    });
-
-    // 7. Reset Matches Only (Keep Teams & PIN)
-    document.getElementById('reset-matches-btn').addEventListener('click', () => {
-      openConfirmModal(
-        'সব ম্যাচ মুছুন',
-        'দলগুলোর নাম ও আপনার পিন ঠিক থাকবে, কিন্তু সব ম্যাচের ফলাফল মুছে গিয়ে পয়েন্ট ও রান রেট ০ হয়ে যাবে। নিশ্চিত?',
-        async () => {
-          const matchIds = appState.matches.map((m) => m.id);
-          appState.matches = [];
-          saveLocalBackup();
-          renderAll();
-          showToast('সব ম্যাচ মুছে পয়েন্ট টেবিল রিসেট করা হয়েছে।', 'info');
-
-          if (currentUser && db) {
-            try {
-              for (const mid of matchIds) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ludo_matches', mid));
-              }
-            } catch (err) {}
-          }
-        }
-      );
-    });
-
-    // 8. Full Reset (Clear Teams & Matches, Keep Updated Admin PIN)
-    document.getElementById('reset-all-btn').addEventListener('click', () => {
-      openConfirmModal(
-        'সব ডাটা রিসেট করুন',
-        'সকল দল ও ম্যাচের ফলাফল মুছে যাবে (আপনার সেট করা অ্যাডমিন পিন সুরক্ষিত থাকবে)। আপনি কি নিশ্চিত?',
-        async () => {
-          const teamIds = appState.teams.map((t) => t.id);
-          const matchIds = appState.matches.map((m) => m.id);
-          appState.teams = [];
-          appState.matches = [];
-          saveLocalBackup();
-          renderAll();
-          showToast('সব দল ও ম্যাচ মুছে ফেলা হয়েছে। এখন নতুন দল যোগ করুন।', 'info');
-
-          if (currentUser && db) {
-            try {
-              for (const tid of teamIds) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ludo_teams', tid));
-              }
-              for (const mid of matchIds) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ludo_matches', mid));
-              }
-            } catch (err) {}
-          }
-        }
-      );
-    });
-
-    // =========================================================
-    // SHARE LINK & CLEAN index.html DOWNLOAD
-    // =========================================================
-    function copyResultLink() {
-      const shareUrl = window.location.href.split('#')[0];
-      const tempInput = document.createElement('input');
-      tempInput.value = shareUrl;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      tempInput.setSelectionRange(0, 99999);
-      try {
-        document.execCommand('copy');
-        showToast('ফলাফলের লিংক কপি হয়েছে! এখন গ্রুপে শেয়ার করুন।', 'success');
-      } catch (err) {
-        showToast('লিংক কপি করা যায়নি। ব্রাউজার থেকে কপি করুন।', 'error');
-      }
-      document.body.removeChild(tempInput);
-    }
-
-    document.getElementById('copy-permanent-link-btn').addEventListener('click', copyResultLink);
-    document.getElementById('admin-copy-link-btn').addEventListener('click', copyResultLink);
-
-    // Download clean index.html snapshot (resets dynamic DOM state so downloaded file boots cleanly)
-    document.getElementById('download-index-btn').addEventListener('click', () => {
-      const cloneDoc = document.documentElement.cloneNode(true);
-      // Clean dynamic toast/table containers in cloned DOM so downloaded file is pristine
-      const toastEl = cloneDoc.querySelector('#toast-container');
-      if (toastEl) toastEl.innerHTML = '';
-      const tbodyEl = cloneDoc.querySelector('#standings-tbody');
-      if (tbodyEl) tbodyEl.innerHTML = '';
-      const pubMatchesEl = cloneDoc.querySelector('#public-matches-list');
-      if (pubMatchesEl) pubMatchesEl.innerHTML = '';
-      const admMatchesEl = cloneDoc.querySelector('#admin-matches-list');
-      if (admMatchesEl) admMatchesEl.innerHTML = '';
-      const admTeamsEl = cloneDoc.querySelector('#admin-teams-list');
-      if (admTeamsEl) admTeamsEl.innerHTML = '';
-
-      // Ensure exported file always starts on Public Results view & locked Admin view
-      const pageResultsEl = cloneDoc.querySelector('#page-results');
-      const pageAdminEl = cloneDoc.querySelector('#page-admin');
-      if (pageResultsEl) pageResultsEl.classList.remove('hidden');
-      if (pageAdminEl) pageAdminEl.classList.add('hidden');
-
-      const lockScreenEl = cloneDoc.querySelector('#admin-lock-screen');
-      const unlockedEl = cloneDoc.querySelector('#admin-unlocked-content');
-      if (lockScreenEl) lockScreenEl.classList.remove('hidden');
-      if (unlockedEl) unlockedEl.classList.add('hidden');
-      const teamModalEl = cloneDoc.querySelector('#team-history-modal');
-      if (teamModalEl) teamModalEl.classList.add('hidden');
-
-      const htmlContent = '<!DOCTYPE html>\n' + cloneDoc.outerHTML;
-      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'index.html';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showToast('index.html ডাউনলোড হয়েছে! এটি GitHub Pages-এ আপলোড করুন।', 'success');
-    });
-
-    // =========================================================
-    // FIREBASE REAL-TIME INITIALIZATION (WITH OFFLINE FALLBACK)
-    // =========================================================
-    async function initApp() {
-      const hadLocalData = loadLocalBackup();
-      if (!hadLocalData) {
-        // Seed 4 sample Bengali Ludo teams on fresh start
-        appState.teams = [...SAMPLE_TEAMS];
-        saveLocalBackup();
-      }
-      renderAll();
-
-      if (!firebaseConfig) {
-        setSyncStatus(false, 'লোকাল মোড চালু');
-        return;
-      }
-
-      try {
-        const app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-
-        // RULE 3: Authenticate BEFORE any Firestore queries
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
+        // Admin Teams List (With Edit Name & Delete)
+        const teamsListEl = document.getElementById('admin-teams-list');
+        if (appState.teams.length === 0) {
+          teamsListEl.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">কোনো দল নেই। উপরে নাম লিখে দল যোগ করুন অথবা নিচ থেকে ডিফল্ট ৮টি দল ফিরিয়ে আনুন।</p>`;
         } else {
-          await signInAnonymously(auth);
+          teamsListEl.innerHTML = appState.teams
+            .map((t, idx) => {
+              const color = t.color || TEAM_COLORS[idx % TEAM_COLORS.length];
+              return `
+                <div class="flex items-center justify-between gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                  <div class="flex items-center gap-2 min-w-0 flex-1">
+                    <span class="w-3.5 h-3.5 rounded-full shrink-0" style="background-color:${color}"></span>
+                    <input
+                      type="text"
+                      data-edit-team-input="${t.id}"
+                      value="${escapeHtml(t.name)}"
+                      class="w-full bg-transparent font-bold text-sm text-slate-800 px-1.5 py-0.5 rounded border border-transparent focus:bg-white focus:border-indigo-400 focus:outline-none"
+                    />
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      data-save-team="${t.id}"
+                      class="save-team-name-btn px-2 py-1 text-xs font-bold text-indigo-600 hover:bg-indigo-100 rounded-lg transition"
+                      title="নাম সেভ করুন"
+                    >
+                      সেভ
+                    </button>
+                    <button
+                      type="button"
+                      data-delete-team="${t.id}"
+                      class="delete-team-btn px-2 py-1 text-xs font-bold text-rose-600 hover:bg-rose-100 rounded-lg transition"
+                    >
+                      মুছুন
+                    </button>
+                  </div>
+                </div>
+              `;
+            })
+            .join('');
+
+          teamsListEl.querySelectorAll('.save-team-name-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const teamId = btn.getAttribute('data-save-team');
+              const inputEl = teamsListEl.querySelector(`[data-edit-team-input="${teamId}"]`);
+              if (inputEl) {
+                renameTeam(teamId, inputEl.value.trim());
+              }
+            });
+          });
+
+          teamsListEl.querySelectorAll('.delete-team-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              deleteTeam(btn.getAttribute('data-delete-team'));
+            });
+          });
         }
-        currentUser = auth.currentUser;
-        if (!currentUser) {
-          setSyncStatus(false, 'অফলাইন মোড চালু');
+
+        // Admin Match History List
+        const adminMatchesEl = document.getElementById('admin-matches-list');
+        const emptyAdminMatches = document.getElementById('empty-admin-matches');
+
+        if (appState.matches.length === 0) {
+          adminMatchesEl.innerHTML = '';
+          emptyAdminMatches.classList.remove('hidden');
+        } else {
+          emptyAdminMatches.classList.add('hidden');
+          const sorted = [...appState.matches].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+          adminMatchesEl.innerHTML = sorted
+            .map((m, idx) => {
+              const matchNo = sorted.length - idx;
+              const wName = getTeamNameById(m.winnerId, m.winnerName);
+              const lName = getTeamNameById(m.loserId, m.loserName);
+              const tokens = Number(m.remainingTokens) || 1;
+              const timeLabel = m.playedAtText || formatBengaliDateTime(m.createdAt);
+              return `
+                <div class="p-3.5 sm:px-5 flex items-center justify-between gap-3 hover:bg-slate-50 transition">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="text-xs font-bold px-2 py-0.5 bg-slate-200 text-slate-700 rounded">#${toBn(matchNo)}</span>
+                      <span class="font-bold text-sm text-emerald-700">🏆 ${escapeHtml(wName)}</span>
+                      <span class="text-xs text-slate-400">বনাম</span>
+                      <span class="font-semibold text-sm text-slate-600">${escapeHtml(lName)}</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">
+                      বিজয়ী: +২ পয়েন্ট, +${toBn(tokens)} রান রেট &bull; পরাজিত: -${toBn(tokens)} রান রেট
+                    </p>
+                    ${timeLabel ? `<p class="text-[11px] text-slate-400 mt-0.5">🕒 ${escapeHtml(timeLabel)}</p>` : ''}
+                  </div>
+                  <button
+                    type="button"
+                    data-delete-match="${m.id}"
+                    class="delete-match-btn px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition shrink-0"
+                  >
+                    মুছুন
+                  </button>
+                </div>
+              `;
+            })
+            .join('');
+
+          adminMatchesEl.querySelectorAll('.delete-match-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              deleteMatch(btn.getAttribute('data-delete-match'));
+            });
+          });
+        }
+      }
+
+      function updateMatchFormUI() {
+        const selectA = document.getElementById('select-team-a');
+        const selectB = document.getElementById('select-team-b');
+        const idA = selectA.value;
+        const idB = selectB.value;
+
+        const nameA = idA ? getTeamNameById(idA, 'দল ১') : 'দল ১';
+        const nameB = idB ? getTeamNameById(idB, 'দল ২') : 'দল ২';
+
+        document.getElementById('label-winner-a').textContent = nameA;
+        document.getElementById('label-winner-b').textContent = nameB;
+
+        const cardA = document.getElementById('winner-card-a');
+        const cardB = document.getElementById('winner-card-b');
+        const badgeA = document.getElementById('badge-winner-a');
+        const badgeB = document.getElementById('badge-winner-b');
+        const radioA = document.getElementById('radio-winner-a');
+        const radioB = document.getElementById('radio-winner-b');
+
+        if (selectedWinnerSide === 'A') {
+          radioA.checked = true;
+          cardA.className = 'cursor-pointer border-2 border-emerald-500 bg-emerald-50/60 rounded-xl p-3.5 flex items-center justify-between transition';
+          cardB.className = 'cursor-pointer border-2 border-slate-200 bg-white rounded-xl p-3.5 flex items-center justify-between transition';
+          badgeA.classList.remove('hidden');
+          badgeB.classList.add('hidden');
+        } else {
+          radioB.checked = true;
+          cardB.className = 'cursor-pointer border-2 border-emerald-500 bg-emerald-50/60 rounded-xl p-3.5 flex items-center justify-between transition';
+          cardA.className = 'cursor-pointer border-2 border-slate-200 bg-white rounded-xl p-3.5 flex items-center justify-between transition';
+          badgeB.classList.remove('hidden');
+          badgeA.classList.add('hidden');
+        }
+
+        const tokensVal = Math.max(1, Number(document.getElementById('remaining-tokens-input').value) || 1);
+        document.querySelectorAll('.token-btn').forEach((btn) => {
+          const val = Number(btn.getAttribute('data-token'));
+          if (val === tokensVal) {
+            btn.className = 'token-btn py-2.5 rounded-xl font-bold border-2 border-indigo-600 bg-indigo-600 text-white shadow-xs transition';
+          } else {
+            btn.className = 'token-btn py-2.5 rounded-xl font-bold border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-800 transition';
+          }
+        });
+
+        const warningEl = document.getElementById('same-team-warning');
+        const submitBtn = document.getElementById('submit-match-btn');
+        const previewEl = document.getElementById('preview-details');
+
+        if (!idA || !idB || appState.teams.length < 2) {
+          warningEl.classList.add('hidden');
+          submitBtn.disabled = true;
+          previewEl.innerHTML = `<p class="text-slate-500">ফলাফল হিসাব করতে কমপক্ষে ২টি দল যোগ করুন।</p>`;
           return;
         }
 
-        // RULE 1: Strict /artifacts/{appId}/public/data/{collectionName} paths
-        const metaDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'ludo_meta', 'config');
-        const teamsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'ludo_teams');
-        const matchesColRef = collection(db, 'artifacts', appId, 'public', 'data', 'ludo_matches');
-
-        // Seed sample teams to cloud only if cloud is completely empty on first launch
-        const metaSnap = await getDoc(metaDocRef);
-        if (!metaSnap.exists()) {
-          await setDoc(metaDocRef, {
-            tournamentName: appState.tournamentName,
-            adminPin: appState.adminPin
-          });
-          const existingTeamsSnap = await getDocs(teamsColRef);
-          if (existingTeamsSnap.empty && appState.teams.length > 0) {
-            for (const t of appState.teams) {
-              await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ludo_teams', t.id), t);
-            }
-          }
+        if (idA === idB) {
+          warningEl.classList.remove('hidden');
+          submitBtn.disabled = true;
+          previewEl.innerHTML = `<p class="text-rose-600 font-semibold">দুটি ভিন্ন দল নির্বাচন করুন।</p>`;
+          return;
         }
 
-        // Real-time Listener 1: Config (Tournament Name & Admin PIN)
-        onSnapshot(
-          metaDocRef,
-          (snap) => {
-            if (snap.exists()) {
-              const data = snap.data();
-              if (data.tournamentName) appState.tournamentName = data.tournamentName;
-              if (data.adminPin) appState.adminPin = String(data.adminPin);
-              saveLocalBackup();
-              renderAll();
-              if (activeTab === 'admin') updateAdminLockVisibility();
-            }
-            setSyncStatus(true, 'লাইভ সিঙ্ক চালু আছে');
-          },
-          (err) => {
-            console.error('Meta snapshot error:', err);
-            setSyncStatus(false, 'লোকাল ব্যাকআপ চালু');
-          }
-        );
+        warningEl.classList.add('hidden');
+        submitBtn.disabled = false;
 
-        // Real-time Listener 2: Teams Collection (RULE 2: Simple collection query, sort in memory)
-        onSnapshot(
-          teamsColRef,
-          (querySnap) => {
-            const loadedTeams = [];
-            querySnap.forEach((docItem) => {
-              loadedTeams.push(docItem.data());
-            });
-            loadedTeams.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-            appState.teams = loadedTeams;
-            saveLocalBackup();
-            renderAll();
-          },
-          (err) => {
-            console.error('Teams snapshot error:', err);
-          }
-        );
+        const winnerName = selectedWinnerSide === 'A' ? nameA : nameB;
+        const loserName = selectedWinnerSide === 'A' ? nameB : nameA;
 
-        // Real-time Listener 3: Matches Collection (RULE 2: Simple collection query, sort in memory)
-        onSnapshot(
-          matchesColRef,
-          (querySnap) => {
-            const loadedMatches = [];
-            querySnap.forEach((docItem) => {
-              loadedMatches.push(docItem.data());
-            });
-            loadedMatches.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-            appState.matches = loadedMatches;
-            saveLocalBackup();
-            renderAll();
-          },
-          (err) => {
-            console.error('Matches snapshot error:', err);
-          }
-        );
-      } catch (err) {
-        console.error('Firebase init fallback:', err);
-        setSyncStatus(false, 'লোকাল মোড চালু');
+        previewEl.innerHTML = `
+          <p class="text-emerald-700 font-bold">✅ ${escapeHtml(winnerName)} (জয়ী): +২ পয়েন্ট এবং +${toBn(tokensVal)} রান রেট পাবে</p>
+          <p class="text-rose-600 font-semibold">❌ ${escapeHtml(loserName)} (পরাজিত): ০ পয়েন্ট এবং -${toBn(tokensVal)} রান রেট পাবে</p>
+        `;
       }
-    }
 
-    initApp();
+      document.getElementById('select-team-a').addEventListener('change', updateMatchFormUI);
+      document.getElementById('select-team-b').addEventListener('change', updateMatchFormUI);
+
+      document.getElementById('radio-winner-a').addEventListener('change', () => {
+        selectedWinnerSide = 'A';
+        updateMatchFormUI();
+      });
+      document.getElementById('radio-winner-b').addEventListener('change', () => {
+        selectedWinnerSide = 'B';
+        updateMatchFormUI();
+      });
+
+      document.querySelectorAll('.token-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.getElementById('remaining-tokens-input').value = btn.getAttribute('data-token');
+          updateMatchFormUI();
+        });
+      });
+
+      document.getElementById('remaining-tokens-input').addEventListener('input', updateMatchFormUI);
+
+      function renderAll() {
+        renderPublicView();
+        renderAdminView();
+        if (currentlyViewedTeamId && !document.getElementById('team-history-modal').classList.contains('hidden')) {
+          openTeamHistoryModal(currentlyViewedTeamId);
+        }
+      }
+
+      // =========================================================
+      // CLOUD-SYNCED CRUD OPERATIONS
+      // =========================================================
+
+      // 1. Add New Team
+      document.getElementById('add-team-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const input = document.getElementById('new-team-name');
+        const name = input.value.trim();
+        if (!name) return;
+
+        if (appState.teams.some((t) => t.name.toLowerCase() === name.toLowerCase())) {
+          showToast('এই নামে ইতিমধ্যে একটি দল আছে!', 'error');
+          return;
+        }
+
+        const newTeam = {
+          id: 'team_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+          name,
+          color: TEAM_COLORS[appState.teams.length % TEAM_COLORS.length],
+          createdAt: Date.now()
+        };
+
+        input.value = '';
+        const nextState = {
+          ...appState,
+          teams: [...appState.teams, newTeam]
+        };
+        await pushStateToCloud(nextState);
+        showToast(`নতুন দল "${name}" লাইভ যোগ হয়েছে!`, 'success');
+      });
+
+      // 2. Rename Team
+      async function renameTeam(teamId, newName) {
+        if (!newName) {
+          showToast('দলের নাম খালি রাখা যাবে না।', 'error');
+          return;
+        }
+        const nextTeams = appState.teams.map((t) => (t.id === teamId ? { ...t, name: newName } : t));
+        await pushStateToCloud({ ...appState, teams: nextTeams });
+        showToast('দলের নাম আপডেট হয়েছে!', 'success');
+      }
+
+      // 3. Delete Team
+      function deleteTeam(teamId) {
+        const team = appState.teams.find((t) => t.id === teamId);
+        if (!team) return;
+
+        openConfirmModal(
+          'দল মুছে ফেলুন',
+          `আপনি কি নিশ্চিতভাবে "${team.name}" দলটি মুছে ফেলতে চান?`,
+          async () => {
+            const nextTeams = appState.teams.filter((t) => t.id !== teamId);
+            await pushStateToCloud({ ...appState, teams: nextTeams });
+            showToast(`"${team.name}" দলটি মুছে ফেলা হয়েছে।`, 'info');
+          }
+        );
+      }
+
+      // 4. Record Match Result
+      document.getElementById('match-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const idA = document.getElementById('select-team-a').value;
+        const idB = document.getElementById('select-team-b').value;
+        if (!idA || !idB || idA === idB) return;
+
+        const winnerId = selectedWinnerSide === 'A' ? idA : idB;
+        const loserId = selectedWinnerSide === 'A' ? idB : idA;
+        const winnerName = getTeamNameById(winnerId, 'বিজয়ী দল');
+        const loserName = getTeamNameById(loserId, 'পরাজিত দল');
+        const remainingTokens = Math.max(1, Number(document.getElementById('remaining-tokens-input').value) || 1);
+        const nowTimestamp = Date.now();
+        const playedAtText = formatBengaliDateTime(nowTimestamp);
+
+        const newMatch = {
+          id: 'match_' + nowTimestamp + '_' + Math.floor(Math.random() * 1000),
+          teamAId: idA,
+          teamBId: idB,
+          winnerId,
+          loserId,
+          winnerName,
+          loserName,
+          remainingTokens,
+          createdAt: nowTimestamp,
+          playedAtText
+        };
+
+        const nextState = {
+          ...appState,
+          matches: [...appState.matches, newMatch]
+        };
+
+        await pushStateToCloud(nextState);
+        showToast(`লাইভ ফলাফল সেভ হয়েছে! ${winnerName} (+২ পয়েন্ট, +${toBn(remainingTokens)} রান রেট)`, 'success');
+      });
+
+      // 5. Delete Match (Recalculates points & NRR automatically)
+      function deleteMatch(matchId) {
+        openConfirmModal(
+          'ম্যাচের ফলাফল মুছুন',
+          'এই ম্যাচটি মুছে ফেললে দুটি দলের পয়েন্ট ও রান রেট অটোমেটিক আগের অবস্থায় ফিরে যাবে। আপনি কি নিশ্চিত?',
+          async () => {
+            const nextMatches = appState.matches.filter((m) => m.id !== matchId);
+            await pushStateToCloud({ ...appState, matches: nextMatches });
+            showToast('ম্যাচটি মুছে ফেলা হয়েছে এবং লাইভ পয়েন্ট টেবিল আপডেট করা হয়েছে।', 'info');
+          }
+        );
+      }
+
+      // 6. Save Tournament Title
+      document.getElementById('save-title-btn').addEventListener('click', async () => {
+        const newTitle = document.getElementById('settings-tournament-name').value.trim();
+        if (!newTitle) {
+          showToast('টুর্নামেন্টের নাম খালি রাখা যাবে না।', 'error');
+          return;
+        }
+        await pushStateToCloud({ ...appState, tournamentName: newTitle });
+        showToast('টুর্নামেন্টের নাম আপডেট হয়েছে!', 'success');
+      });
+
+      // 7. Save Admin PIN
+      document.getElementById('save-pin-btn').addEventListener('click', async () => {
+        const newPin = document.getElementById('settings-admin-pin').value.trim();
+        if (newPin.length < 4) {
+          showToast('পিন কোড কমপক্ষে ৪ সংখ্যার হতে হবে।', 'error');
+          return;
+        }
+        await pushStateToCloud({ ...appState, adminPin: newPin });
+        showToast(`নতুন পিন (${newPin}) স্থায়ীভাবে ক্লাউডে সেভ হয়েছে!`, 'success');
+      });
+
+      // 8. Reset Matches Only (Keep 8 teams)
+      document.getElementById('reset-matches-btn').addEventListener('click', () => {
+        openConfirmModal(
+          'সব ম্যাচ রিসেট করুন',
+          '৮টি দলের নাম ও আপনার পিন ঠিক থাকবে, কিন্তু সব ম্যাচের ফলাফল মুছে গিয়ে পয়েন্ট ও রান রেট ০ হয়ে যাবে। নিশ্চিত?',
+          async () => {
+            await pushStateToCloud({ ...appState, matches: [] });
+            showToast('সব ম্যাচ মুছে পয়েন্ট টেবিল ০ করা হয়েছে।', 'info');
+          }
+        );
+      });
+
+      // 9. Restore Default 8 Teams
+      document.getElementById('restore-default-teams-btn').addEventListener('click', () => {
+        openConfirmModal(
+          'ডিফল্ট ৮টি দল ফিরিয়ে আনুন',
+          'আপনি কি নির্ধারিত ৮টি দল (চেল্লু ও গালিব, নওশাদ ও ছোটন, নয়ন ও নাঈম, মারুফ ও মাসুম, মোহন ও নান্টু, রনি ও মিশু, রাবু ও মিলন, রোমান ও তনু) ফিরিয়ে আনতে চান?',
+          async () => {
+            await pushStateToCloud({
+              ...appState,
+              teams: buildDefaultTeamsList(),
+              matches: []
+            });
+            showToast('নির্ধারিত ৮টি দল সফলভাবে লোড করা হয়েছে!', 'success');
+          }
+        );
+      });
+
+      // 10. Full Reset (Empty All Teams & Matches, Keep Custom PIN)
+      document.getElementById('reset-all-btn').addEventListener('click', () => {
+        openConfirmModal(
+          'সব ডাটা মুছে খালি করুন',
+          'সকল দল ও ম্যাচের ফলাফল মুছে যাবে (আপনার সেট করা অ্যাডমিন পিন সুরক্ষিত থাকবে)। আপনি কি নিশ্চিত?',
+          async () => {
+            await pushStateToCloud({
+              ...appState,
+              teams: [],
+              matches: []
+            });
+            showToast('সব ডাটা মুছে ফেলা হয়েছে!', 'info');
+          }
+        );
+      });
+
+      // =========================================================
+      // PERMANENT CLEAN URL COPY & STANDALONE index.html DOWNLOAD
+      // =========================================================
+      function copyPermanentLink() {
+        const cleanPermanentUrl = window.location.origin + window.location.pathname;
+        const tempInput = document.createElement('input');
+        tempInput.value = cleanPermanentUrl;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        tempInput.setSelectionRange(0, 999999);
+        try {
+          document.execCommand('copy');
+          showToast('স্থায়ী লিংক কপি হয়েছে! একবার গ্রুপে শেয়ার করলেই সবাই লাইভ আপডেট দেখতে পাবে।', 'success');
+        } catch (err) {
+          showToast('লিংক কপি করা যায়নি। ব্রাউজারের অ্যাড্রেস বার থেকে লিংকটি কপি করুন।', 'error');
+        }
+        document.body.removeChild(tempInput);
+      }
+
+      document.getElementById('copy-permanent-link-btn').addEventListener('click', copyPermanentLink);
+      document.getElementById('admin-copy-link-btn').addEventListener('click', copyPermanentLink);
+
+      document.getElementById('manual-refresh-btn').addEventListener('click', async () => {
+        showToast('লাইভ ডাটা চেক করা হচ্ছে...', 'info');
+        await fetchStateFromCloud(false);
+        showToast('সর্বশেষ লাইভ ফলাফল আপডেট হয়েছে!', 'success');
+      });
+
+      // Export clean self-contained index.html for GitHub Pages upload
+      document.getElementById('download-index-btn').addEventListener('click', () => {
+        const cloneDoc = document.documentElement.cloneNode(true);
+
+        const toastEl = cloneDoc.querySelector('#toast-container');
+        if (toastEl) toastEl.innerHTML = '';
+        const tbodyEl = cloneDoc.querySelector('#standings-tbody');
+        if (tbodyEl) tbodyEl.innerHTML = '';
+        const pubMatchesEl = cloneDoc.querySelector('#public-matches-list');
+        if (pubMatchesEl) pubMatchesEl.innerHTML = '';
+        const admMatchesEl = cloneDoc.querySelector('#admin-matches-list');
+        if (admMatchesEl) admMatchesEl.innerHTML = '';
+        const admTeamsEl = cloneDoc.querySelector('#admin-teams-list');
+        if (admTeamsEl) admTeamsEl.innerHTML = '';
+
+        const pageResultsEl = cloneDoc.querySelector('#page-results');
+        const pageAdminEl = cloneDoc.querySelector('#page-admin');
+        if (pageResultsEl) pageResultsEl.classList.remove('hidden');
+        if (pageAdminEl) pageAdminEl.classList.add('hidden');
+
+        const lockScreenEl = cloneDoc.querySelector('#admin-lock-screen');
+        const unlockedEl = cloneDoc.querySelector('#admin-unlocked-content');
+        if (lockScreenEl) lockScreenEl.classList.remove('hidden');
+        if (unlockedEl) unlockedEl.classList.add('hidden');
+        const teamModalEl = cloneDoc.querySelector('#team-history-modal');
+        if (teamModalEl) teamModalEl.classList.add('hidden');
+
+        const htmlContent = '<!DOCTYPE html>\n' + cloneDoc.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('index.html ডাউনলোড হয়েছে! এখন এটি GitHub-এ আপলোড করুন।', 'success');
+      });
+
+      // =========================================================
+      // INITIALIZE APP & START 4-SECOND LIVE CLOUD POLLING
+      // =========================================================
+      const cached = loadLocalCache();
+      if (cached) {
+        appState = cached;
+      } else {
+        appState = createDefaultState('1234');
+      }
+      lastKnownSignature = computeSignature(appState);
+      renderAll();
+
+      // Fetch live state from cloud immediately on load, then poll every 4 seconds
+      fetchStateFromCloud(true);
+      setInterval(() => {
+        fetchStateFromCloud(false);
+      }, 4000);
+
+      // Also sync immediately when user switches back to the browser tab
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          fetchStateFromCloud(false);
+        }
+      });
+    })();
   </script>
 </body>
 </html>
