@@ -54,7 +54,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col text-slate-800 pb-24 sm:pb-10">
+<body id="app-body" class="min-h-screen flex flex-col text-slate-800 pb-10">
 
   <!-- Top 4-Color Ludo Accent Bar -->
   <div class="h-1.5 w-full ludo-gradient no-print"></div>
@@ -81,7 +81,7 @@
     </div>
   </div>
 
-  <!-- Team Match History Modal (Opens when clicking any team row/name) -->
+  <!-- Team Match History Modal (Available in both Public and Admin modes) -->
   <div id="team-history-modal" class="fixed inset-0 z-50 hidden bg-slate-900/65 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-slate-200 fade-in overflow-hidden">
       <!-- Modal Header -->
@@ -146,37 +146,52 @@
         </div>
       </div>
 
-      <!-- Desktop Navigation Tabs -->
-      <nav class="hidden sm:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 no-print">
+      <!-- Desktop Navigation Tabs (ONLY VISIBLE IN ADMIN MODE ?admin=1) -->
+      <nav id="desktop-admin-nav" class="hidden items-center bg-slate-100 p-1 rounded-xl border border-slate-200 no-print">
         <button
           id="nav-results-desktop"
           type="button"
-          class="flex items-center gap-1.5 px-4 py-2 rounded-lg font-bold text-sm transition tab-active"
+          class="flex items-center gap-1.5 px-4 py-2 rounded-lg font-bold text-sm transition tab-inactive"
         >
           <span>🏆 ফলাফল শিট</span>
         </button>
         <button
           id="nav-admin-desktop"
           type="button"
-          class="flex items-center gap-1.5 px-4 py-2 rounded-lg font-bold text-sm transition tab-inactive"
+          class="flex items-center gap-1.5 px-4 py-2 rounded-lg font-bold text-sm transition tab-active"
         >
           <span>🛡️ অ্যাডমিন প্যানেল</span>
         </button>
       </nav>
 
-      <!-- Direct index.html Download Button -->
-      <button
-        id="download-index-btn"
-        type="button"
-        title="GitHub Pages-এ আপলোডের জন্য index.html ডাউনলোড করুন"
-        class="no-print flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition active:scale-95 shrink-0"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
-        </svg>
-        <span class="hidden md:inline">অ্যাপ সেভ (index.html)</span>
-        <span class="md:hidden">index.html</span>
-      </button>
+      <!-- Header Right Actions -->
+      <div class="flex items-center gap-2 shrink-0 no-print">
+        <!-- Public Mode Header Copy Link Button -->
+        <button
+          id="header-public-copy-btn"
+          type="button"
+          class="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition active:scale-95"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+          </svg>
+          <span>লিংক কপি করুন</span>
+        </button>
+
+        <!-- Admin Mode Header index.html Download Button (HIDDEN IN PUBLIC MODE) -->
+        <button
+          id="download-index-btn"
+          type="button"
+          title="GitHub Pages-এ আপলোডের জন্য index.html ডাউনলোড করুন"
+          class="hidden items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition active:scale-95"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+          </svg>
+          <span class="hidden md:inline">index.html ডাউনলোড</span>
+          <span class="md:hidden">index.html</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -188,7 +203,7 @@
     <!-- ========================================================= -->
     <section id="page-results" class="fade-in space-y-4 sm:space-y-5">
 
-      <!-- Permanent Link Share Banner -->
+      <!-- Public Leaderboard Header Card -->
       <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div class="flex flex-wrap items-center gap-2 mb-1">
@@ -205,14 +220,14 @@
 
         <div class="flex flex-wrap items-center gap-2 no-print">
           <button
-            id="copy-permanent-link-btn"
+            id="copy-public-link-btn"
             type="button"
             class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-xs transition active:scale-95"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
-            <span>স্থায়ী লিংক কপি করুন</span>
+            <span>ফলাফলের লিংক কপি করুন</span>
           </button>
           <button
             id="manual-refresh-btn"
@@ -245,7 +260,7 @@
         </div>
       </div>
 
-      <!-- Standings Table (Full Team Names Guaranteed Without Truncation) -->
+      <!-- Standings Table -->
       <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div class="px-3.5 sm:px-5 py-3.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/70">
           <h3 class="font-bold text-slate-800 flex items-center gap-2 text-base">
@@ -273,7 +288,7 @@
           </table>
         </div>
         <div id="empty-teams-msg" class="hidden p-8 text-center text-slate-500 text-sm">
-          এখনো কোনো দল যোগ করা হয়নি। <strong>অ্যাডমিন প্যানেল</strong> থেকে দল যোগ করুন।
+          এখনো কোনো দল যোগ করা হয়নি।
         </div>
       </div>
 
@@ -287,14 +302,14 @@
         </div>
         <div id="public-matches-list" class="divide-y divide-slate-100"></div>
         <div id="empty-public-matches" class="p-8 text-center text-slate-500 text-sm">
-          এখনো কোনো ম্যাচ খেলা হয়নি। অ্যাডমিন প্যানেল থেকে ফলাফল দিলে এখানে দেখা যাবে।
+          এখনো কোনো ম্যাচ খেলা হয়নি। ফলাফল আপডেট হলে এখানে দেখা যাবে।
         </div>
       </div>
     </section>
 
 
     <!-- ========================================================= -->
-    <!-- VIEW 2: ADMIN PANEL                                       -->
+    <!-- VIEW 2: PRIVATE ADMIN PANEL (ONLY LOADED WHEN ?admin=1)   -->
     <!-- ========================================================= -->
     <section id="page-admin" class="hidden fade-in space-y-5">
 
@@ -303,7 +318,7 @@
         <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-3xl shadow-xs">
           🔐
         </div>
-        <h2 class="text-2xl font-bold text-slate-900 mb-1">অ্যাডমিন প্যানেল প্রবেশ</h2>
+        <h2 class="text-2xl font-bold text-slate-900 mb-1">প্রাইভেট অ্যাডমিন প্যানেল</h2>
         <p class="text-sm text-slate-600 mb-5">
           ম্যাচের ফলাফল ও দল পরিচালনা করতে আপনার গোপন পিন কোডটি দিন।
           <span id="pin-hint-box" class="block mt-1 text-xs font-semibold text-indigo-600">
@@ -355,16 +370,9 @@
               <span class="text-xs text-emerald-300 font-semibold">● লাইভ অটো ক্যালকুলেশন ও ক্লাউড সিঙ্ক</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-bold">ম্যাচের ফলাফল ও দল পরিচালনা</h2>
-            <p class="text-xs sm:text-sm text-slate-300 mt-0.5">এখানে ফলাফল সেভ করলেই সবার ফোনে থাকা স্থায়ী লিংকে পয়েন্ট ও রান রেট অটো আপডেট হবে।</p>
+            <p class="text-xs sm:text-sm text-slate-300 mt-0.5">এখানে ফলাফল সেভ করলেই পাবলিক ফলাফল লিংকে পয়েন্ট ও রান রেট অটো আপডেট হবে।</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button
-              id="admin-copy-link-btn"
-              type="button"
-              class="flex items-center gap-1.5 px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs sm:text-sm rounded-xl transition"
-            >
-              <span>🔗 স্থায়ী লিংক কপি</span>
-            </button>
             <button
               id="lock-admin-btn"
               type="button"
@@ -372,6 +380,49 @@
             >
               <span>🔒 লক করুন</span>
             </button>
+          </div>
+        </div>
+
+        <!-- Dedicated Dual Link Copy & Share Box -->
+        <div class="bg-white rounded-2xl border-2 border-indigo-100 shadow-xs p-4 sm:p-5 space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🔗</span>
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-slate-900">লিংক কপি ও শেয়ার (আলাদা দুটি লিংক)</h3>
+              <p class="text-xs text-slate-500">সবার জন্য শুধু ফলাফলের লিংক দিন, আর নিজের ফোনে অ্যাডমিন লিংকটি সেভ রাখুন</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+            <!-- Public Link Card -->
+            <div class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 flex flex-col justify-between gap-2.5">
+              <div>
+                <span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white mb-1">সবার জন্য (শুধু ফলাফল দেখাবে)</span>
+                <p id="display-public-url" class="text-xs font-mono text-slate-700 break-all bg-white px-2.5 py-1.5 rounded-lg border border-emerald-200"></p>
+              </div>
+              <button
+                id="admin-copy-public-link-btn"
+                type="button"
+                class="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition active:scale-95"
+              >
+                📢 পাবলিক ফলাফল লিংক কপি করুন (সবার জন্য)
+              </button>
+            </div>
+
+            <!-- Private Admin Link Card -->
+            <div class="p-3.5 rounded-xl bg-indigo-50/70 border border-indigo-200 flex flex-col justify-between gap-2.5">
+              <div>
+                <span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded bg-indigo-600 text-white mb-1">শুধু আপনার জন্য (ফলাফল + অ্যাডমিন)</span>
+                <p id="display-admin-url" class="text-xs font-mono text-slate-700 break-all bg-white px-2.5 py-1.5 rounded-lg border border-indigo-200"></p>
+              </div>
+              <button
+                id="admin-copy-private-link-btn"
+                type="button"
+                class="w-full py-2.5 px-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition active:scale-95"
+              >
+                🔐 আপনার অ্যাডমিন লিংক কপি করুন (শুধু আপনার জন্য)
+              </button>
+            </div>
           </div>
         </div>
 
@@ -472,7 +523,7 @@
                     <button type="button" data-token="6" class="token-btn py-2.5 rounded-xl font-bold border border-slate-300 bg-slate-50 text-slate-800 transition">৬</button>
                   </div>
 
-                  <!-- Custom Number Input for >6 tokens (e.g., 7 or 8 tokens in 2-player team Ludo) -->
+                  <!-- Custom Number Input for >6 tokens -->
                   <div class="flex items-center gap-2.5">
                     <span class="text-xs text-slate-500">৬-এর বেশি হলে লিখুন:</span>
                     <input
@@ -635,12 +686,12 @@
 
   </main>
 
-  <!-- Mobile Bottom Navigation Bar -->
-  <nav class="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] flex items-center justify-around p-1.5 no-print">
+  <!-- Mobile Bottom Navigation Bar (ONLY VISIBLE IN ADMIN MODE ?admin=1) -->
+  <nav id="mobile-admin-nav" class="hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] items-center justify-around p-1.5 no-print">
     <button
       id="nav-results-mobile"
       type="button"
-      class="flex-1 flex flex-col items-center justify-center py-2 rounded-xl font-bold text-xs transition tab-active"
+      class="flex-1 flex flex-col items-center justify-center py-2 rounded-xl font-bold text-xs transition tab-inactive"
     >
       <span class="text-base leading-none mb-1">🏆</span>
       <span>ফলাফল শিট</span>
@@ -649,7 +700,7 @@
     <button
       id="nav-admin-mobile"
       type="button"
-      class="flex-1 flex flex-col items-center justify-center py-2 rounded-xl font-bold text-xs transition tab-inactive"
+      class="flex-1 flex flex-col items-center justify-center py-2 rounded-xl font-bold text-xs transition tab-active"
     >
       <span class="text-base leading-none mb-1">🛡️</span>
       <span>অ্যাডমিন প্যানেল</span>
@@ -657,21 +708,24 @@
   </nav>
 
   <!-- ========================================================= -->
-  <!-- ZERO-CONFIG REAL-TIME CLOUD REST SYNC + LOCAL FALLBACK    -->
+  <!-- JAVASCRIPT: URL MODE ROUTER + REAL-TIME CLOUD SYNC        -->
   <!-- ========================================================= -->
   <script>
     (function () {
       'use strict';
 
-      // Dedicated Public Cloud REST Endpoint for Cross-Device Live Sync on GitHub Pages
-      const CLOUD_PRIMARY_URL = 'https://ludo-tournament-live-default-rtdb.firebaseio.com/mohon000_ludo_2026.json';
-      const CLOUD_BACKUP_URL = 'https://kvdb.io/A9x7kL2mP4qR8wT1vN5zB3/mohon000_ludo_2026';
+      // CRITICAL MODE & ROUTING CHECK (?admin=1)
+      const isAdminMode = new URLSearchParams(window.location.search).get('admin') === '1';
 
-      const LOCAL_STORAGE_KEY = 'ludo_champ_2026_mohon000_cache_v2';
-      const AUTH_SESSION_KEY = 'ludo_champ_2026_admin_unlocked_v2';
+      // Shared Cloud REST Storage Endpoints (Works reliably on GitHub Pages without blocked SDKs)
+      const CLOUD_PRIMARY_URL = 'https://ludo-tournament-live-default-rtdb.firebaseio.com/mohon000_ludo_champ_2026_v3.json';
+      const CLOUD_BACKUP_URL = 'https://jsonblob.com/api/jsonBlob/1351984726109421568';
+
+      const LOCAL_STORAGE_KEY = 'ludo_champ_2026_mohon000_cache_v3';
+      const AUTH_SESSION_KEY = 'ludo_champ_2026_admin_unlocked_v3';
       const TEAM_COLORS = ['#ef4444', '#22c55e', '#eab308', '#3b82f6', '#8b5cf6', '#ec4899', '#f97316', '#06b6d4'];
 
-      // Official 8 Teams List
+      // Pre-loaded Official 8 Teams List
       const DEFAULT_TEAM_NAMES = [
         'চেল্লু ও গালিব',
         'নওশাদ ও ছোটন',
@@ -705,15 +759,22 @@
 
       // Application State
       let appState = createDefaultState('1234');
-      let activeTab = 'results';
       let selectedWinnerSide = 'A';
       let currentlyViewedTeamId = null;
       let isSavingToCloud = false;
       let lastKnownSignature = '';
 
       // =========================================================
-      // HELPER FUNCTIONS (BENGALI DIGITS & DATE/TIME)
+      // HELPER FUNCTIONS (URLs, BENGALI DIGITS & DATE/TIME)
       // =========================================================
+      function getPublicCleanUrl() {
+        return window.location.origin + window.location.pathname;
+      }
+
+      function getAdminPrivateUrl() {
+        return window.location.origin + window.location.pathname + '?admin=1';
+      }
+
       function toBn(num) {
         const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
         return String(num).replace(/\d/g, (d) => bnDigits[Number(d)]);
@@ -775,12 +836,55 @@
         } else {
           dotEl.className = 'w-2 h-2 rounded-full bg-amber-500';
           textEl.className = 'text-xs font-semibold text-amber-700';
-          textEl.textContent = 'অফলাইন লোকাল ক্যাশ চালু';
+          textEl.textContent = 'লোকাল ক্যাশ চালু';
         }
       }
 
       // =========================================================
-      // CLOUD REST SYNC ENGINE (FETCH GET / PUT + 4s POLLING)
+      // INITIALIZE PUBLIC VS ADMIN UI VISIBILITY
+      // =========================================================
+      function configureModeVisibility() {
+        const bodyEl = document.getElementById('app-body');
+        const desktopAdminNav = document.getElementById('desktop-admin-nav');
+        const mobileAdminNav = document.getElementById('mobile-admin-nav');
+        const downloadIndexBtn = document.getElementById('download-index-btn');
+        const headerPublicCopyBtn = document.getElementById('header-public-copy-btn');
+        const pageResults = document.getElementById('page-results');
+        const pageAdmin = document.getElementById('page-admin');
+
+        if (isAdminMode) {
+          // ADMIN MODE (?admin=1): Show Admin Panel by default + Navigation Tabs + index.html Download
+          bodyEl.classList.add('pb-24');
+          desktopAdminNav.classList.remove('hidden');
+          desktopAdminNav.classList.add('sm:flex');
+          mobileAdminNav.classList.remove('hidden');
+          mobileAdminNav.classList.add('flex', 'sm:hidden');
+          downloadIndexBtn.classList.remove('hidden');
+          downloadIndexBtn.classList.add('flex');
+          headerPublicCopyBtn.classList.add('hidden');
+
+          // Populate URL display boxes inside Admin Panel
+          const pubUrlBox = document.getElementById('display-public-url');
+          const admUrlBox = document.getElementById('display-admin-url');
+          if (pubUrlBox) pubUrlBox.textContent = getPublicCleanUrl();
+          if (admUrlBox) admUrlBox.textContent = getAdminPrivateUrl();
+
+          switchAdminSubTab('admin');
+        } else {
+          // PUBLIC VIEW (Default): Strictly hide all Admin elements & show only Leaderboard
+          bodyEl.classList.remove('pb-24');
+          desktopAdminNav.classList.add('hidden');
+          mobileAdminNav.classList.add('hidden');
+          downloadIndexBtn.classList.add('hidden');
+          headerPublicCopyBtn.classList.remove('hidden');
+
+          pageAdmin.classList.add('hidden');
+          pageResults.classList.remove('hidden');
+        }
+      }
+
+      // =========================================================
+      // CLOUD REST SYNC ENGINE (FETCH GET / PUT + 5s POLLING)
       // =========================================================
       function saveLocalCache(stateObj) {
         try {
@@ -827,34 +931,24 @@
         setSyncStatus('saving');
 
         let synced = false;
-        // 1. Primary Cloud REST Endpoint (Firebase RTDB public JSON)
         try {
           const res = await fetch(CLOUD_PRIMARY_URL, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(appState)
           });
-          if (res.ok) {
-            synced = true;
-          }
-        } catch (err) {
-          console.warn('Primary cloud PUT fallback triggered:', err);
-        }
+          if (res.ok) synced = true;
+        } catch (err) {}
 
-        // 2. Backup Cloud REST Endpoint (kvdb.io) if primary is unreachable
         if (!synced) {
           try {
-            const resBackup = await fetch(CLOUD_BACKUP_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+            const resB = await fetch(CLOUD_BACKUP_URL, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
               body: JSON.stringify(appState)
             });
-            if (resBackup.ok) {
-              synced = true;
-            }
-          } catch (err2) {
-            console.warn('Backup cloud POST fallback triggered:', err2);
-          }
+            if (resB.ok) synced = true;
+          } catch (err2) {}
         }
 
         isSavingToCloud = false;
@@ -868,7 +962,6 @@
         let remoteData = null;
         let fetchedOk = false;
 
-        // Try Primary Cloud REST Endpoint
         try {
           const res = await fetch(`${CLOUD_PRIMARY_URL}?t=${Date.now()}`, {
             method: 'GET',
@@ -882,15 +975,15 @@
             }
           }
         } catch (err) {
-          // Try Backup Cloud REST Endpoint
           try {
-            const resBackup = await fetch(`${CLOUD_BACKUP_URL}?t=${Date.now()}`, {
+            const resB = await fetch(`${CLOUD_BACKUP_URL}?t=${Date.now()}`, {
               method: 'GET',
+              headers: { 'Accept': 'application/json' },
               cache: 'no-store'
             });
-            if (resBackup.ok) {
+            if (resB.ok) {
               fetchedOk = true;
-              const jsonB = await resBackup.json();
+              const jsonB = await resB.json();
               if (jsonB && typeof jsonB === 'object' && Array.isArray(jsonB.teams)) {
                 remoteData = jsonB;
               }
@@ -915,8 +1008,7 @@
               saveLocalCache(appState);
               renderAll();
             }
-          } else if (isInitialBoot) {
-            // Cloud bucket is completely empty on first-ever visit -> seed the 8 default teams
+          } else if (isInitialBoot && isAdminMode) {
             const seedState = loadLocalCache() || createDefaultState('1234');
             await pushStateToCloud(seedState);
           }
@@ -971,10 +1063,10 @@
       });
 
       // =========================================================
-      // NAVIGATION & INLINE ADMIN UNLOCK
+      // ADMIN TAB SWITCHER & INLINE PIN UNLOCK (ONLY IN ?admin=1)
       // =========================================================
-      function switchTab(tabName) {
-        activeTab = tabName;
+      function switchAdminSubTab(tabName) {
+        if (!isAdminMode) return;
         const resultsPage = document.getElementById('page-results');
         const adminPage = document.getElementById('page-admin');
 
@@ -1007,6 +1099,7 @@
       }
 
       function isAdminUnlocked() {
+        if (!isAdminMode) return false;
         try {
           return sessionStorage.getItem(AUTH_SESSION_KEY) === 'true';
         } catch (e) {
@@ -1015,6 +1108,7 @@
       }
 
       function updateAdminLockVisibility() {
+        if (!isAdminMode) return;
         const lockScreen = document.getElementById('admin-lock-screen');
         const unlockedContent = document.getElementById('admin-unlocked-content');
         const hintBox = document.getElementById('pin-hint-box');
@@ -1035,13 +1129,14 @@
         }
       }
 
-      document.getElementById('nav-results-desktop').addEventListener('click', () => switchTab('results'));
-      document.getElementById('nav-admin-desktop').addEventListener('click', () => switchTab('admin'));
-      document.getElementById('nav-results-mobile').addEventListener('click', () => switchTab('results'));
-      document.getElementById('nav-admin-mobile').addEventListener('click', () => switchTab('admin'));
+      document.getElementById('nav-results-desktop').addEventListener('click', () => switchAdminSubTab('results'));
+      document.getElementById('nav-admin-desktop').addEventListener('click', () => switchAdminSubTab('admin'));
+      document.getElementById('nav-results-mobile').addEventListener('click', () => switchAdminSubTab('results'));
+      document.getElementById('nav-admin-mobile').addEventListener('click', () => switchAdminSubTab('admin'));
 
       document.getElementById('inline-pin-form').addEventListener('submit', (e) => {
         e.preventDefault();
+        if (!isAdminMode) return;
         const inputEl = document.getElementById('inline-pin-input');
         const entered = inputEl.value.trim();
         const expected = String(appState.adminPin || '1234').trim();
@@ -1069,6 +1164,7 @@
       });
 
       document.getElementById('forgot-pin-reset-btn').addEventListener('click', () => {
+        if (!isAdminMode) return;
         openConfirmModal(
           'পিন রিসেট করুন',
           'আপনি কি অ্যাডমিন পিনটি পুনরায় ডিফল্ট "1234"-এ ফিরিয়ে আনতে চান?',
@@ -1372,10 +1468,10 @@
       });
 
       // =========================================================
-      // RENDER ADMIN VIEW
+      // RENDER ADMIN VIEW (ONLY ACTIVE IN ?admin=1)
       // =========================================================
       function renderAdminView() {
-        if (!isAdminUnlocked()) return;
+        if (!isAdminMode || !isAdminUnlocked()) return;
 
         document.getElementById('admin-team-count-pill').textContent = `${toBn(appState.teams.length)}টি দল`;
 
@@ -1620,19 +1716,21 @@
 
       function renderAll() {
         renderPublicView();
-        renderAdminView();
+        if (isAdminMode) {
+          renderAdminView();
+        }
         if (currentlyViewedTeamId && !document.getElementById('team-history-modal').classList.contains('hidden')) {
           openTeamHistoryModal(currentlyViewedTeamId);
         }
       }
 
       // =========================================================
-      // CLOUD-SYNCED CRUD OPERATIONS
+      // CLOUD-SYNCED CRUD OPERATIONS (GUARDED BY isAdminMode)
       // =========================================================
 
-      // 1. Add New Team
       document.getElementById('add-team-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (!isAdminMode) return;
         const input = document.getElementById('new-team-name');
         const name = input.value.trim();
         if (!name) return;
@@ -1650,16 +1748,15 @@
         };
 
         input.value = '';
-        const nextState = {
+        await pushStateToCloud({
           ...appState,
           teams: [...appState.teams, newTeam]
-        };
-        await pushStateToCloud(nextState);
+        });
         showToast(`নতুন দল "${name}" লাইভ যোগ হয়েছে!`, 'success');
       });
 
-      // 2. Rename Team
       async function renameTeam(teamId, newName) {
+        if (!isAdminMode) return;
         if (!newName) {
           showToast('দলের নাম খালি রাখা যাবে না।', 'error');
           return;
@@ -1669,8 +1766,8 @@
         showToast('দলের নাম আপডেট হয়েছে!', 'success');
       }
 
-      // 3. Delete Team
       function deleteTeam(teamId) {
+        if (!isAdminMode) return;
         const team = appState.teams.find((t) => t.id === teamId);
         if (!team) return;
 
@@ -1685,9 +1782,9 @@
         );
       }
 
-      // 4. Record Match Result
       document.getElementById('match-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (!isAdminMode) return;
         const idA = document.getElementById('select-team-a').value;
         const idB = document.getElementById('select-team-b').value;
         if (!idA || !idB || idA === idB) return;
@@ -1713,17 +1810,15 @@
           playedAtText
         };
 
-        const nextState = {
+        await pushStateToCloud({
           ...appState,
           matches: [...appState.matches, newMatch]
-        };
-
-        await pushStateToCloud(nextState);
+        });
         showToast(`লাইভ ফলাফল সেভ হয়েছে! ${winnerName} (+২ পয়েন্ট, +${toBn(remainingTokens)} রান রেট)`, 'success');
       });
 
-      // 5. Delete Match (Recalculates points & NRR automatically)
       function deleteMatch(matchId) {
+        if (!isAdminMode) return;
         openConfirmModal(
           'ম্যাচের ফলাফল মুছুন',
           'এই ম্যাচটি মুছে ফেললে দুটি দলের পয়েন্ট ও রান রেট অটোমেটিক আগের অবস্থায় ফিরে যাবে। আপনি কি নিশ্চিত?',
@@ -1735,8 +1830,8 @@
         );
       }
 
-      // 6. Save Tournament Title
       document.getElementById('save-title-btn').addEventListener('click', async () => {
+        if (!isAdminMode) return;
         const newTitle = document.getElementById('settings-tournament-name').value.trim();
         if (!newTitle) {
           showToast('টুর্নামেন্টের নাম খালি রাখা যাবে না।', 'error');
@@ -1746,19 +1841,19 @@
         showToast('টুর্নামেন্টের নাম আপডেট হয়েছে!', 'success');
       });
 
-      // 7. Save Admin PIN
       document.getElementById('save-pin-btn').addEventListener('click', async () => {
+        if (!isAdminMode) return;
         const newPin = document.getElementById('settings-admin-pin').value.trim();
         if (newPin.length < 4) {
           showToast('পিন কোড কমপক্ষে ৪ সংখ্যার হতে হবে।', 'error');
           return;
         }
         await pushStateToCloud({ ...appState, adminPin: newPin });
-        showToast(`নতুন পিন (${newPin}) স্থায়ীভাবে ক্লাউডে সেভ হয়েছে!`, 'success');
+        showToast(`নতুন পিন (${newPin}) স্থায়ীভাবে সেভ হয়েছে!`, 'success');
       });
 
-      // 8. Reset Matches Only (Keep 8 teams)
       document.getElementById('reset-matches-btn').addEventListener('click', () => {
+        if (!isAdminMode) return;
         openConfirmModal(
           'সব ম্যাচ রিসেট করুন',
           '৮টি দলের নাম ও আপনার পিন ঠিক থাকবে, কিন্তু সব ম্যাচের ফলাফল মুছে গিয়ে পয়েন্ট ও রান রেট ০ হয়ে যাবে। নিশ্চিত?',
@@ -1769,11 +1864,11 @@
         );
       });
 
-      // 9. Restore Default 8 Teams
       document.getElementById('restore-default-teams-btn').addEventListener('click', () => {
+        if (!isAdminMode) return;
         openConfirmModal(
           'ডিফল্ট ৮টি দল ফিরিয়ে আনুন',
-          'আপনি কি নির্ধারিত ৮টি দল (চেল্লু ও গালিব, নওশাদ ও ছোটন, নয়ন ও নাঈম, মারুফ ও মাসুম, মোহন ও নান্টু, রনি ও মিশু, রাবু ও মিলন, রোমান ও তনু) ফিরিয়ে আনতে চান?',
+          'আপনি কি নির্ধারিত ৮টি দল ফিরিয়ে আনতে চান?',
           async () => {
             await pushStateToCloud({
               ...appState,
@@ -1785,8 +1880,8 @@
         );
       });
 
-      // 10. Full Reset (Empty All Teams & Matches, Keep Custom PIN)
       document.getElementById('reset-all-btn').addEventListener('click', () => {
+        if (!isAdminMode) return;
         openConfirmModal(
           'সব ডাটা মুছে খালি করুন',
           'সকল দল ও ম্যাচের ফলাফল মুছে যাবে (আপনার সেট করা অ্যাডমিন পিন সুরক্ষিত থাকবে)। আপনি কি নিশ্চিত?',
@@ -1802,26 +1897,50 @@
       });
 
       // =========================================================
-      // PERMANENT CLEAN URL COPY & STANDALONE index.html DOWNLOAD
+      // CLIPBOARD COPY HELPERS (PUBLIC LINK VS PRIVATE ADMIN LINK)
       // =========================================================
-      function copyPermanentLink() {
-        const cleanPermanentUrl = window.location.origin + window.location.pathname;
+      function copyTextToClipboard(text, successMsg) {
         const tempInput = document.createElement('input');
-        tempInput.value = cleanPermanentUrl;
+        tempInput.value = text;
         document.body.appendChild(tempInput);
         tempInput.select();
         tempInput.setSelectionRange(0, 999999);
         try {
           document.execCommand('copy');
-          showToast('স্থায়ী লিংক কপি হয়েছে! একবার গ্রুপে শেয়ার করলেই সবাই লাইভ আপডেট দেখতে পাবে।', 'success');
+          showToast(successMsg, 'success');
         } catch (err) {
-          showToast('লিংক কপি করা যায়নি। ব্রাউজারের অ্যাড্রেস বার থেকে লিংকটি কপি করুন।', 'error');
+          showToast('লিংক কপি করা যায়নি। অ্যাড্রেস বার থেকে কপি করুন।', 'error');
         }
         document.body.removeChild(tempInput);
       }
 
-      document.getElementById('copy-permanent-link-btn').addEventListener('click', copyPermanentLink);
-      document.getElementById('admin-copy-link-btn').addEventListener('click', copyPermanentLink);
+      document.getElementById('header-public-copy-btn').addEventListener('click', () => {
+        copyTextToClipboard(
+          getPublicCleanUrl(),
+          'ফলাফলের পাবলিক লিংক কপি হয়েছে! সবাই এই লিংকে শুধু ফলাফল দেখতে পাবে।'
+        );
+      });
+
+      document.getElementById('copy-public-link-btn').addEventListener('click', () => {
+        copyTextToClipboard(
+          getPublicCleanUrl(),
+          'ফলাফলের পাবলিক লিংক কপি হয়েছে! সবাই এই লিংকে শুধু ফলাফল দেখতে পাবে।'
+        );
+      });
+
+      document.getElementById('admin-copy-public-link-btn').addEventListener('click', () => {
+        copyTextToClipboard(
+          getPublicCleanUrl(),
+          '📢 পাবলিক ফলাফল লিংক কপি হয়েছে! এটি গ্রুপে শেয়ার করুন (এখানে অ্যাডমিন প্যানেল দেখাবে না)।'
+        );
+      });
+
+      document.getElementById('admin-copy-private-link-btn').addEventListener('click', () => {
+        copyTextToClipboard(
+          getAdminPrivateUrl(),
+          '🔐 আপনার গোপন অ্যাডমিন লিংক (?admin=1) কপি হয়েছে! এটি শুধু নিজের কাছে সেভ রাখুন।'
+        );
+      });
 
       document.getElementById('manual-refresh-btn').addEventListener('click', async () => {
         showToast('লাইভ ডাটা চেক করা হচ্ছে...', 'info');
@@ -1843,6 +1962,14 @@
         if (admMatchesEl) admMatchesEl.innerHTML = '';
         const admTeamsEl = cloneDoc.querySelector('#admin-teams-list');
         if (admTeamsEl) admTeamsEl.innerHTML = '';
+
+        // Reset clean default DOM visibility before exporting
+        const desktopNav = cloneDoc.querySelector('#desktop-admin-nav');
+        if (desktopNav) desktopNav.className = 'hidden items-center bg-slate-100 p-1 rounded-xl border border-slate-200 no-print';
+        const mobileNav = cloneDoc.querySelector('#mobile-admin-nav');
+        if (mobileNav) mobileNav.className = 'hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] items-center justify-around p-1.5 no-print';
+        const dlBtn = cloneDoc.querySelector('#download-index-btn');
+        if (dlBtn) dlBtn.className = 'hidden items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition active:scale-95';
 
         const pageResultsEl = cloneDoc.querySelector('#page-results');
         const pageAdminEl = cloneDoc.querySelector('#page-admin');
@@ -1870,8 +1997,10 @@
       });
 
       // =========================================================
-      // INITIALIZE APP & START 4-SECOND LIVE CLOUD POLLING
+      // BOOTSTRAP APP & START 5-SECOND LIVE CLOUD POLLING
       // =========================================================
+      configureModeVisibility();
+
       const cached = loadLocalCache();
       if (cached) {
         appState = cached;
@@ -1881,13 +2010,11 @@
       lastKnownSignature = computeSignature(appState);
       renderAll();
 
-      // Fetch live state from cloud immediately on load, then poll every 4 seconds
       fetchStateFromCloud(true);
       setInterval(() => {
         fetchStateFromCloud(false);
-      }, 4000);
+      }, 5000);
 
-      // Also sync immediately when user switches back to the browser tab
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
           fetchStateFromCloud(false);
