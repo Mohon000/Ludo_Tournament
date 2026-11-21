@@ -1,1064 +1,1464 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="bn" class="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0f172a" />
-  <title>লুডু চ্যাম্পিয়নশিপ ২০২৬ - লাইভ স্কোরবোর্ড ও পাবলিক আড্ডা</title>
-
-  <!-- Inline 4-Color Ludo App Icon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%230f172a'/%3E%3Crect x='14' y='14' width='32' height='32' rx='8' fill='%23ef4444'/%3E%3Crect x='54' y='14' width='32' height='32' rx='8' fill='%2322c55e'/%3E%3Crect x='14' y='54' width='32' height='32' rx='8' fill='%233b82f6'/%3E%3Crect x='54' y='54' width='32' height='32' rx='8' fill='%23eab308'/%3E%3Ccircle cx='50' cy='50' r='12' fill='%23ffffff'/%3E%3C/svg%3E" />
-
-  <!-- Tailwind CSS -->
+  <title>লুডু চ্যাম্পিয়নশিপ ২০২৬ - লাইভ স্কোরবোর্ড</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class'
-    };
-  </script>
-
   <!-- Google Fonts: Hind Siliguri & Noto Sans Bengali -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet" />
-
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Hind Siliguri"', '"Noto Sans Bengali"', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
   <style>
     body {
       font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
-    .ludo-gradient {
-      background: linear-gradient(135deg, #ef4444 0%, #eab308 35%, #22c55e 70%, #3b82f6 100%);
-    }
-    /* Top Right-to-Left Marquee Ticker */
-    .marquee-rtl-track {
-      display: inline-block;
-      white-space: nowrap;
-      padding-left: 100%;
-      animation: marqueeRtl 24s linear infinite;
-    }
-    .marquee-rtl-track:hover {
-      animation-play-state: paused;
-    }
-    @keyframes marqueeRtl {
-      0% { transform: translateX(0); }
+    @keyframes marqueeAnim {
+      0% { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
     }
-    /* Bottom Right-to-Left Public Message Ticker (Natural Bangla Reading Direction) */
-    .marquee-public-rtl-track {
+    .marquee-track {
       display: inline-block;
       white-space: nowrap;
-      padding-left: 100%;
-      animation: marqueePublicRtl 20s linear infinite;
+      animation: marqueeAnim 25s linear infinite;
     }
-    .marquee-public-rtl-track:hover {
+    .marquee-track:hover {
       animation-play-state: paused;
     }
-    @keyframes marqueePublicRtl {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
     }
-    .fade-up {
-      animation: fadeUp 0.22s ease-out;
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    /* Native File Input Styling */
-    input[type="file"]::file-selector-button {
-      background-color: #4f46e5;
-      color: #ffffff;
-      border: none;
-      padding: 0.45rem 0.9rem;
-      border-radius: 0.65rem;
-      font-weight: 700;
-      font-size: 0.8rem;
-      margin-right: 0.75rem;
-      cursor: pointer;
-    }
-    input[type="file"]::file-selector-button:hover {
-      background-color: #4338ca;
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.5);
+      border-radius: 9999px;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col bg-slate-100 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200">
-
-  <!-- Top 4-Color Accent Bar -->
-  <div class="h-1.5 w-full ludo-gradient shrink-0"></div>
+<body class="bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen pb-16 transition-colors duration-200">
 
   <!-- Toast Notification Container -->
-  <div id="toast-container" class="fixed top-24 right-3 left-3 sm:left-auto sm:right-5 z-[9990] flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toast-box" class="fixed top-16 right-3 left-3 sm:left-auto sm:w-80 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- Custom Confirm Modal (No browser alert/confirm) -->
-  <div id="confirm-modal" class="fixed inset-0 z-[9995] hidden bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 fade-up">
-      <div class="flex items-center gap-3 text-amber-500 mb-3">
-        <div class="p-2.5 bg-amber-50 dark:bg-amber-950/60 rounded-xl font-bold text-lg">⚠️</div>
-        <h3 id="confirm-title" class="text-xl font-bold text-slate-900 dark:text-white">নিশ্চিত করুন</h3>
-      </div>
-      <p id="confirm-message" class="text-slate-600 dark:text-slate-300 text-sm sm:text-base mb-6 leading-relaxed"></p>
-      <div class="flex justify-end gap-3">
-        <button id="confirm-cancel-btn" type="button" class="px-4 py-2.5 rounded-xl font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-          বাতিল
-        </button>
-        <button id="confirm-ok-btn" type="button" class="px-5 py-2.5 rounded-xl font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition">
-          হ্যাঁ, নিশ্চিত
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Fullscreen Photo Lightbox Viewer -->
-  <div id="photo-lightbox-modal" class="fixed inset-0 z-[9999] hidden bg-slate-950/95 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-6">
-    <div class="max-w-2xl w-full bg-slate-900 rounded-3xl overflow-hidden border border-slate-700/90 shadow-2xl fade-up flex flex-col max-h-[94vh]">
-      <div class="px-4 py-3 flex items-center justify-between gap-2 border-b border-slate-800 shrink-0">
-        <span id="lightbox-badge" class="text-xs font-bold px-3 py-1 rounded-full bg-amber-400 text-slate-950">📸 মুহূর্ত</span>
-        <div class="flex items-center gap-2">
-          <button id="download-lightbox-btn" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition active:scale-95">
-            <span>⬇️ ডাউনলোড</span>
-          </button>
-          <button id="close-lightbox-btn" type="button" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition active:scale-95">
-            <span>✕ বন্ধ</span>
-          </button>
+  <!-- Top Sticky Header -->
+  <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-4xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-slate-900 p-1.5 grid grid-cols-2 gap-1 shrink-0 shadow">
+          <span class="bg-rose-500 rounded-sm"></span>
+          <span class="bg-emerald-500 rounded-sm"></span>
+          <span class="bg-amber-400 rounded-sm"></span>
+          <span class="bg-sky-500 rounded-sm"></span>
         </div>
-      </div>
-      <div class="bg-black flex-1 flex items-center justify-center overflow-hidden min-h-[220px]">
-        <img id="lightbox-img" src="" alt="বড় ছবি" class="w-full h-auto max-h-[75vh] object-contain select-none" />
-      </div>
-      <div class="p-4 bg-slate-900 text-white space-y-1 border-t border-slate-800 shrink-0">
-        <p id="lightbox-caption" class="text-sm sm:text-base font-bold leading-snug"></p>
-        <p id="lightbox-time" class="text-xs text-slate-400"></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Team Match History Modal -->
-  <div id="team-history-modal" class="fixed inset-0 z-[9980] hidden bg-slate-950/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-2xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-800 fade-up overflow-hidden">
-      <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between gap-3 shrink-0">
-        <div class="flex items-center gap-3 min-w-0">
-          <div id="modal-team-avatars"></div>
-          <div class="min-w-0">
-            <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300 block">দলের বিস্তারিত ফলাফল</span>
-            <h3 id="modal-team-name" class="text-lg sm:text-xl font-bold break-words">দলের নাম</h3>
-          </div>
-        </div>
-        <button id="close-team-modal-btn" type="button" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition shrink-0">
-          ✕
-        </button>
-      </div>
-      <div id="modal-team-stats" class="grid grid-cols-5 gap-1.5 sm:gap-2 p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 shrink-0 text-center"></div>
-      <div class="p-4 sm:p-5 overflow-y-auto flex-1 space-y-3 bg-slate-100/60 dark:bg-slate-950/40">
-        <div class="flex items-center justify-between">
-          <h4 class="text-sm font-bold text-slate-700 dark:text-slate-200">🎲 খেলার পূর্ণাঙ্গ বিবরণ ও সময়সূচি</h4>
-          <span id="modal-match-count" class="text-xs font-semibold text-slate-500"></span>
-        </div>
-        <div id="modal-team-matches-list" class="space-y-3"></div>
-      </div>
-      <div class="px-5 py-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-end shrink-0">
-        <button id="close-team-modal-footer-btn" type="button" class="w-full sm:w-auto px-5 py-2.5 bg-slate-900 dark:bg-indigo-600 text-white font-bold text-sm rounded-xl transition">
-          বন্ধ করুন
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Left Sidebar Drawer (☰ Menu) -->
-  <div id="sidebar-backdrop" class="fixed inset-0 z-[9970] hidden bg-slate-950/60 backdrop-blur-xs transition-opacity"></div>
-  <aside id="left-sidebar-drawer" class="fixed top-0 left-0 bottom-0 z-[9975] w-72 max-w-[82vw] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-2xl transform -translate-x-full transition-transform duration-200 flex flex-col">
-    <div class="p-4 bg-slate-900 text-white flex items-center justify-between">
-      <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl ludo-gradient p-0.5 flex items-center justify-center">
-          <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-base">🎲</div>
-        </div>
-        <div>
-          <h2 class="font-bold text-sm leading-tight">টুর্নামেন্ট মেনু</h2>
-          <span class="text-[11px] text-amber-300 font-semibold">লুডু চ্যাম্পিয়নশিপ ২০২৬</span>
-        </div>
-      </div>
-      <button id="close-sidebar-btn" type="button" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-bold">✕</button>
-    </div>
-
-    <div class="p-3.5 flex-1 space-y-2 overflow-y-auto">
-      <button id="menu-nav-scoreboard" type="button" class="w-full flex items-center justify-between p-3 rounded-xl font-bold text-sm bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 transition">
-        <span class="flex items-center gap-2.5"><span>🏆</span><span>পয়েন্ট টেবিল ও ফলাফল</span></span>
-        <span>›</span>
-      </button>
-
-      <button id="menu-nav-gallery" type="button" class="w-full flex items-center justify-between p-3 rounded-xl font-bold text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-        <span class="flex items-center gap-2.5"><span>📸</span><span>টুর্নামেন্ট গ্যালারি ও আড্ডা</span></span>
-        <span id="sidebar-post-count-badge" class="px-2 py-0.5 text-xs font-extrabold rounded-full bg-rose-600 text-white">০</span>
-      </button>
-
-      <button id="menu-nav-rules" type="button" class="w-full flex items-center justify-between p-3 rounded-xl font-bold text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-        <span class="flex items-center gap-2.5"><span>📜</span><span>টুর্নামেন্টের নিয়মাবলি</span></span>
-        <span>›</span>
-      </button>
-
-      <div class="pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
-        <button id="sidebar-share-link-btn" type="button" class="w-full flex items-center gap-2.5 p-3 rounded-xl font-bold text-xs bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 transition">
-          <span>🔗</span>
-          <span>পাবলিক ফলাফলের লিংক কপি করুন</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="p-3.5 border-t border-slate-200 dark:border-slate-800 text-center">
-      <p class="text-[11px] text-slate-400">৮ দলের রাউন্ড রবিন ➔ সেমিফাইনাল ➔ ফাইনাল</p>
-    </div>
-  </aside>
-
-  <!-- App Sticky Header -->
-  <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-xs">
-    <div class="max-w-5xl mx-auto px-2.5 sm:px-4 py-2.5 flex items-center justify-between gap-2">
-      <!-- Left: Hamburger Menu + Logo + Title -->
-      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-        <button id="open-sidebar-btn" type="button" aria-label="মেনু খুলুন" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-bold transition active:scale-95 shrink-0">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-
-        <div class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-xs shrink-0">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-            <rect x="2" y="2" width="9" height="9" rx="2" fill="#ef4444"/>
-            <rect x="13" y="2" width="9" height="9" rx="2" fill="#22c55e"/>
-            <rect x="2" y="13" width="9" height="9" rx="2" fill="#3b82f6"/>
-            <rect x="13" y="13" width="9" height="9" rx="2" fill="#eab308"/>
-            <circle cx="12" cy="12" r="3" fill="#ffffff"/>
-          </svg>
-        </div>
-
         <div class="min-w-0">
-          <h1 id="header-tournament-name" class="text-sm sm:text-lg font-bold text-slate-900 dark:text-white truncate">
+          <h1 class="text-base sm:text-xl font-bold leading-tight truncate text-slate-900 dark:text-white">
             লুডু চ্যাম্পিয়নশিপ ২০২৬
           </h1>
-          <div class="flex items-center gap-1.5">
-            <span id="sync-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-            <span id="sync-status-text" class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">লাইভ সিঙ্ক সংযোগ হচ্ছে...</span>
+          <div id="sync-status-pill" class="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+            🟡 সিঙ্ক হচ্ছে...
           </div>
         </div>
       </div>
 
-      <!-- Right: Gallery Quick Pill + Download index.html (Admin) + Dark Mode Toggle -->
-      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-        <button id="header-gallery-btn" type="button" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70 font-bold text-xs transition active:scale-95">
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button id="btn-open-gallery" type="button"
+          class="px-3 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition">
           <span>📸</span>
-          <span class="hidden sm:inline">গ্যালারি ও আড্ডা</span>
-          <span id="header-post-count" class="px-1.5 py-0.2 rounded-full bg-rose-600 text-white text-[10px] font-extrabold">০</span>
+          <span>গ্যালারি</span>
+          <span id="post-count-badge" class="bg-white/20 px-1.5 py-0.2 rounded-full text-[10px]">০</span>
         </button>
-
-        <button id="download-index-btn" type="button" title="GitHub-এ আপলোডের জন্য index.html ডাউনলোড করুন" class="hidden items-center gap-1 px-2.5 sm:px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition active:scale-95">
-          <span>📥</span>
-          <span>index.html</span>
-        </button>
-
-        <button id="theme-toggle-btn" type="button" aria-label="থিম পরিবর্তন" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-base transition active:scale-95">
+        <button id="btn-theme-toggle" type="button" title="ডার্ক/লাইট মোড"
+          class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-base active:scale-95 transition">
           🌙
         </button>
       </div>
     </div>
 
-    <!-- Top Right-to-Left Scrolling Live Notice Ticker -->
-    <div class="bg-slate-900 dark:bg-black text-white border-t border-slate-800 flex items-center overflow-hidden h-8">
-      <div class="bg-rose-600 text-white text-[11px] font-extrabold px-2.5 h-full flex items-center gap-1.5 shrink-0 z-10 shadow-md">
-        <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
-        <span>লাইভ নোটিশ</span>
-      </div>
-      <div class="flex-1 overflow-hidden relative">
-        <div id="top-notice-marquee" class="marquee-rtl-track text-xs font-semibold text-amber-300">
-          🏆 লুডু চ্যাম্পিয়নশিপ ২০২৬-এ সবাইকে স্বাগতম! প্রথম রাউন্ডে ৮টি দলের মধ্যে রাউন্ড রবিন লিগ খেলা অনুষ্ঠিত হবে এবং শীর্ষ ৪টি দল সেমিফাইনালে উত্তীর্ণ হবে।
+    <!-- Live Scrolling Notice Bar -->
+    <div class="bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white text-xs sm:text-sm py-1.5 px-2 flex items-center overflow-hidden">
+      <span class="bg-slate-950/85 text-amber-300 font-bold px-2 py-0.5 rounded mr-2 shrink-0 text-[11px] flex items-center gap-1">
+        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+        🔴 লাইভ নোটিশ
+      </span>
+      <div class="overflow-hidden flex-1">
+        <div id="live-notice-marquee" class="marquee-track font-semibold">
+          🏆 লুডু চ্যাম্পিয়নশিপ ২০২৬-এ সবাইকে স্বাগতম! প্রথম রাউন্ডের খেলা শীঘ্রই শুরু হবে।
         </div>
       </div>
     </div>
   </header>
 
   <!-- Main Content Container -->
-  <main class="flex-1 max-w-5xl w-full mx-auto px-2.5 sm:px-4 py-4 sm:py-6 pb-28">
+  <main class="max-w-4xl mx-auto px-3 py-4 space-y-5">
 
-    <!-- ========================================================= -->
-    <!-- VIEW 1: PUBLIC SCOREBOARD (ফলাফল শিট)                    -->
-    <!-- ========================================================= -->
-    <section id="view-scoreboard" class="fade-up space-y-4 sm:space-y-5">
+    <!-- Banner Card to Open Gallery -->
+    <div class="rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-4 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="text-center sm:text-left">
+        <h2 class="text-base sm:text-lg font-bold">📸 টুর্নামেন্টের সেরা মুহূর্ত ও আড্ডা</h2>
+        <p class="text-xs text-indigo-100">আপনার দলের ছবি পোস্ট করুন এবং সবার পোস্টে লাইক, ডিসলাইক ও কমেন্ট করুন!</p>
+      </div>
+      <button id="btn-banner-gallery" type="button"
+        class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white text-indigo-700 hover:bg-indigo-50 font-extrabold text-xs sm:text-sm shadow active:scale-95 transition shrink-0">
+        📸 ছবি পোস্ট ও কমেন্ট করুন →
+      </button>
+    </div>
 
-      <!-- Quick Action Banner: Open Public Gallery & Chat -->
-      <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 rounded-2xl p-3.5 sm:p-4 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-xs flex items-center justify-center text-xl shrink-0">📸</div>
-          <div>
-            <h2 class="font-bold text-sm sm:text-base leading-tight">টুর্নামেন্ট গ্যালারি ও পাবলিক আড্ডা</h2>
-            <p class="text-xs text-white/85 mt-0.5">আপনার দলের ছবি পোস্ট করুন এবং সবার পোস্টে লাইক, ডিসলাইক ও কমেন্ট করুন!</p>
-          </div>
+    <!-- Round Robin Points Table Card -->
+    <section class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-slate-50/80 dark:bg-slate-800/40">
+        <div>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+            🏆 রাউন্ড রবিন পয়েন্ট টেবিল
+          </h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            শীর্ষ ৪ দল সেমিফাইনালে যাবে &bull; জয়: +২ পয়েন্ট &bull; রান রেট: ৮ গুটির ভিত্তিতে (+GF / -GA)
+          </p>
         </div>
-        <button id="banner-open-gallery-btn" type="button" class="px-4 py-2 rounded-xl bg-white text-slate-900 hover:bg-amber-300 font-extrabold text-xs sm:text-sm shadow-sm transition active:scale-95 shrink-0 text-center">
-          📸 ছবি পোস্ট ও কমেন্ট করুন ➔
+        <button id="btn-manual-refresh" type="button"
+          class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-bold flex items-center gap-1 border border-indigo-200 dark:border-indigo-800 active:scale-95 transition">
+          <span>🔄</span>
+          <span>রিফ্রেশ</span>
         </button>
       </div>
 
-      <!-- Dynamic Tournament Highlights (ONLY SHOWN AFTER AT LEAST 1 MATCH IS PLAYED) -->
-      <div id="tournament-highlights-grid" class="hidden grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
-        <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-          <span class="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase">👑 বর্তমান শীর্ষ দল</span>
-          <p id="hl-top-team" class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5 truncate">-</p>
-          <p id="hl-top-team-sub" class="text-xs text-slate-500 mt-0.5">-</p>
-        </div>
-        <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-          <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">📈 সর্বোচ্চ নেট রান রেট</span>
-          <p id="hl-best-nrr-team" class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5 truncate">-</p>
-          <p id="hl-best-nrr-val" class="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-0.5">-</p>
-        </div>
-        <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-          <span class="text-[11px] font-bold text-rose-600 dark:text-rose-400 uppercase">🔥 সবচেয়ে বড় ব্যবধানে জয়</span>
-          <p id="hl-biggest-win-team" class="text-base font-extrabold text-slate-900 dark:text-white mt-0.5 truncate">-</p>
-          <p id="hl-biggest-win-sub" class="text-xs text-slate-500 mt-0.5">-</p>
-        </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-900 text-white text-xs sm:text-sm">
+              <th class="py-2.5 px-2.5 text-center w-12">ক্রম</th>
+              <th class="py-2.5 px-3">দলের নাম ও জুটি</th>
+              <th class="py-2.5 px-2 text-center">ম্যাচ</th>
+              <th class="py-2.5 px-2 text-center text-emerald-300">জয়</th>
+              <th class="py-2.5 px-2 text-center text-rose-300">হার</th>
+              <th class="py-2.5 px-2.5 text-center text-amber-300">পয়েন্ট</th>
+              <th class="py-2.5 px-2.5 text-center">রান রেট</th>
+            </tr>
+          </thead>
+          <tbody id="points-table-body" class="divide-y divide-slate-200 dark:divide-slate-800 text-xs sm:text-sm">
+            <!-- Populated dynamically via JS -->
+          </tbody>
+        </table>
       </div>
 
-      <!-- Round Robin Standings Table -->
-      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-        <div class="px-3.5 sm:px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-slate-50/70 dark:bg-slate-900">
-          <div>
-            <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg flex items-center gap-2">
-              <span>🏆 রাউন্ড রবিন পয়েন্ট টেবিল</span>
-            </h3>
-            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
-              শীর্ষ ৪ দল সেমিফাইনালে যাবে &bull; জয়: +২ পয়েন্ট &bull; রান রেট: ৮ গুটির ভিত্তিতে
-            </p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button id="public-refresh-btn" type="button" class="px-3 py-1.5 rounded-xl bg-slate-200/80 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-200 font-bold text-xs transition">
-              🔄 রিফ্রেশ
-            </button>
-          </div>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-900 text-white text-[11px] sm:text-sm">
-                <th class="py-3 px-1.5 sm:px-3 font-bold text-center w-11 sm:w-14">ক্রম</th>
-                <th class="py-3 px-2 sm:px-4 font-bold min-w-[165px] sm:min-w-[230px]">দলের নাম ও জুটি</th>
-                <th class="py-3 px-1.5 sm:px-3 font-bold text-center">ম্যাচ</th>
-                <th class="py-3 px-1.5 sm:px-3 font-bold text-center text-emerald-300">জয়</th>
-                <th class="py-3 px-1.5 sm:px-3 font-bold text-center text-rose-300">হার</th>
-                <th class="py-3 px-1.5 sm:px-4 font-bold text-center bg-slate-800 text-amber-300">পয়েন্ট</th>
-                <th class="py-3 px-1.5 sm:px-4 font-bold text-center">রান রেট</th>
-              </tr>
-            </thead>
-            <tbody id="standings-tbody" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-base"></tbody>
-          </table>
-        </div>
-        <div class="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
-          <span>🟢 সবুজ চিহ্নিত ১ম–৪র্থ স্থান = সেমিফাইনাল জোন (খেলা শুরু হলে সক্রিয় হবে)</span>
-          <span>👆 বিস্তারিত দেখতে দলের নামে ক্লিক করুন</span>
-        </div>
+      <div class="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600 dark:text-slate-400">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+          সবুজ চিহ্নিত ১ম–৪র্থ স্থান = সেমিফাইনাল জোন
+        </span>
+        <span>👆 বিস্তারিত ও খেলার ইতিহাস দেখতে দলের নামে ক্লিক করুন</span>
       </div>
-
-      <!-- Recent Match Results Card (Only visible after matches exist, or clean pre-tournament message) -->
-      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-        <div class="px-4 sm:px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900">
-          <h3 class="font-bold text-slate-900 dark:text-white text-base">🎲 সাম্প্রতিক ম্যাচের ফলাফল</h3>
-          <span id="public-match-count-badge" class="text-xs font-bold px-2.5 py-1 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-full">০টি ম্যাচ</span>
-        </div>
-        <div id="public-matches-list" class="divide-y divide-slate-100 dark:divide-slate-800"></div>
-        <div id="empty-public-matches" class="p-7 text-center text-slate-500 dark:text-slate-400 text-sm">
-          এখনো কোনো ম্যাচ শুরু হয়নি। অ্যাডমিন ফলাফল আপডেট করলে এখানে লাইভ স্কোর দেখা যাবে।
-        </div>
-      </div>
-
-      <!-- Collapsible Knockout & Final Bracket Accordion ("দেখুন ▾") -->
-      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-        <button id="toggle-bracket-btn" type="button" class="w-full px-4 sm:px-5 py-4 flex items-center justify-between gap-3 bg-gradient-to-r from-slate-900 to-indigo-950 text-white text-left transition">
-          <div class="flex items-center gap-2.5">
-            <span class="text-xl">🏆</span>
-            <div>
-              <h3 class="font-bold text-sm sm:text-base">সেমিফাইনাল ও গ্র্যান্ড ফাইনাল ব্র্যাকেট</h3>
-              <p class="text-[11px] text-slate-300">সেরা ৪ দলের নকআউট পর্ব ও চ্যাম্পিয়ন ট্রফি</p>
-            </div>
-          </div>
-          <span id="bracket-toggle-label" class="px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs shrink-0">
-            দেখুন ▾
-          </span>
-        </button>
-
-        <div id="bracket-content-panel" class="hidden p-4 sm:p-5 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-200 dark:border-slate-800 space-y-4 fade-up">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-            <!-- Semifinal 1 -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">সেমিফাইনাল ১ (১ম বনাম ৪র্থ)</span>
-                <span id="sf1-status-badge" class="text-[11px] font-bold text-slate-400">অপেক্ষমাণ</span>
-              </div>
-              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 flex items-center justify-between font-bold text-sm">
-                <span id="sf1-team1-display">লিগ ১ম স্থান</span>
-                <span class="text-xs text-rose-500 font-extrabold">VS</span>
-                <span id="sf1-team2-display">লিগ ৪র্থ স্থান</span>
-              </div>
-              <p id="sf1-winner-display" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hidden"></p>
-            </div>
-
-            <!-- Semifinal 2 -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">সেমিফাইনাল ২ (২য় বনাম ৩য়)</span>
-                <span id="sf2-status-badge" class="text-[11px] font-bold text-slate-400">অপেক্ষমাণ</span>
-              </div>
-              <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 flex items-center justify-between font-bold text-sm">
-                <span id="sf2-team1-display">লিগ ২য় স্থান</span>
-                <span class="text-xs text-rose-500 font-extrabold">VS</span>
-                <span id="sf2-team2-display">লিগ ৩য় স্থান</span>
-              </div>
-              <p id="sf2-winner-display" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hidden"></p>
-            </div>
-          </div>
-
-          <!-- Grand Final & Champion Box -->
-          <div class="bg-gradient-to-br from-amber-500/15 via-yellow-500/10 to-indigo-500/15 dark:from-amber-950/40 dark:to-slate-900 rounded-2xl p-4 sm:p-5 border-2 border-amber-400/60 text-center space-y-2.5">
-            <span class="inline-block px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-extrabold text-xs">👑 গ্র্যান্ড ফাইনাল ও চ্যাম্পিয়ন ২০২৬</span>
-            <div class="flex items-center justify-center gap-3 font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
-              <span id="final-team1-display">সেমিফাইনাল ১ বিজয়ী</span>
-              <span class="px-2 py-0.5 rounded bg-rose-600 text-white text-xs">VS</span>
-              <span id="final-team2-display">সেমিফাইনাল ২ বিজয়ী</span>
-            </div>
-            <div id="champion-banner-box" class="pt-2">
-              <p id="champion-name-display" class="text-base sm:text-xl font-extrabold text-amber-600 dark:text-amber-300">
-                🏆 চ্যাম্পিয়ন: ফাইনাল শেষে নির্ধারিত হবে
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Collapsible Tournament Rules Card -->
-      <div id="rules-section-card" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-        <button id="toggle-rules-btn" type="button" class="w-full px-4 sm:px-5 py-3.5 flex items-center justify-between text-left bg-slate-50/70 dark:bg-slate-900">
-          <span class="font-bold text-slate-800 dark:text-white text-sm sm:text-base flex items-center gap-2">
-            <span>📜</span>
-            <span>টুর্নামেন্টের নিয়মাবলি ও পয়েন্ট হিসাব</span>
-          </span>
-          <span id="rules-toggle-icon" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">দেখুন ▾</span>
-        </button>
-        <div id="rules-content-panel" class="hidden px-4 sm:px-5 pb-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
-          <p>১. <strong>লিগ পর্ব:</strong> ৮টি দলের মধ্যে প্রত্যেকে প্রত্যেকের সাথে রাউন্ড রবিন পদ্ধতিতে খেলবে।</p>
-          <p>২. <strong>পয়েন্ট ও রান রেট (৮ গুটি):</strong> প্রতিটি জয়ের জন্য <strong>+২ পয়েন্ট</strong>। প্রতি দলে ২ জন খেলোয়াড়ের মোট <strong>৮টি গুটি</strong> থাকে—খেলা শেষে পরাজিত দলের যতটি গুটি বোর্ডে বাকি থাকবে, বিজয়ী দল তত <strong>+গুটি/৮</strong> নেট রান রেট পাবে এবং পরাজিত দল তত <strong>-গুটি/৮</strong> পাবে।</p>
-          <p>৩. <strong>সেমিফাইনাল ও ফাইনাল:</strong> পয়েন্ট টেবিলের শীর্ষ ৪টি দল সেমিফাইনালে উঠবে (১ম বনাম ৪র্থ এবং ২য় বনাম ৩য়)। সেখান থেকে বিজয়ী ২ দল গ্র্যান্ড ফাইনাল খেলবে।</p>
-        </div>
-      </div>
-
     </section>
 
-    <!-- ========================================================= -->
-    <!-- VIEW 2: PUBLIC GALLERY, PHOTO POSTING & OPEN CHAT WALL    -->
-    <!-- ========================================================= -->
-    <section id="view-gallery" class="hidden fade-up space-y-5">
-
-      <!-- Top Back Bar -->
-      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-            <span>📸 টুর্নামেন্ট গ্যালারি ও পাবলিক আড্ডা</span>
-          </h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400">সবার জন্য উন্মুক্ত—ছবি পোস্ট করুন, মতামত দিন ও লাইক/ডিসলাইক করুন</p>
-        </div>
-        <button id="back-to-scoreboard-btn" type="button" class="px-4 py-2 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white font-bold text-xs sm:text-sm transition active:scale-95">
-          ← পয়েন্ট টেবিলে ফিরুন
-        </button>
+    <!-- Recent Match Results Card -->
+    <section class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/40">
+        <h2 class="text-base sm:text-lg font-bold flex items-center gap-1.5">
+          🎲 সাম্প্রতিক ম্যাচের ফলাফল
+        </h2>
+        <span id="matches-count-pill" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800">
+          ০টি ম্যাচ
+        </span>
       </div>
+      <div id="recent-matches-container" class="p-3 sm:p-4 space-y-2.5">
+        <!-- Populated dynamically via JS -->
+      </div>
+    </section>
 
-      <!-- TWO-IN-ONE PUBLIC INTERACTION GRID: (A) PUBLIC PHOTO POST + (B) QUICK PUBLIC MESSAGE -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <!-- Collapsible Semifinal & Grand Final Bracket -->
+    <section class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <button id="btn-toggle-knockout" type="button"
+        class="w-full p-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex items-center justify-between text-left">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🏆</span>
+          <div>
+            <div class="font-bold text-sm sm:text-base">সেমিফাইনাল ও গ্র্যান্ড ফাইনাল ব্র্যাকেট</div>
+            <div class="text-xs text-slate-300">সেরা ৪ দলের নকআউট পর্ব ও চ্যাম্পিয়ন ট্রফি</div>
+          </div>
+        </div>
+        <span id="knockout-toggle-badge" class="px-3 py-1 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs shrink-0">
+          দেখুন ▾
+        </span>
+      </button>
 
-        <!-- A. Public & Admin Photo Post Form (7 Cols) -->
-        <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 space-y-3.5">
-          <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">📷</span>
-              <div>
-                <h3 class="font-bold text-base text-slate-900 dark:text-white">ছবি বা ম্যাচের মুহূর্ত পোস্ট করুন</h3>
-                <p class="text-[11px] text-slate-500">গ্যালারি থেকে ছবি বাছাই করে ক্যাপশনসহ সবার সাথে শেয়ার করুন</p>
-              </div>
+      <div id="knockout-panel-body" class="hidden p-4 space-y-4 border-t border-slate-200 dark:border-slate-800">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          <!-- Semi Final 1 -->
+          <div class="p-3.5 rounded-2xl border border-indigo-200 dark:border-indigo-900 bg-indigo-50/50 dark:bg-indigo-950/20 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-indigo-700 dark:text-indigo-300">সেমিফাইনাল ১ (১ম বনাম ৪র্থ)</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-600 text-white font-bold">SF-1</span>
             </div>
-            <span id="post-author-role-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-              👤 পাবলিক পোস্ট
-            </span>
+            <div id="sf1-card" class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-bold space-y-1.5"></div>
           </div>
 
-          <form id="public-photo-post-form" class="space-y-3">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <!-- Semi Final 2 -->
+          <div class="p-3.5 rounded-2xl border border-purple-200 dark:border-purple-900 bg-purple-50/50 dark:bg-purple-950/20 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-purple-700 dark:text-purple-300">সেমিফাইনাল ২ (২য় বনাম ৩য়)</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-purple-600 text-white font-bold">SF-2</span>
+            </div>
+            <div id="sf2-card" class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-bold space-y-1.5"></div>
+          </div>
+        </div>
+
+        <!-- Grand Final -->
+        <div class="p-4 rounded-2xl border-2 border-amber-400 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-slate-900 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-extrabold text-amber-700 dark:text-amber-300">👑 গ্র্যান্ড ফাইনাল ২০২৬</span>
+            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950">ফাইনাল</span>
+          </div>
+          <div id="final-card" class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-amber-200 dark:border-amber-800 text-xs sm:text-sm font-bold"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Collapsible Rules Accordion -->
+    <section class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+      <button id="btn-toggle-rules" type="button"
+        class="w-full px-4 py-3.5 flex items-center justify-between text-left font-bold text-sm sm:text-base hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+        <span>📜 টুর্নামেন্টের নিয়মাবলি ও পয়েন্ট হিসাব</span>
+        <span id="rules-toggle-badge" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">দেখুন ▾</span>
+      </button>
+      <div id="rules-panel-body" class="hidden px-4 pb-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2">
+        <p>১. <strong>লিগ পর্ব:</strong> ৮টি দলের মধ্যে রাউন্ড রবিন পদ্ধতিতে খেলা অনুষ্ঠিত হবে।</p>
+        <p>২. <strong>পয়েন্ট হিসাব:</strong> প্রতিটি জয়ের জন্য <strong>+২ পয়েন্ট</strong> এবং পরাজয়ের জন্য <strong>০ পয়েন্ট</strong>।</p>
+        <p>৩. <strong>রান রেট (+GF / -GA):</strong> প্রতি দলে ২ জন খেলোয়াড়ের মোট ৮টি গুটি থাকে। বিজয়ী দল ৮টি গুটি ঘরে তুললে এবং প্রতিপক্ষের যে কয়টি গুটি বাকি থাকে, তার ব্যবধান অনুযায়ী রান রেট নির্ধারিত হয়।</p>
+        <p>৪. <strong>সেমিফাইনাল ও ফাইনাল:</strong> পয়েন্ট টেবিলের শীর্ষ ৪টি দল সেমিফাইনালে উঠবে (১ম বনাম ৪র্থ এবং ২য় বনাম ৩য়)।</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Fixed Bottom Public Message Ticker + Admin Lock Button -->
+  <footer class="fixed bottom-0 inset-x-0 z-30 bg-slate-900 text-white border-t border-slate-800 h-10 flex items-center">
+    <span class="bg-purple-600 text-white font-bold px-2.5 h-full flex items-center text-xs shrink-0">
+      💬 পাবলিক মেসেজ
+    </span>
+    <div class="overflow-hidden flex-1 px-2 text-xs">
+      <div id="bottom-public-marquee" class="marquee-track text-slate-200">
+        এখনো কোনো পাবলিক মেসেজ নেই — গ্যালারি থেকে প্রথম মেসেজ বা ছবি পোস্ট করুন!
+      </div>
+    </div>
+    <button id="btn-admin-lock" type="button" title="অ্যাডমিন প্যানেল (পিন: 1234)"
+      class="h-full px-3.5 bg-slate-800 hover:bg-indigo-600 border-l border-slate-700 flex items-center justify-center text-sm transition shrink-0">
+      🔒
+    </button>
+  </footer>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 1: PUBLIC PHOTO & COMMENT GALLERY                   -->
+  <!-- ========================================================= -->
+  <div id="modal-gallery" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-2xl h-[92vh] sm:h-[85vh] rounded-t-3xl sm:rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
+      <!-- Modal Header -->
+      <div class="px-4 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 shrink-0">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold">📸 টুর্নামেন্ট গ্যালারি ও লাইভ আড্ডা</h3>
+          <p class="text-[11px] text-slate-500">ছবি ও মতামত পোস্ট করলে সবার ফোনে লাইভ দেখাবে</p>
+        </div>
+        <button id="btn-close-gallery" type="button" class="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 font-bold text-sm">✕</button>
+      </div>
+
+      <!-- Modal Scrollable Content -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-4">
+        <!-- Create New Post Form -->
+        <form id="form-new-post" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <input type="text" id="input-post-author" required maxlength="30" placeholder="আপনার নাম লিখুন (যেমন: মোহন)"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <label class="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border-2 border-dashed border-indigo-400 bg-indigo-50/60 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 text-xs sm:text-sm font-bold cursor-pointer hover:bg-indigo-100/70 transition">
+              <span>🖼️ ছবি সংযুক্ত করুন (ঐচ্ছিক)</span>
+              <input type="file" id="input-post-file" accept="image/*" class="hidden" />
+            </label>
+          </div>
+
+          <div id="preview-container" class="hidden relative rounded-xl overflow-hidden bg-slate-900 p-2">
+            <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg object-contain" />
+            <button type="button" id="btn-clear-img" class="absolute top-3 right-3 w-7 h-7 rounded-full bg-rose-600 text-white text-xs font-bold shadow">✕</button>
+          </div>
+
+          <textarea id="input-post-text" rows="2" required maxlength="300" placeholder="আপনার দলের জন্য শুভকামনা বা খেলার অনুভূতি লিখুন..."
+            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+
+          <button type="submit" id="btn-publish-post"
+            class="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-sm shadow active:scale-[0.99] transition">
+            🚀 সবার সাথে শেয়ার করুন
+          </button>
+        </form>
+
+        <!-- Feed List -->
+        <div id="gallery-posts-feed" class="space-y-4"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: TEAM DETAILS & MATCH HISTORY                     -->
+  <!-- ========================================================= -->
+  <div id="modal-team-details" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[85vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h3 id="team-modal-heading" class="text-lg font-bold">দলের বিস্তারিত</h3>
+        <button id="btn-close-team-modal" type="button" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 font-bold text-sm">✕</button>
+      </div>
+      <div id="team-modal-content" class="space-y-3 text-sm"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 3: ADMIN PIN LOGIN                                  -->
+  <!-- ========================================================= -->
+  <div id="modal-admin-pin" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xs w-full p-5 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+      <div class="text-center space-y-1">
+        <div class="text-3xl">🔐</div>
+        <h3 class="text-lg font-bold">অ্যাডমিন লগইন</h3>
+        <p class="text-xs text-slate-500">ফলাফল ও তথ্য নিয়ন্ত্রণ করতে পিন দিন</p>
+      </div>
+      <form id="form-admin-pin" class="space-y-3">
+        <input type="password" inputmode="numeric" id="input-admin-pin" maxlength="6" required placeholder="••••"
+          class="w-full text-center text-2xl tracking-widest py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <div class="flex gap-2">
+          <button type="button" id="btn-cancel-pin" class="flex-1 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold">বাতিল</button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold">প্রবেশ করুন</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 4: FULL PIN-PROTECTED ADMIN PANEL                   -->
+  <!-- ========================================================= -->
+  <div id="modal-admin-panel" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-3xl h-[94vh] sm:h-[88vh] rounded-t-3xl sm:rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
+      <!-- Admin Header -->
+      <div class="px-4 py-3.5 bg-indigo-950 text-white flex items-center justify-between shrink-0">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold flex items-center gap-2">🛡️ অ্যাডমিন কন্ট্রোল প্যানেল</h3>
+          <p class="text-[11px] text-indigo-200">প্রতিটি পরিবর্তন সরাসরি সবার ফোনে লাইভ আপডেট হবে</p>
+        </div>
+        <button id="btn-close-admin" type="button" class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-xs font-bold">বন্ধ করুন ✕</button>
+      </div>
+
+      <!-- Admin Scrollable Body -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-5">
+
+        <!-- 1. Record Match Result -->
+        <div class="p-4 rounded-2xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50/40 dark:bg-emerald-950/20 space-y-3">
+          <h4 class="font-bold text-base text-emerald-700 dark:text-emerald-400">➕ নতুন ম্যাচের ফলাফল যুক্ত করুন</h4>
+          <form id="form-add-match" class="space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">আপনার নাম *</label>
-                <input type="text" id="post-author-name" placeholder="যেমন: মোহন / রনি / দর্শক" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <label class="block text-xs font-bold mb-1">দল ১ (প্রথম জুটি)</label>
+                <select id="select-team-a" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-bold"></select>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">পোস্টের ধরন</label>
-                <select id="post-category-select" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <option value="moment">📸 ম্যাচের মুহূর্ত / সেলফি</option>
-                  <option value="start">⚔️ খেলার শুরুতে মুখোমুখি</option>
-                  <option value="winner">🏆 বিজয়ী দলের আনন্দ মুহূর্ত</option>
-                </select>
+                <label class="block text-xs font-bold mb-1">দল ২ (দ্বিতীয় জুটি)</label>
+                <select id="select-team-b" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-bold"></select>
               </div>
             </div>
 
-            <!-- Native File Input + Paste/URL Fallback -->
-            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-dashed border-indigo-300 dark:border-indigo-700 space-y-2">
-              <label class="block text-xs font-bold text-indigo-700 dark:text-indigo-300">১. ফোনের গ্যালারি থেকে ছবি বাছাই করুন:</label>
-              <input type="file" id="public-post-file-input" accept="image/*" class="w-full text-xs text-slate-600 dark:text-slate-300" />
-              <div class="pt-1">
-                <input type="text" id="public-post-url-input" placeholder="অথবা এখানে ছবি পেস্ট (Paste) করুন / ছবির লিংক দিন" class="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold mb-1">দল ১-এর পাকা গুটি (০–৮)</label>
+                <input type="number" id="input-score-a" min="0" max="8" value="8" required
+                  class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-base font-extrabold text-center" />
               </div>
-              <!-- Instant Image Preview -->
-              <div id="public-post-preview-box" class="hidden pt-2">
-                <div class="relative inline-block">
-                  <img id="public-post-preview-img" src="" alt="প্রিভিউ" class="h-28 w-auto rounded-xl object-cover border border-slate-300 shadow-xs" />
-                  <button type="button" id="clear-public-post-img-btn" class="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rose-600 text-white text-xs font-bold shadow">✕</button>
-                </div>
-                <span class="block text-[11px] font-bold text-emerald-600 mt-1">✅ ছবি প্রস্তুত হয়েছে!</span>
+              <div>
+                <label class="block text-xs font-bold mb-1">দল ২-এর পাকা গুটি (০–৮)</label>
+                <input type="number" id="input-score-b" min="0" max="8" value="5" required
+                  class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-base font-extrabold text-center" />
               </div>
             </div>
 
-            <div>
-              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">ক্যাপশন বা আপনার কথা লিখুন *</label>
-              <input type="text" id="public-post-caption" placeholder="যেমন: দারুণ জমে উঠেছে আজকের খেলা!" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-            </div>
-
-            <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-rose-600 hover:from-indigo-700 hover:to-rose-700 text-white font-extrabold text-sm shadow-md transition active:scale-[0.99]">
-              🚀 সবার জন্য পোস্ট করুন
+            <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow transition">
+              ✅ ফলাফল সেভ ও লাইভ পাবলিশ করুন
             </button>
           </form>
         </div>
 
-        <!-- B. Standalone Public Quick Comment / Live Ticker Message Box (5 Cols) -->
-        <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 flex flex-col justify-between space-y-3.5">
-          <div class="space-y-3">
-            <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
-              <span class="text-xl">💬</span>
-              <div>
-                <h3 class="font-bold text-base text-slate-900 dark:text-white">উন্মুক্ত পাবলিক কমেন্ট বক্স</h3>
-                <p class="text-[11px] text-slate-500">ছবি ছাড়াই সরাসরি কমেন্ট করুন—আপনার মেসেজ নিচের স্ক্রলিং বারে ভাসবে!</p>
-              </div>
+        <!-- 2. Update Live Notice -->
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2.5">
+          <h4 class="font-bold text-sm sm:text-base text-amber-600 dark:text-amber-400">📢 লাইভ নোটিশ পরিবর্তন করুন</h4>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input type="text" id="input-admin-notice" placeholder="নতুন নোটিশ লিখুন..."
+              class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm" />
+            <button id="btn-update-notice" type="button" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm shrink-0">
+              নোটিশ আপডেট
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Knockout Overrides -->
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+          <h4 class="font-bold text-sm sm:text-base text-purple-600 dark:text-purple-400">👑 সেমিফাইনাল ও ফাইনাল বিজয়ী নির্ধারণ</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div>
+              <label class="block text-xs font-bold mb-1">সেমিফাইনাল ১ বিজয়ী</label>
+              <select id="select-sf1-win" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold"></select>
             </div>
-
-            <form id="quick-public-shoutout-form" class="space-y-2.5">
-              <div>
-                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">আপনার নাম *</label>
-                <input type="text" id="shoutout-author-input" placeholder="আপনার নাম লিখুন..." required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500" />
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">আপনার কমেন্ট / বার্তা *</label>
-                <textarea id="shoutout-text-input" rows="2" placeholder="যেকোনো দলের জন্য শুভকামনা বা আপনার মতামত লিখুন..." required class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
-              </div>
-              <button type="submit" class="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow-xs transition active:scale-95">
-                💬 পাবলিক কমেন্ট পাঠান
-              </button>
-            </form>
+            <div>
+              <label class="block text-xs font-bold mb-1">সেমিফাইনাল ২ বিজয়ী</label>
+              <select id="select-sf2-win" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold mb-1">🏆 চ্যাম্পিয়ন ২০২৬</label>
+              <select id="select-champion-win" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold"></select>
+            </div>
           </div>
-
-          <div class="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 text-[11px] text-purple-800 dark:text-purple-200">
-            💡 <strong>টিপস:</strong> এখানে করা প্রতিটি কমেন্ট এবং নিচের পোস্টগুলোর কমেন্ট অটোমেটিক স্ক্রিনের একদম নিচে <strong>💬 পাবলিক মেসেজ</strong> বারে বাম থেকে ডানে স্ক্রল হতে থাকবে।
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Feed of All Posts (Admin + Public) with Likes, Dislikes & Comments -->
-      <div class="space-y-3">
-        <div class="flex items-center justify-between px-1">
-          <h3 class="font-extrabold text-base sm:text-lg text-slate-900 dark:text-white">📰 সকল পোস্ট ও পাবলিক কমেন্ট ফিড</h3>
-          <span id="gallery-feed-count" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">০টি পোস্ট</span>
-        </div>
-
-        <div id="gallery-posts-feed" class="space-y-4"></div>
-
-        <div id="empty-gallery-feed" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-10 text-center space-y-2">
-          <div class="text-4xl">📸</div>
-          <p class="font-bold text-slate-700 dark:text-slate-200">এখনো কোনো ছবি বা কমেন্ট পোস্ট করা হয়নি</p>
-          <p class="text-xs text-slate-500">উপরের ফর্ম থেকে প্রথম ছবি বা পাবলিক কমেন্ট পোস্ট করে আড্ডা শুরু করুন!</p>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- ========================================================= -->
-    <!-- VIEW 3: PRIVATE ADMIN PANEL (?admin=1 / PIN 1234)         -->
-    <!-- ========================================================= -->
-    <section id="view-admin" class="hidden fade-up space-y-5">
-
-      <!-- Pin Lock Screen -->
-      <div id="admin-lock-screen" class="max-w-md mx-auto bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl p-6 sm:p-8 text-center my-4">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-3xl">
-          🔐
-        </div>
-        <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-1">অ্যাডমিন কন্ট্রোল প্যানেল</h2>
-        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-5">
-          ম্যাচের ফলাফল, দলের ছবি এবং পাবলিক পোস্ট/কমেন্ট নিয়ন্ত্রণ করতে পিন দিন।
-          <span class="block mt-1 font-bold text-indigo-600 dark:text-indigo-400">(ডিফল্ট পিন: 1234)</span>
-        </p>
-
-        <form id="admin-pin-form" class="space-y-3">
-          <input type="password" inputmode="numeric" id="admin-pin-input" maxlength="12" placeholder="••••" required class="w-full px-4 py-3.5 text-center text-2xl tracking-[0.4em] font-bold border-2 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl focus:outline-none focus:border-indigo-600" />
-          <p id="admin-pin-error" class="hidden text-rose-600 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 rounded-xl py-2 px-3 text-xs font-bold">
-            ❌ ভুল পিন কোড! সঠিক পিন দিয়ে আবার চেষ্টা করুন।
-          </p>
-          <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base rounded-xl shadow-md transition">
-            🔓 আনলক করুন
+          <button id="btn-save-knockout" type="button" class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs sm:text-sm">
+            নকআউট তথ্য সেভ করুন
           </button>
-        </form>
-      </div>
+        </div>
 
-      <!-- Unlocked Admin Dashboard -->
-      <div id="admin-unlocked-dashboard" class="hidden space-y-5">
+        <!-- 4. Edit Team Names / Players -->
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+          <h4 class="font-bold text-sm sm:text-base">✏️ দলের নাম ও খেলোয়াড় সম্পাদনা</h4>
+          <div id="admin-teams-editor" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+          <button id="btn-save-teams" type="button" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm">
+            দলের তথ্য সেভ করুন
+          </button>
+        </div>
 
-        <!-- Admin Top Banner -->
-        <div class="bg-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <span class="px-2.5 py-0.5 text-xs font-bold bg-amber-400 text-slate-950 rounded-full">🛡️ অ্যাডমিন মোড সক্রিয়</span>
-              <span class="text-xs text-emerald-400 font-semibold">● সব পরিবর্তন লাইভ সিঙ্ক হচ্ছে</span>
-            </div>
-            <h2 class="text-lg sm:text-xl font-bold">টুর্নামেন্ট ও পাবলিক কনটেন্ট নিয়ন্ত্রণ</h2>
+        <!-- 5. Undo Matches & Moderate Posts -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
+            <h4 class="font-bold text-sm text-rose-600">🗑️ ম্যাচ ফলাফল ডিলিট করুন</h4>
+            <div id="admin-match-list" class="space-y-2 max-h-52 overflow-y-auto text-xs"></div>
           </div>
+          <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
+            <h4 class="font-bold text-sm text-rose-600">🧹 পাবলিক পোস্ট ও কমেন্ট নিয়ন্ত্রণ</h4>
+            <div id="admin-post-list" class="space-y-2 max-h-52 overflow-y-auto text-xs"></div>
+          </div>
+        </div>
+
+        <!-- 6. Backup, Restore & Double-Confirm Reset -->
+        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+          <h4 class="font-bold text-sm sm:text-base">💾 ডেটা ব্যাকআপ, রিস্টোর ও রিসেট</h4>
           <div class="flex flex-wrap gap-2">
-            <button id="copy-whatsapp-score-btn" type="button" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition">
-              📲 WhatsApp স্কোরকার্ড কপি
+            <button id="btn-download-backup" type="button" class="flex-1 py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">
+              ⬇️ ব্যাকআপ ডাউনলোড (.json)
             </button>
-            <button id="admin-lock-btn" type="button" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition">
-              🔒 লক করুন
+            <label class="flex-1 py-2.5 px-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold text-center cursor-pointer">
+              ⬆️ ব্যাকআপ রিস্টোর
+              <input type="file" id="input-restore-file" accept=".json,application/json" class="hidden" />
+            </label>
+            <button id="btn-trigger-reset" type="button" class="w-full sm:w-auto py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold">
+              ⚠️ সব ডেটা রিসেট
             </button>
-          </div>
-        </div>
-
-        <!-- Dual Link Share Box -->
-        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-xs grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div class="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 space-y-2">
-            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-600 text-white">📢 পাবলিক লিংক (সবার জন্য শুধু ফলাফল ও গ্যালারি)</span>
-            <p id="admin-public-url-text" class="text-xs font-mono break-all bg-white dark:bg-slate-950 px-2.5 py-1.5 rounded-lg border border-emerald-200 dark:border-slate-800"></p>
-            <button id="btn-copy-public-url" type="button" class="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition">
-              পাবলিক লিংক কপি করুন
-            </button>
-          </div>
-          <div class="p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 space-y-2">
-            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-indigo-600 text-white">🔐 প্রাইভেট অ্যাডমিন লিংক (?admin=1)</span>
-            <p id="admin-private-url-text" class="text-xs font-mono break-all bg-white dark:bg-slate-950 px-2.5 py-1.5 rounded-lg border border-indigo-200 dark:border-slate-800"></p>
-            <button id="btn-copy-private-url" type="button" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition">
-              আপনার অ্যাডমিন লিংক কপি করুন
-            </button>
-          </div>
-        </div>
-
-        <!-- Main Admin Two-Column Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-
-          <!-- LEFT 7 COLS: MATCH ENTRY + MATCH HISTORY + PUBLIC MODERATION -->
-          <div class="lg:col-span-7 space-y-5">
-
-            <!-- 1. League Match Entry Form (1 to 8 Remaining Pieces) -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-xs space-y-4">
-              <div class="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-3">
-                <span class="text-xl">🎲</span>
-                <div>
-                  <h3 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white">লিগ ম্যাচের ফলাফল এন্ট্রি (১–৮ গুটি)</h3>
-                  <p class="text-xs text-slate-500">বিজয়ী দল +২ পয়েন্ট পাবে এবং পরাজিত দলের বাকি গুটি অনুযায়ী রান রেট যোগ হবে</p>
-                </div>
-              </div>
-
-              <form id="admin-match-form" class="space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">দল ১ নির্বাচন করুন</label>
-                    <select id="admin-select-team-a" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-sm"></select>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">দল ২ নির্বাচন করুন</label>
-                    <select id="admin-select-team-b" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-sm"></select>
-                  </div>
-                </div>
-
-                <p id="admin-same-team-err" class="hidden text-xs font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/60 p-2.5 rounded-xl">
-                  ⚠️ দুটি ভিন্ন দল নির্বাচন করুন।
-                </p>
-
-                <!-- Winner Selection -->
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">বিজয়ী দলে টিক দিন:</label>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <label id="win-card-a" class="cursor-pointer border-2 border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 rounded-xl p-3 flex items-center justify-between">
-                      <div class="flex items-center gap-2 min-w-0">
-                        <input type="radio" name="winner_side" value="A" id="radio-win-a" checked class="w-4 h-4 text-emerald-600" />
-                        <span id="lbl-win-a" class="font-bold text-sm truncate">দল ১</span>
-                      </div>
-                      <span id="badge-win-a" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">✓ বিজয়ী</span>
-                    </label>
-                    <label id="win-card-b" class="cursor-pointer border-2 border-slate-200 dark:border-slate-700 rounded-xl p-3 flex items-center justify-between">
-                      <div class="flex items-center gap-2 min-w-0">
-                        <input type="radio" name="winner_side" value="B" id="radio-win-b" class="w-4 h-4 text-emerald-600" />
-                        <span id="lbl-win-b" class="font-bold text-sm truncate">দল ২</span>
-                      </div>
-                      <span id="badge-win-b" class="hidden text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">✓ বিজয়ী</span>
-                    </label>
-                  </div>
-                </div>
-
-                <!-- 1 to 8 Remaining Pieces Selector -->
-                <div>
-                  <div class="flex items-center justify-between mb-1.5">
-                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300">পরাজিত দলের কয়টি গুটি বাকি ছিল? (মোট ৮ গুটির মধ্যে)</label>
-                    <span class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">১ থেকে ৮ পর্যন্ত</span>
-                  </div>
-                  <div class="grid grid-cols-8 gap-1.5">
-                    <button type="button" data-pieces="1" class="piece-btn py-2.5 rounded-xl font-extrabold text-sm border border-slate-300 dark:border-slate-700">১</button>
-                    <button type="button" data-pieces="2" class="piece-btn py-2.5 rounded-xl font-extrabold text-sm border-2 border-indigo-600 bg-indigo-600 text-white">২</button>
-                    <button type="button" data-pieces="3" class="piece-btn py-2.5 rounded-xl font-extrabold text-sm border border-slate-300 dark:border-slate-700">৩</button>
-                    <button type="button" data-pieces="4" class="piece-btn py-2.5 rounded-xl font-extrabold text-sm border border-slate-300 dark:border-slate-700">৪</button>
-                    <button type="button" data-pieces="5" class="piece-btn py-2.5 rounded-xl font-extrabold text-sm border border-slate-300 dark:border-slate-700">৫</button>
-                    <button type="button" data-pieces="6" class="piece-btn py-2.5 rounded-xl font-extrabold text-sm border border-slate-300 dark:border-slate-700">৬</button>
-                    <button type="button" data-pieces="7" class="piece-btn py-2.5 rounded-xl font-extrabold text-sm border border-slate-300 dark:border-slate-700">৭</button>
-                    <button type="button" data-pieces="8" class="piece-btn py-2.5 rounded-xl font-extrabold text-sm border border-slate-300 dark:border-slate-700">৮</button>
-                  </div>
-                  <input type="hidden" id="selected-pieces-val" value="2" />
-                </div>
-
-                <!-- Live Calculation Preview -->
-                <div id="match-nrr-preview" class="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900 text-xs space-y-1"></div>
-
-                <button type="submit" id="save-match-submit-btn" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 text-white font-bold text-sm shadow-md transition">
-                  ✅ ফলাফল সেভ করুন ও লাইভ আপডেট দিন
-                </button>
-              </form>
-            </div>
-
-            <!-- 2. Admin Moderation Center: Control & Delete Public Posts & Comments -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border-2 border-rose-200 dark:border-rose-900/70 p-4 sm:p-5 shadow-xs space-y-4">
-              <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                <div class="flex items-center gap-2">
-                  <span class="text-xl">🛡️</span>
-                  <div>
-                    <h3 class="font-bold text-base text-slate-900 dark:text-white">পাবলিক পোস্ট ও কমেন্ট নিয়ন্ত্রণ (Moderation)</h3>
-                    <p class="text-[11px] text-slate-500">সাধারণ দর্শকদের পোস্ট করা যেকোনো ছবি বা অপ্রয়োজনীয় কমেন্ট এখান থেকে মুছে ফেলুন</p>
-                  </div>
-                </div>
-                <span id="mod-total-badge" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">০টি পোস্ট</span>
-              </div>
-
-              <div id="admin-moderation-list" class="space-y-3 max-h-[420px] overflow-y-auto pr-1"></div>
-              <p id="empty-moderation-msg" class="text-xs text-slate-500 text-center py-4">এখনো কোনো পোস্ট বা পাবলিক কমেন্ট নেই।</p>
-            </div>
-
-            <!-- 3. Match History & Delete -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">
-              <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900">
-                <h3 class="font-bold text-sm sm:text-base">📋 ম্যাচ ইতিহাস ও সংশোধন</h3>
-                <span class="text-[11px] text-slate-500">মুছলে পয়েন্ট অটো ঠিক হবে</span>
-              </div>
-              <div id="admin-matches-history" class="divide-y divide-slate-100 dark:divide-slate-800"></div>
-              <p id="empty-admin-matches-msg" class="p-6 text-center text-xs text-slate-500">এখনো কোনো ম্যাচ সেভ করা হয়নি।</p>
-            </div>
-
-          </div>
-
-          <!-- RIGHT 5 COLS: NOTICE TICKER + PLAYER AVATARS + KNOCKOUT BRACKET + SETTINGS -->
-          <div class="lg:col-span-5 space-y-5">
-
-            <!-- Live Scrolling Notice Control -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-xs space-y-3">
-              <h3 class="font-bold text-base flex items-center gap-2">📢 লাইভ চলমান নোটিশ পরিবর্তন</h3>
-              <textarea id="admin-notice-textarea" rows="2" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs sm:text-sm font-semibold"></textarea>
-              <button id="save-notice-btn" type="button" class="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm transition">
-                📡 নোটিশ লাইভ আপডেট করুন
-              </button>
-            </div>
-
-            <!-- Dual Player Photo Upload -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-xs space-y-3.5">
-              <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
-                <span class="text-xl">🧑‍🤝‍🧑</span>
-                <div>
-                  <h3 class="font-bold text-base">খেলোয়াড়দের ছবি আপলোড</h3>
-                  <p class="text-[11px] text-slate-500">প্রতি দলের ২ জন খেলোয়াড়ের গোল ছবি সেট করুন</p>
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">দল নির্বাচন করুন</label>
-                <select id="avatar-team-select" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-sm"></select>
-              </div>
-
-              <!-- Player 1 Avatar -->
-              <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2.5">
-                    <div id="preview-p1-avatar" class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm overflow-hidden">১</div>
-                    <div>
-                      <p id="preview-p1-name" class="font-bold text-sm">খেলোয়াড় ১</p>
-                      <button type="button" id="remove-p1-avatar-btn" class="text-[11px] font-bold text-rose-600 hover:underline">ছবি মুছুন</button>
-                    </div>
-                  </div>
-                </div>
-                <input type="file" id="input-p1-avatar" accept="image/*" class="w-full text-xs" />
-              </div>
-
-              <!-- Player 2 Avatar -->
-              <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2.5">
-                    <div id="preview-p2-avatar" class="w-10 h-10 rounded-full bg-slate-700 text-white flex items-center justify-center font-bold text-sm overflow-hidden">২</div>
-                    <div>
-                      <p id="preview-p2-name" class="font-bold text-sm">খেলোয়াড় ২</p>
-                      <button type="button" id="remove-p2-avatar-btn" class="text-[11px] font-bold text-rose-600 hover:underline">ছবি মুছুন</button>
-                    </div>
-                  </div>
-                </div>
-                <input type="file" id="input-p2-avatar" accept="image/*" class="w-full text-xs" />
-              </div>
-            </div>
-
-            <!-- Semifinal & Final Winner Control -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-xs space-y-3">
-              <h3 class="font-bold text-base flex items-center gap-2">👑 সেমিফাইনাল ও ফাইনাল নিয়ন্ত্রণ</h3>
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">সেমিফাইনাল ১ বিজয়ী (১ম বনাম ৪র্থ)</label>
-                <select id="admin-sf1-winner-select" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold"></select>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">সেমিফাইনাল ২ বিজয়ী (২য় বনাম ৩য়)</label>
-                <select id="admin-sf2-winner-select" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold"></select>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-amber-600 mb-1">🏆 টুর্নামেন্ট চ্যাম্পিয়ন দল</label>
-                <select id="admin-champion-select" class="w-full px-3 py-2 rounded-xl border-2 border-amber-400 bg-amber-50/40 dark:bg-slate-800 text-xs font-extrabold"></select>
-              </div>
-              <button id="save-knockout-btn" type="button" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs transition">
-                🏆 নকআউট ও চ্যাম্পিয়ন সেভ করুন
-              </button>
-            </div>
-
-            <!-- Team Name Edit & Security PIN -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-xs space-y-3.5">
-              <h3 class="font-bold text-base flex items-center gap-2">⚙️ দল ও পিন সেটিংস</h3>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">টুর্নামেন্টের শিরোনাম</label>
-                <div class="flex gap-2">
-                  <input type="text" id="admin-title-input" class="flex-1 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold" />
-                  <button id="save-title-btn" type="button" class="px-3 py-2 rounded-xl bg-slate-800 text-white font-bold text-xs">সেভ</button>
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">নতুন অ্যাডমিন পিন</label>
-                <div class="flex gap-2">
-                  <input type="text" inputmode="numeric" id="admin-new-pin-input" maxlength="10" class="flex-1 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold" />
-                  <button id="save-new-pin-btn" type="button" class="px-3 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs">পিন সেভ</button>
-                </div>
-              </div>
-
-              <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
-                <button id="reset-all-matches-btn" type="button" class="w-full py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-bold text-xs hover:bg-rose-100 transition">
-                  🗑️ সব তথ্য মুছে ফেলুন (Reset All Data)
-                </button>
-
-                <!-- Double-Confirmation Safety Box for Reset -->
-                <div id="double-confirm-reset-box" class="hidden p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/70 border-2 border-rose-400 dark:border-rose-700 space-y-2.5 fade-up">
-                  <div class="flex items-start gap-2">
-                    <span class="text-base">⚠️</span>
-                    <div class="text-xs text-rose-800 dark:text-rose-200 leading-relaxed">
-                      <p class="font-extrabold">সতর্কতা: সব ম্যাচের ফলাফল ও পয়েন্ট মুছে যাবে!</p>
-                      <p class="mt-0.5">নিশ্চিত করতে নিচের ঘরে <strong class="underline">DELETE</strong> লিখুন অথবা আপনার অ্যাডমিন পিন দিন:</p>
-                    </div>
-                  </div>
-                  <input
-                    type="text"
-                    id="reset-verify-input"
-                    placeholder="DELETE অথবা পিন লিখুন"
-                    autocomplete="off"
-                    class="w-full px-3 py-2 rounded-lg border border-rose-300 dark:border-rose-700 bg-white dark:bg-slate-900 text-xs font-extrabold text-center tracking-wider uppercase focus:outline-none focus:ring-2 focus:ring-rose-500"
-                  />
-                  <div class="flex items-center gap-2">
-                    <button id="cancel-double-reset-btn" type="button" class="flex-1 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs">
-                      বাতিল
-                    </button>
-                    <button id="execute-double-reset-btn" type="button" class="flex-1 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs shadow-xs">
-                      চূড়ান্তভাবে মুছুন
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Backup & Data Protection Card -->
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border-2 border-emerald-200 dark:border-emerald-900/70 p-4 sm:p-5 shadow-xs space-y-3.5">
-              <div class="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-2.5">
-                <span class="text-xl">💾</span>
-                <div>
-                  <h3 class="font-bold text-base text-slate-900 dark:text-white">ব্যাকআপ ও ডেটা সুরক্ষা (Backup & Restore)</h3>
-                  <p class="text-[11px] text-slate-500">সব ফলাফল, ছবি ও কমেন্ট ফোনে সেভ রাখুন এবং যেকোনো সময় ফেরত আনুন</p>
-                </div>
-              </div>
-
-              <!-- Export JSON Backup -->
-              <button id="export-json-backup-btn" type="button" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition active:scale-[0.99]">
-                <span>📥 ব্যাকআপ ডাউনলোড করুন (JSON)</span>
-              </button>
-
-              <!-- Restore JSON Backup -->
-              <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-dashed border-emerald-300 dark:border-emerald-700 space-y-2">
-                <label class="block text-xs font-bold text-emerald-700 dark:text-emerald-300">
-                  📤 পূর্বের ব্যাকআপ ফাইল (.json) থেকে সব তথ্য ফেরত আনুন:
-                </label>
-                <input type="file" id="restore-json-backup-input" accept=".json,application/json" class="w-full text-xs text-slate-600 dark:text-slate-300" />
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
-
-    </section>
-
-  </main>
-
-  <!-- Floating Bottom Pill Navigation (Shown when ?admin=1 OR inside sandboxed preview/file testing) -->
-  <nav id="bottom-nav-bar" class="hidden fixed bottom-9 inset-x-0 z-40 pointer-events-none px-4">
-    <div class="max-w-xs mx-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-1.5 rounded-full shadow-xl border border-slate-200 dark:border-slate-700 flex items-center gap-1 pointer-events-auto">
-      <button id="pill-nav-scoreboard" type="button" class="flex-1 py-2 px-3 rounded-full font-extrabold text-xs bg-slate-900 text-white dark:bg-indigo-600 transition">
-        🏆 ফলাফল শিট
-      </button>
-      <button id="pill-nav-admin" type="button" class="flex-1 py-2 px-3 rounded-full font-extrabold text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-        🛡️ অ্যাডমিন প্যানেল
-      </button>
     </div>
-  </nav>
-
-  <!-- Fixed Bottom Right-to-Left Scrolling Latest Public Message Ticker -->
-  <div class="fixed bottom-0 inset-x-0 z-40 h-8 bg-slate-900 dark:bg-black text-white border-t border-slate-800 flex items-center overflow-hidden shadow-lg">
-    <div class="bg-purple-600 text-white text-[11px] font-extrabold px-2.5 h-full flex items-center gap-1 shrink-0 z-10 shadow-md">
-      <span>💬</span>
-      <span>পাবলিক মেসেজ</span>
-    </div>
-    <div class="flex-1 overflow-hidden relative">
-      <div id="bottom-public-message-marquee" class="marquee-public-rtl-track text-xs font-semibold text-emerald-300">
-        এখনো কোনো পাবলিক মেসেজ নেই — গ্যালারি থেকে প্রথম মেসেজ পাঠান!
-      </div>
-    </div>
-    <!-- Subtle Secret Lock Icon for Owner if opening public URL directly -->
-    <button id="footer-secret-lock-btn" type="button" title="অ্যাডমিন অ্যাক্সেস" class="px-2 h-full text-slate-500 hover:text-amber-400 text-xs shrink-0 z-10 bg-slate-900 dark:bg-black">
-      🔒
-    </button>
   </div>
 
   <!-- ========================================================= -->
-  <!-- JAVASCRIPT APPLICATION LOGIC                              -->
+  <!-- MODAL 5: DOUBLE-CONFIRMATION RESET DIALOG                 -->
   <!-- ========================================================= -->
+  <div id="modal-reset-confirm" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-rose-400 space-y-4">
+      <h3 id="reset-dialog-title" class="text-lg font-bold text-rose-600">⚠️ প্রথম ধাপ: নিশ্চিত করুন</h3>
+      <p id="reset-dialog-desc" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+        আপনি কি সত্যিই টুর্নামেন্টের সব ম্যাচের ফলাফল ও গ্যালারি পোস্ট মুছে ফেলতে চান?
+      </p>
+      <div class="flex gap-2">
+        <button id="btn-reset-cancel" type="button" class="flex-1 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold">বাতিল</button>
+        <button id="btn-reset-next" type="button" class="flex-1 py-2.5 rounded-xl bg-rose-600 text-white text-xs font-bold">নিশ্চিত করুন</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
       'use strict';
 
       // =========================================================
-      // 1. ENVIRONMENT & MODE DETECTION (?admin=1 vs Public)
+      // 1. CLOUD ENDPOINT & DEFAULT CRASH-PROOF DATA
       // =========================================================
-      const urlParams = new URLSearchParams(window.location.search);
-      const isExplicitAdminQuery = urlParams.get('admin') === '1';
-      const isSandboxOrLocal =
-        window.location.protocol === 'file:' ||
-        window.self !== window.top ||
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1';
+      const API_ENDPOINT = 'https://api.npoint.io/7e14215e2d4abb1e570d';
+      const STORAGE_KEY = 'ludo_championship_2026_v4';
+      const ADMIN_PIN = '1234';
 
-      let canAccessAdminNav = isExplicitAdminQuery || isSandboxOrLocal;
+      const DEFAULT_TEAMS = [
+        { id: 1, name: 'চেল্লু ও গালিব', p1: 'চেল্লু', p2: 'গালিব', c1: '#ef4444', c2: '#334155' },
+        { id: 2, name: 'নওশাদ ও ছোটন', p1: 'নওশাদ', p2: 'ছোটন', c1: '#22c55e', c2: '#1e293b' },
+        { id: 3, name: 'নয়ন ও নাঈম', p1: 'নয়ন', p2: 'নাঈম', c1: '#eab308', c2: '#0f172a' },
+        { id: 4, name: 'মারুফ ও মাসুম', p1: 'মারুফ', p2: 'মাসুম', c1: '#3b82f6', c2: '#334155' },
+        { id: 5, name: 'মোহন ও নান্টু', p1: 'মোহন', p2: 'নান্টু', c1: '#a855f7', c2: '#1e293b' },
+        { id: 6, name: 'রনি ও মিন্টু', p1: 'রনি', p2: 'মিন্টু', c1: '#ec4899', c2: '#0f172a' },
+        { id: 7, name: 'রাবু ও মিলন', p1: 'রাবু', p2: 'মিলন', c1: '#f97316', c2: '#334155' },
+        { id: 8, name: 'রোমান ও তনু', p1: 'রোমান', p2: 'তনু', c1: '#06b6d4', c2: '#1e293b' },
+      ];
 
-      // Dedicated npoint.io Live Sync Endpoint + LocalStorage Fallback
-      const SYNC_ENDPOINT = 'https://api.npoint.io/7e14215e2d4abb1e570d';
-      const LOCAL_STORAGE_KEY = 'ludo_champ_2026_mohon000_state_v5';
-      const AUTH_SESSION_KEY = 'ludo_champ_2026_admin_unlocked_v5';
-// ... existing code ... -->
-      function setSyncIndicator(mode) {
-        const dot = document.getElementById('sync-dot');
-        const txt = document.getElementById('sync-status-text');
-        if (mode === 'live') {
-          dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
-          txt.textContent = '🟢 লাইভ সিঙ্ক সক্রিয়';
-        } else if (mode === 'saving') {
-          dot.className = 'w-2 h-2 rounded-full bg-indigo-500 animate-ping';
-          txt.textContent = 'লাইভ সার্ভারে সেভ হচ্ছে...';
-        } else {
-          dot.className = 'w-2 h-2 rounded-full bg-amber-500';
-          txt.textContent = 'লোকাল ও সিঙ্ক মোড';
-        }
-      }
-// ... existing code ... -->
-      async function pushState(nextState) {
-        nextState.updatedAt = Date.now();
-        appState = normalizeState(nextState);
-        lastSignature = getSignature(appState);
-        saveLocal(appState);
-        renderAll();
-
-        isSyncingPush = true;
-        setSyncIndicator('saving');
-        try {
-          const res = await fetch(SYNC_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(appState)
-          });
-          if (res.ok) {
-            setSyncIndicator('live');
-            showToast('🟢 লাইভ সার্ভারে আপডেট হয়েছে!', 'success');
-          } else {
-            setSyncIndicator('offline');
-          }
-        } catch (err) {
-          setSyncIndicator('offline');
-        } finally {
-          isSyncingPush = false;
-        }
+      function buildInitialState() {
+        return {
+          teams: JSON.parse(JSON.stringify(DEFAULT_TEAMS)),
+          matches: [],
+          posts: [],
+          notice: '🏆 লুডু চ্যাম্পিয়নশিপ ২০২৬-এ সবাইকে স্বাগতম! প্রথম রাউন্ডের খেলা শীঘ্রই শুরু হবে।',
+          knockout: { sf1WinnerId: null, sf2WinnerId: null, championId: null },
+          updatedAt: Date.now(),
+        };
       }
 
-      async function pullState(isInitial = false) {
-        if (isSyncingPush) return;
-        try {
-          const res = await fetch(`${SYNC_ENDPOINT}?t=${Date.now()}`, { cache: 'no-store' });
-          if (res.ok) {
-            setSyncIndicator('live');
-            const data = await res.json();
-            if (data && typeof data === 'object' && Object.keys(data).length > 0 && Array.isArray(data.teams)) {
-              const norm = normalizeState(data);
-              const sig = getSignature(norm);
-              const isRemoteNewer = !appState.updatedAt || (norm.updatedAt && norm.updatedAt >= appState.updatedAt);
-              if (sig !== lastSignature && (isRemoteNewer || isInitial)) {
-                appState = norm;
-                lastSignature = sig;
-                saveLocal(appState);
-                renderAll();
+      function sanitizeState(raw) {
+        const fallback = buildInitialState();
+        if (!raw || typeof raw !== 'object') return fallback;
+        return {
+          teams: Array.isArray(raw.teams) && raw.teams.length > 0 ? raw.teams : fallback.teams,
+          matches: Array.isArray(raw.matches) ? raw.matches : [],
+          posts: Array.isArray(raw.posts) ? raw.posts : [],
+          notice: typeof raw.notice === 'string' && raw.notice.trim() ? raw.notice : fallback.notice,
+          knockout: raw.knockout && typeof raw.knockout === 'object'
+            ? {
+                sf1WinnerId: raw.knockout.sf1WinnerId || null,
+                sf2WinnerId: raw.knockout.sf2WinnerId || null,
+                championId: raw.knockout.championId || null,
               }
-            } else if (isInitial) {
-              await pushState(appState);
-            }
+            : fallback.knockout,
+          updatedAt: raw.updatedAt || Date.now(),
+        };
+      }
+
+      let state = buildInitialState();
+      let isSyncBusy = false;
+      let compressedImageBase64 = '';
+      let resetConfirmStage = 1;
+
+      // =========================================================
+      // 2. HELPERS (BENGALI NUMERALS, ESCAPE, TOAST)
+      // =========================================================
+      const bnNums = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+      function toBn(val) {
+        return String(val).replace(/\d/g, (d) => bnNums[Number(d)]);
+      }
+
+      function esc(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function toast(text, variant = 'info') {
+        const box = document.getElementById('toast-box');
+        if (!box) return;
+        const styles = {
+          success: 'bg-emerald-600 text-white',
+          error: 'bg-rose-600 text-white',
+          info: 'bg-slate-900 text-white dark:bg-indigo-600',
+        };
+        const item = document.createElement('div');
+        item.className = `${styles[variant] || styles.info} px-4 py-2.5 rounded-xl shadow-lg text-xs sm:text-sm font-bold transition-opacity duration-300`;
+        item.textContent = text;
+        box.appendChild(item);
+        setTimeout(() => {
+          item.style.opacity = '0';
+          setTimeout(() => item.remove(), 300);
+        }, 3000);
+      }
+
+      function updateSyncPill(mode) {
+        const pill = document.getElementById('sync-status-pill');
+        if (!pill) return;
+        if (mode === 'live') {
+          pill.className = 'text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1';
+          pill.textContent = '🟢 লাইভ সিঙ্ক সক্রিয়';
+        } else if (mode === 'syncing') {
+          pill.className = 'text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1';
+          pill.textContent = '🟡 সিঙ্ক হচ্ছে...';
+        } else {
+          pill.className = 'text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1';
+          pill.textContent = '🔴 অফলাইন ব্যাকআপ';
+        }
+      }
+
+      // =========================================================
+      // 3. CRASH-PROOF CLOUD SYNC (NPOINT.IO)
+      // =========================================================
+      function saveToLocal() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          console.warn('LocalStorage error:', e);
+        }
+      }
+
+      function loadFromLocal() {
+        try {
+          const cached = localStorage.getItem(STORAGE_KEY);
+          if (cached) {
+            state = sanitizeState(JSON.parse(cached));
           }
         } catch (e) {
-          setSyncIndicator('offline');
+          state = buildInitialState();
         }
       }
-// ... existing code ... -->
-      document.getElementById('input-p1-avatar').addEventListener('change', async (e) => {
-        const file = e.target.files && e.target.files[0];
-        const teamId = document.getElementById('avatar-team-select').value;
-        if (!file || !teamId) return;
-        const compressed = await compressImageFile(file, 160, 0.7);
-        const nextTeams = appState.teams.map((t) => (t.id === teamId ? { ...t, avatar1: compressed } : t));
-        e.target.value = '';
-        await pushState({ ...appState, teams: nextTeams });
-        showToast('✅ খেলোয়াড় ১-এর ছবি আপডেট হয়েছে!', 'success');
-      });
 
-      document.getElementById('input-p2-avatar').addEventListener('change', async (e) => {
-        const file = e.target.files && e.target.files[0];
-        const teamId = document.getElementById('avatar-team-select').value;
-        if (!file || !teamId) return;
-        const compressed = await compressImageFile(file, 160, 0.7);
-        const nextTeams = appState.teams.map((t) => (t.id === teamId ? { ...t, avatar2: compressed } : t));
-        e.target.value = '';
-        await pushState({ ...appState, teams: nextTeams });
-        showToast('✅ খেলোয়াড় ২-এর ছবি আপডেট হয়েছে!', 'success');
-      });
-// ... existing code ... -->
+      async function saveToCloud(silent = false) {
+        if (isSyncBusy) return;
+        isSyncBusy = true;
+        state.updatedAt = Date.now();
+        saveToLocal();
+        updateSyncPill('syncing');
+
+        try {
+          const response = await fetch(API_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(state),
+          });
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          updateSyncPill('live');
+          if (!silent) toast('✅ সবার ফোনে লাইভ আপডেট হয়েছে!', 'success');
+        } catch (err) {
+          console.error('Save error:', err);
+          updateSyncPill('offline');
+          if (!silent) toast('⚠️ অফলাইন ব্যাকআপে সেভ হয়েছে (নেটওয়ার্ক চেক করুন)।', 'error');
+        } finally {
+          isSyncBusy = false;
+        }
+      }
+
+      async function fetchFromCloud(isFirstLoad = false) {
+        if (isSyncBusy) return;
+        if (isFirstLoad) updateSyncPill('syncing');
+
+        try {
+          const response = await fetch(`${API_ENDPOINT}?nocache=${Date.now()}`, { cache: 'no-store' });
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          const remoteData = await response.json();
+
+          // If npoint.io returns {} or missing/empty teams array, initialize and immediately POST default state
+          if (!remoteData || !Array.isArray(remoteData.teams) || remoteData.teams.length === 0) {
+            state = buildInitialState();
+            saveToLocal();
+            updateSyncPill('live');
+            renderUI();
+            await saveToCloud(true);
+            return;
+          }
+
+          state = sanitizeState(remoteData);
+          saveToLocal();
+          updateSyncPill('live');
+          renderUI();
+        } catch (err) {
+          console.warn('Fetch error:', err);
+          updateSyncPill('offline');
+          if (isFirstLoad) renderUI();
+        }
+      }
+
+      // =========================================================
+      // 4. STANDINGS & RUN RATE ENGINE (+GF / -GA OVER 8 PIECES)
+      // =========================================================
+      function computeStandings() {
+        const map = {};
+        state.teams.forEach((team) => {
+          map[team.id] = {
+            ...team,
+            m: 0,
+            w: 0,
+            l: 0,
+            pts: 0,
+            gf: 0,
+            ga: 0,
+            diff: 0,
+          };
+        });
+
+        state.matches.forEach((match) => {
+          const a = map[match.teamAId];
+          const b = map[match.teamBId];
+          if (!a || !b) return;
+
+          const sA = Number(match.scoreA) || 0;
+          const sB = Number(match.scoreB) || 0;
+
+          a.m += 1;
+          b.m += 1;
+          a.gf += sA;
+          a.ga += sB;
+          b.gf += sB;
+          b.ga += sA;
+
+          if (sA > sB) {
+            a.w += 1;
+            a.pts += 2;
+            b.l += 1;
+          } else if (sB > sA) {
+            b.w += 1;
+            b.pts += 2;
+            a.l += 1;
+          } else {
+            a.pts += 1;
+            b.pts += 1;
+          }
+        });
+
+        const arr = Object.values(map).map((t) => {
+          t.diff = t.gf - t.ga;
+          return t;
+        });
+
+        arr.sort((a, b) => {
+          if (b.pts !== a.pts) return b.pts - a.pts;
+          if (b.diff !== a.diff) return b.diff - a.diff;
+          if (b.w !== a.w) return b.w - a.w;
+          return a.id - b.id;
+        });
+
+        return arr;
+      }
+
+      // =========================================================
+      // 5. UI RENDERING
+      // =========================================================
+      function renderUI() {
+        const standings = computeStandings();
+
+        // Update Top Notice & Post Count Badge
+        document.getElementById('live-notice-marquee').textContent = state.notice;
+        document.getElementById('post-count-badge').textContent = toBn(state.posts.length);
+        document.getElementById('matches-count-pill').textContent = `${toBn(state.matches.length)}টি ম্যাচ`;
+
+        // Render Points Table
+        const tbody = document.getElementById('points-table-body');
+        tbody.innerHTML = standings
+          .map((t, index) => {
+            const rank = index + 1;
+            const isQualified = rank <= 4;
+            const diffText =
+              t.diff > 0
+                ? `+${toBn(t.diff)}`
+                : t.diff < 0
+                ? `-${toBn(Math.abs(t.diff))}`
+                : '০';
+            const diffColor =
+              t.diff > 0
+                ? 'text-emerald-600 dark:text-emerald-400'
+                : t.diff < 0
+                ? 'text-rose-600 dark:text-rose-400'
+                : 'text-slate-500';
+
+            return `
+              <tr data-team-id="${t.id}" class="team-row cursor-pointer transition hover:bg-indigo-50/70 dark:hover:bg-slate-800/70 ${
+                isQualified ? 'bg-emerald-50/40 dark:bg-emerald-950/20' : ''
+              }">
+                <td class="py-3 px-2.5 text-center font-bold">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs ${
+                    isQualified
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                  }">
+                    ${toBn(rank)}
+                  </span>
+                </td>
+                <td class="py-3 px-3">
+                  <div class="flex items-center gap-2">
+                    <div class="flex -space-x-1.5 shrink-0">
+                      <span class="w-6 h-6 rounded-full text-[10px] font-bold text-white flex items-center justify-center ring-2 ring-white dark:ring-slate-900" style="background:${t.c1}">${esc(t.p1.charAt(0))}</span>
+                      <span class="w-6 h-6 rounded-full text-[10px] font-bold text-white flex items-center justify-center ring-2 ring-white dark:ring-slate-900" style="background:${t.c2}">${esc(t.p2.charAt(0))}</span>
+                    </div>
+                    <div>
+                      <div class="font-bold text-slate-900 dark:text-white leading-snug">${esc(t.name)}</div>
+                      <div class="text-[11px] text-slate-500 dark:text-slate-400">${esc(t.p1)} ও ${esc(t.p2)}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3 px-2 text-center font-semibold">${toBn(t.m)}</td>
+                <td class="py-3 px-2 text-center font-bold text-emerald-600 dark:text-emerald-400">${toBn(t.w)}</td>
+                <td class="py-3 px-2 text-center font-bold text-rose-600 dark:text-rose-400">${toBn(t.l)}</td>
+                <td class="py-3 px-2.5 text-center">
+                  <span class="inline-block px-2.5 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-extrabold">
+                    ${toBn(t.pts)}
+                  </span>
+                </td>
+                <td class="py-3 px-2.5 text-center font-bold ${diffColor}">
+                  ${diffText} <span class="text-[10px] font-normal text-slate-400">(${toBn(t.gf)}/${toBn(t.ga)})</span>
+                </td>
+              </tr>
+            `;
+          })
+          .join('');
+
+        // Render Recent Matches
+        const matchesBox = document.getElementById('recent-matches-container');
+        if (state.matches.length === 0) {
+          matchesBox.innerHTML = `
+            <div class="py-8 text-center text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              এখনো কোনো ম্যাচ শুরু হয়নি। অ্যাডমিন ফলাফল আপডেট করলে এখানে লাইভ স্কোর দেখা যাবে।
+            </div>
+          `;
+        } else {
+          matchesBox.innerHTML = [...state.matches]
+            .reverse()
+            .map((m, idx) => {
+              const tA = state.teams.find((x) => x.id === m.teamAId) || { name: 'দল ১' };
+              const tB = state.teams.find((x) => x.id === m.teamBId) || { name: 'দল ২' };
+              const aWin = m.scoreA > m.scoreB;
+              const bWin = m.scoreB > m.scoreA;
+              const mNum = state.matches.length - idx;
+              return `
+                <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700">ম্যাচ #${toBn(mNum)}</span>
+                    <span class="font-bold text-xs sm:text-sm ${aWin ? 'text-emerald-600 dark:text-emerald-400' : ''}">
+                      ${esc(tA.name)} ${aWin ? '🏆' : ''}
+                    </span>
+                    <span class="px-2.5 py-0.5 rounded-lg bg-slate-900 text-white font-extrabold text-xs">
+                      ${toBn(m.scoreA)} - ${toBn(m.scoreB)}
+                    </span>
+                    <span class="font-bold text-xs sm:text-sm ${bWin ? 'text-emerald-600 dark:text-emerald-400' : ''}">
+                      ${esc(tB.name)} ${bWin ? '🏆' : ''}
+                    </span>
+                  </div>
+                  <div class="text-[11px] text-slate-500 dark:text-slate-400">${esc(m.time || '')}</div>
+                </div>
+              `;
+            })
+            .join('');
+        }
+
+        // Render Knockout Bracket
+        renderKnockoutBracket(standings);
+
+        // Render Gallery & Bottom Ticker
+        renderGalleryFeed();
+
+        // Sync Admin Lists if modal open
+        if (!document.getElementById('modal-admin-panel').classList.contains('hidden')) {
+          populateAdminPanel();
+        }
+      }
+
+      function renderKnockoutBracket(standings) {
+        const s1 = standings[0] || { name: '১ম স্থান' };
+        const s2 = standings[1] || { name: '২য় স্থান' };
+        const s3 = standings[2] || { name: '৩য় স্থান' };
+        const s4 = standings[3] || { name: '৪র্থ স্থান' };
+
+        const ko = state.knockout || {};
+        const sf1Win = state.teams.find((t) => t.id === Number(ko.sf1WinnerId));
+        const sf2Win = state.teams.find((t) => t.id === Number(ko.sf2WinnerId));
+        const champ = state.teams.find((t) => t.id === Number(ko.championId));
+
+        document.getElementById('sf1-card').innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <span>১ম: ${esc(s1.name)}</span>
+            <span class="text-xs text-slate-400">VS</span>
+            <span>৪র্থ: ${esc(s4.name)}</span>
+          </div>
+          ${sf1Win ? `<div class="text-xs text-emerald-600 dark:text-emerald-400 pt-1 border-t border-slate-100 dark:border-slate-800">✅ বিজয়ী: ${esc(sf1Win.name)}</div>` : ''}
+        `;
+
+        document.getElementById('sf2-card').innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <span>২য়: ${esc(s2.name)}</span>
+            <span class="text-xs text-slate-400">VS</span>
+            <span>৩য়: ${esc(s3.name)}</span>
+          </div>
+          ${sf2Win ? `<div class="text-xs text-emerald-600 dark:text-emerald-400 pt-1 border-t border-slate-100 dark:border-slate-800">✅ বিজয়ী: ${esc(sf2Win.name)}</div>` : ''}
+        `;
+
+        document.getElementById('final-card').innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span>${sf1Win ? esc(sf1Win.name) : 'সেমিফাইনাল ১ বিজয়ী'}</span>
+            <span class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 text-xs font-extrabold">VS</span>
+            <span>${sf2Win ? esc(sf2Win.name) : 'সেমিফাইনাল ২ বিজয়ী'}</span>
+          </div>
+          ${
+            champ
+              ? `<div class="mt-2.5 p-2 rounded-xl bg-amber-400/20 border border-amber-400 text-center text-amber-700 dark:text-amber-300 font-extrabold text-base">🏆 চ্যাম্পিয়ন ২০২৬: ${esc(champ.name)} 🎉</div>`
+              : `<div class="mt-2 text-xs text-slate-500">ফাইনাল ম্যাচ শেষে চ্যাম্পিয়নের নাম এখানে প্রদর্শিত হবে।</div>`
+          }
+        `;
+      }
+
+      function renderGalleryFeed() {
+        const feed = document.getElementById('gallery-posts-feed');
+        const bottomTicker = document.getElementById('bottom-public-marquee');
+
+        if (!state.posts || state.posts.length === 0) {
+          bottomTicker.textContent = 'এখনো কোনো পাবলিক মেসেজ নেই — গ্যালারি থেকে প্রথম মেসেজ বা ছবি পোস্ট করুন!';
+          feed.innerHTML = `
+            <div class="p-8 text-center text-xs sm:text-sm text-slate-500 border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl">
+              এখনো কোনো ছবি বা পোস্ট নেই। উপরের ফর্ম থেকে প্রথম পোস্টটি শেয়ার করুন!
+            </div>
+          `;
+          return;
+        }
+
+        bottomTicker.textContent = [...state.posts]
+          .slice(-6)
+          .reverse()
+          .map((p) => `${p.author}: "${p.text}"`)
+          .join('   ★   ');
+
+        feed.innerHTML = [...state.posts]
+          .reverse()
+          .map((post) => {
+            const comments = Array.isArray(post.comments) ? post.comments : [];
+            return `
+              <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
+                <div class="p-3 flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800">
+                  <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs">
+                    ${esc((post.author || 'U').charAt(0))}
+                  </div>
+                  <div>
+                    <div class="font-bold text-xs sm:text-sm">${esc(post.author)}</div>
+                    <div class="text-[10px] text-slate-500">${esc(post.time || 'এইমাত্র')}</div>
+                  </div>
+                </div>
+
+                ${
+                  post.image
+                    ? `<div class="bg-slate-950 flex justify-center">
+                        <img src="${post.image}" alt="Tournament Photo" class="max-h-80 w-auto object-contain" loading="lazy" />
+                      </div>`
+                    : ''
+                }
+
+                <div class="p-3.5 space-y-3">
+                  <p class="text-xs sm:text-sm text-slate-800 dark:text-slate-200 whitespace-pre-line">${esc(post.text)}</p>
+
+                  <div class="flex items-center gap-2">
+                    <button type="button" data-react="like" data-id="${post.id}"
+                      class="btn-react px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold">
+                      👍 লাইক (${toBn(post.likes || 0)})
+                    </button>
+                    <button type="button" data-react="dislike" data-id="${post.id}"
+                      class="btn-react px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 text-xs font-bold">
+                      👎 ডিসলাইক (${toBn(post.dislikes || 0)})
+                    </button>
+                    <span class="ml-auto text-xs text-slate-500 font-semibold">💬 ${toBn(comments.length)} কমেন্ট</span>
+                  </div>
+
+                  <!-- Nested Comments -->
+                  <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                    <div class="space-y-1.5 max-h-40 overflow-y-auto">
+                      ${comments
+                        .map(
+                          (c) => `
+                          <div class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs">
+                            <span class="font-bold text-indigo-600 dark:text-indigo-400">${esc(c.author)}:</span>
+                            <span>${esc(c.text)}</span>
+                          </div>
+                        `
+                        )
+                        .join('')}
+                    </div>
+                    <form data-id="${post.id}" class="form-nested-comment flex gap-1.5">
+                      <input type="text" name="cName" required maxlength="20" placeholder="নাম"
+                        class="w-24 px-2.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs" />
+                      <input type="text" name="cBody" required maxlength="150" placeholder="কমেন্ট লিখুন..."
+                        class="flex-1 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs" />
+                      <button type="submit" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold shrink-0">পাঠান</button>
+                    </form>
+                  </div>
+                </div>
+              </article>
+            `;
+          })
+          .join('');
+      }
+
+      // =========================================================
+      // 6. ADMIN PANEL POPULATION
+      // =========================================================
+      function populateAdminPanel() {
+        const opts = state.teams.map((t) => `<option value="${t.id}">${esc(t.name)}</option>`).join('');
+        const selA = document.getElementById('select-team-a');
+        const selB = document.getElementById('select-team-b');
+        selA.innerHTML = opts;
+        selB.innerHTML = opts;
+        if (state.teams[1]) selB.value = String(state.teams[1].id);
+
+        document.getElementById('input-admin-notice').value = state.notice;
+
+        const koOpts = `<option value="">-- নির্ধারিত নয় --</option>` + opts;
+        const sf1 = document.getElementById('select-sf1-win');
+        const sf2 = document.getElementById('select-sf2-win');
+        const champ = document.getElementById('select-champion-win');
+        sf1.innerHTML = koOpts;
+        sf2.innerHTML = koOpts;
+        champ.innerHTML = koOpts;
+        sf1.value = state.knockout?.sf1WinnerId || '';
+        sf2.value = state.knockout?.sf2WinnerId || '';
+        champ.value = state.knockout?.championId || '';
+
+        // Team Editor
+        document.getElementById('admin-teams-editor').innerHTML = state.teams
+          .map(
+            (t) => `
+            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1.5 text-xs">
+              <div class="font-bold text-indigo-600 dark:text-indigo-400">দল #${toBn(t.id)}</div>
+              <input type="text" data-tid="${t.id}" data-field="name" value="${esc(t.name)}" placeholder="দলের নাম"
+                class="team-edit-input w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 font-bold" />
+              <div class="grid grid-cols-2 gap-1.5">
+                <input type="text" data-tid="${t.id}" data-field="p1" value="${esc(t.p1)}" placeholder="খেলোয়াড় ১"
+                  class="team-edit-input w-full px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900" />
+                <input type="text" data-tid="${t.id}" data-field="p2" value="${esc(t.p2)}" placeholder="খেলোয়াড় ২"
+                  class="team-edit-input w-full px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900" />
+              </div>
+            </div>
+          `
+          )
+          .join('');
+
+        // Matches Delete List
+        const mList = document.getElementById('admin-match-list');
+        mList.innerHTML =
+          state.matches.length === 0
+            ? '<p class="text-slate-500">কোনো ম্যাচ নেই।</p>'
+            : [...state.matches]
+                .reverse()
+                .map((m) => {
+                  const tA = state.teams.find((x) => x.id === m.teamAId) || { name: 'দল ১' };
+                  const tB = state.teams.find((x) => x.id === m.teamBId) || { name: 'দল ২' };
+                  return `
+                    <div class="flex items-center justify-between p-2 rounded-xl bg-slate-100 dark:bg-slate-800 gap-2">
+                      <span class="truncate font-semibold">${esc(tA.name)} (${toBn(m.scoreA)}) vs ${esc(tB.name)} (${toBn(m.scoreB)})</span>
+                      <button type="button" data-mid="${m.id}" class="btn-remove-match px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold shrink-0">মুছুন</button>
+                    </div>
+                  `;
+                })
+                .join('');
+
+        // Posts Moderation List
+        const pList = document.getElementById('admin-post-list');
+        pList.innerHTML =
+          state.posts.length === 0
+            ? '<p class="text-slate-500">কোনো পোস্ট নেই।</p>'
+            : [...state.posts]
+                .reverse()
+                .map(
+                  (p) => `
+                  <div class="flex items-center justify-between p-2 rounded-xl bg-slate-100 dark:bg-slate-800 gap-2">
+                    <span class="truncate"><strong>${esc(p.author)}:</strong> ${esc(p.text)}</span>
+                    <button type="button" data-pid="${p.id}" class="btn-remove-post px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold shrink-0">ডিলিট</button>
+                  </div>
+                `
+                )
+                .join('');
+      }
+
+      // =========================================================
+      // 7. IMAGE COMPRESSION (MAX 600PX, JPEG 0.6)
+      // =========================================================
+      function compressImageToDataUrl(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const MAX_WIDTH = 600;
+              let width = img.width;
+              let height = img.height;
+              if (width > MAX_WIDTH) {
+                height = Math.round((height * MAX_WIDTH) / width);
+                width = MAX_WIDTH;
+              }
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL('image/jpeg', 0.6));
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // =========================================================
+      // 8. ALL EVENT HANDLERS
+      // =========================================================
+      function initEventListeners() {
+        // Dark / Light Theme Toggle
+        const themeBtn = document.getElementById('btn-theme-toggle');
+        if (localStorage.getItem('ludo_dark_mode') === '1') {
+          document.documentElement.classList.add('dark');
+          themeBtn.textContent = '☀️';
+        }
+        themeBtn.addEventListener('click', () => {
+          const dark = document.documentElement.classList.toggle('dark');
+          localStorage.setItem('ludo_dark_mode', dark ? '1' : '0');
+          themeBtn.textContent = dark ? '☀️' : '🌙';
+        });
+
+        // Manual Refresh
+        document.getElementById('btn-manual-refresh').addEventListener('click', async () => {
+          toast('🔄 লাইভ ডেটা আপডেট হচ্ছে...', 'info');
+          await fetchFromCloud(true);
+          toast('✅ সর্বশেষ তথ্য লোড হয়েছে!', 'success');
+        });
+
+        // Toggle Knockout Panel
+        document.getElementById('btn-toggle-knockout').addEventListener('click', () => {
+          const panel = document.getElementById('knockout-panel-body');
+          const badge = document.getElementById('knockout-toggle-badge');
+          const hidden = panel.classList.toggle('hidden');
+          badge.textContent = hidden ? 'দেখুন ▾' : 'লুকান ▴';
+        });
+
+        // Toggle Rules Accordion
+        document.getElementById('btn-toggle-rules').addEventListener('click', () => {
+          const panel = document.getElementById('rules-panel-body');
+          const badge = document.getElementById('rules-toggle-badge');
+          const hidden = panel.classList.toggle('hidden');
+          badge.textContent = hidden ? 'দেখুন ▾' : 'লুকান ▴';
+        });
+
+        // Team Row Click -> Details Modal
+        document.getElementById('points-table-body').addEventListener('click', (e) => {
+          const row = e.target.closest('.team-row');
+          if (!row) return;
+          const id = Number(row.getAttribute('data-team-id'));
+          const team = state.teams.find((t) => t.id === id);
+          if (!team) return;
+
+          const teamMatches = state.matches.filter((m) => m.teamAId === id || m.teamBId === id);
+          document.getElementById('team-modal-heading').textContent = `🎲 ${team.name}`;
+          document.getElementById('team-modal-content').innerHTML = `
+            <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 flex justify-between text-xs font-bold">
+              <span>খেলোয়াড় ১: ${esc(team.p1)}</span>
+              <span>খেলোয়াড় ২: ${esc(team.p2)}</span>
+            </div>
+            <div class="font-bold text-xs text-slate-500 pt-1">খেলার ইতিহাস (${toBn(teamMatches.length)}টি ম্যাচ)</div>
+            ${
+              teamMatches.length === 0
+                ? '<p class="text-xs text-slate-500 text-center py-4">এই দল এখনো কোনো ম্যাচ খেলেনি।</p>'
+                : teamMatches
+                    .map((m) => {
+                      const tA = state.teams.find((x) => x.id === m.teamAId) || { name: 'দল ১' };
+                      const tB = state.teams.find((x) => x.id === m.teamBId) || { name: 'দল ২' };
+                      return `
+                        <div class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center text-xs font-bold">
+                          <span>${esc(tA.name)} vs ${esc(tB.name)}</span>
+                          <span class="px-2 py-0.5 rounded bg-indigo-600 text-white">${toBn(m.scoreA)} - ${toBn(m.scoreB)}</span>
+                        </div>
+                      `;
+                    })
+                    .join('')
+            }
+          `;
+          document.getElementById('modal-team-details').classList.remove('hidden');
+        });
+
+        document.getElementById('btn-close-team-modal').addEventListener('click', () => {
+          document.getElementById('modal-team-details').classList.add('hidden');
+        });
+
+        // Open / Close Gallery Modal
+        const openGallery = () => {
+          renderGalleryFeed();
+          document.getElementById('modal-gallery').classList.remove('hidden');
+        };
+        document.getElementById('btn-open-gallery').addEventListener('click', openGallery);
+        document.getElementById('btn-banner-gallery').addEventListener('click', openGallery);
+        document.getElementById('btn-close-gallery').addEventListener('click', () => {
+          document.getElementById('modal-gallery').classList.add('hidden');
+        });
+
+        // Image Attachment Compression
+        document.getElementById('input-post-file').addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          try {
+            toast('🖼️ ছবি সংকুচিত করা হচ্ছে...', 'info');
+            compressedImageBase64 = await compressImageToDataUrl(file);
+            document.getElementById('preview-img').src = compressedImageBase64;
+            document.getElementById('preview-container').classList.remove('hidden');
+          } catch (err) {
+            toast('❌ ছবি লোড করতে সমস্যা হয়েছে।', 'error');
+          }
+        });
+
+        document.getElementById('btn-clear-img').addEventListener('click', () => {
+          compressedImageBase64 = '';
+          document.getElementById('input-post-file').value = '';
+          document.getElementById('preview-container').classList.add('hidden');
+        });
+
+        // Publish New Post
+        document.getElementById('form-new-post').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const author = document.getElementById('input-post-author').value.trim();
+          const text = document.getElementById('input-post-text').value.trim();
+          if (!author || !text) return;
+
+          const timeStr = new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+          state.posts.push({
+            id: 'p_' + Date.now(),
+            author,
+            text,
+            image: compressedImageBase64 || '',
+            likes: 0,
+            dislikes: 0,
+            comments: [],
+            time: timeStr,
+          });
+
+          if (state.posts.length > 25) state.posts = state.posts.slice(-25);
+
+          compressedImageBase64 = '';
+          document.getElementById('input-post-text').value = '';
+          document.getElementById('input-post-file').value = '';
+          document.getElementById('preview-container').classList.add('hidden');
+
+          renderUI();
+          await saveToCloud(false);
+        });
+
+        // Likes, Dislikes & Nested Comments
+        const feedContainer = document.getElementById('gallery-posts-feed');
+        feedContainer.addEventListener('click', async (e) => {
+          const btn = e.target.closest('.btn-react');
+          if (!btn) return;
+          const post = state.posts.find((p) => p.id === btn.getAttribute('data-id'));
+          if (!post) return;
+
+          if (btn.getAttribute('data-react') === 'like') post.likes = (post.likes || 0) + 1;
+          else post.dislikes = (post.dislikes || 0) + 1;
+
+          renderGalleryFeed();
+          await saveToCloud(true);
+        });
+
+        feedContainer.addEventListener('submit', async (e) => {
+          const form = e.target.closest('.form-nested-comment');
+          if (!form) return;
+          e.preventDefault();
+          const post = state.posts.find((p) => p.id === form.getAttribute('data-id'));
+          if (!post) return;
+
+          const cName = form.elements.cName.value.trim();
+          const cBody = form.elements.cBody.value.trim();
+          if (!cName || !cBody) return;
+
+          if (!Array.isArray(post.comments)) post.comments = [];
+          post.comments.push({ author: cName, text: cBody });
+
+          renderGalleryFeed();
+          await saveToCloud(false);
+        });
+
+        // Admin Lock Button -> PIN Modal
+        document.getElementById('btn-admin-lock').addEventListener('click', () => {
+          document.getElementById('input-admin-pin').value = '';
+          document.getElementById('modal-admin-pin').classList.remove('hidden');
+          setTimeout(() => document.getElementById('input-admin-pin').focus(), 100);
+        });
+
+        document.getElementById('btn-cancel-pin').addEventListener('click', () => {
+          document.getElementById('modal-admin-pin').classList.add('hidden');
+        });
+
+        document.getElementById('form-admin-pin').addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (document.getElementById('input-admin-pin').value.trim() === ADMIN_PIN) {
+            document.getElementById('modal-admin-pin').classList.add('hidden');
+            populateAdminPanel();
+            document.getElementById('modal-admin-panel').classList.remove('hidden');
+            toast('🔓 অ্যাডমিন প্যানেল আনলক হয়েছে!', 'success');
+          } else {
+            toast('❌ ভুল পিন! সঠিক পিন (1234) দিন।', 'error');
+          }
+        });
+
+        document.getElementById('btn-close-admin').addEventListener('click', () => {
+          document.getElementById('modal-admin-panel').classList.add('hidden');
+        });
+
+        // Admin: Add Match Result
+        document.getElementById('form-add-match').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const teamAId = Number(document.getElementById('select-team-a').value);
+          const teamBId = Number(document.getElementById('select-team-b').value);
+          const scoreA = Number(document.getElementById('input-score-a').value);
+          const scoreB = Number(document.getElementById('input-score-b').value);
+
+          if (teamAId === teamBId) {
+            toast('⚠️ দুটি ভিন্ন দল নির্বাচন করুন!', 'error');
+            return;
+          }
+
+          const timeStr = new Date().toLocaleString('bn-BD', {
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+
+          state.matches.push({
+            id: 'm_' + Date.now(),
+            teamAId,
+            teamBId,
+            scoreA,
+            scoreB,
+            time: timeStr,
+          });
+
+          renderUI();
+          await saveToCloud(false);
+        });
+
+        // Admin: Update Notice
+        document.getElementById('btn-update-notice').addEventListener('click', async () => {
+          const text = document.getElementById('input-admin-notice').value.trim();
+          if (!text) return;
+          state.notice = text;
+          renderUI();
+          await saveToCloud(false);
+        });
+
+        // Admin: Save Knockout Winners
+        document.getElementById('btn-save-knockout').addEventListener('click', async () => {
+          state.knockout = {
+            sf1WinnerId: Number(document.getElementById('select-sf1-win').value) || null,
+            sf2WinnerId: Number(document.getElementById('select-sf2-win').value) || null,
+            championId: Number(document.getElementById('select-champion-win').value) || null,
+          };
+          renderUI();
+          await saveToCloud(false);
+        });
+
+        // Admin: Save Edited Team Names
+        document.getElementById('btn-save-teams').addEventListener('click', async () => {
+          document.querySelectorAll('.team-edit-input').forEach((inp) => {
+            const tid = Number(inp.getAttribute('data-tid'));
+            const field = inp.getAttribute('data-field');
+            const team = state.teams.find((t) => t.id === tid);
+            if (team && inp.value.trim()) {
+              team[field] = inp.value.trim();
+            }
+          });
+          renderUI();
+          await saveToCloud(false);
+        });
+
+        // Admin: Delete Match / Post
+        document.getElementById('admin-match-list').addEventListener('click', async (e) => {
+          const btn = e.target.closest('.btn-remove-match');
+          if (!btn) return;
+          state.matches = state.matches.filter((m) => m.id !== btn.getAttribute('data-mid'));
+          renderUI();
+          await saveToCloud(false);
+        });
+
+        document.getElementById('admin-post-list').addEventListener('click', async (e) => {
+          const btn = e.target.closest('.btn-remove-post');
+          if (!btn) return;
+          state.posts = state.posts.filter((p) => p.id !== btn.getAttribute('data-pid'));
+          renderUI();
+          await saveToCloud(false);
+        });
+
+        // Admin: Download JSON Backup
+        document.getElementById('btn-download-backup').addEventListener('click', () => {
+          const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `ludo-championship-2026-backup-${new Date().toISOString().slice(0, 10)}.json`;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+          toast('📥 ব্যাকআপ ফাইল ডাউনলোড হয়েছে!', 'success');
+        });
+
+        // Admin: Restore JSON Backup
+        document.getElementById('input-restore-file').addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = async (ev) => {
+            try {
+              state = sanitizeState(JSON.parse(ev.target.result));
+              renderUI();
+              await saveToCloud(false);
+              toast('✅ ব্যাকআপ থেকে সব তথ্য রিস্টোর হয়েছে!', 'success');
+            } catch (err) {
+              toast('❌ সঠিক JSON ব্যাকআপ ফাইল দিন।', 'error');
+            }
+          };
+          reader.readAsText(file);
+        });
+
+        // Admin: Double-Confirmation Reset
+        const resetModal = document.getElementById('modal-reset-confirm');
+        document.getElementById('btn-trigger-reset').addEventListener('click', () => {
+          resetConfirmStage = 1;
+          document.getElementById('reset-dialog-title').textContent = '⚠️ প্রথম ধাপ: নিশ্চিত করুন';
+          document.getElementById('reset-dialog-desc').textContent =
+            'আপনি কি সত্যিই টুর্নামেন্টের সব ম্যাচের ফলাফল ও গ্যালারি পোস্ট মুছে ফেলতে চান?';
+          document.getElementById('btn-reset-next').textContent = 'নিশ্চিত করুন';
+          resetModal.classList.remove('hidden');
+        });
+
+        document.getElementById('btn-reset-cancel').addEventListener('click', () => {
+          resetModal.classList.add('hidden');
+        });
+
+        document.getElementById('btn-reset-next').addEventListener('click', async () => {
+          if (resetConfirmStage === 1) {
+            resetConfirmStage = 2;
+            document.getElementById('reset-dialog-title').textContent = '🚨 দ্বিতীয় ধাপ: চূড়ান্ত সতর্কতা';
+            document.getElementById('reset-dialog-desc').textContent =
+              'সতর্কতা! এই কাজটি করলে আগের সব স্কোর ও পোস্ট চিরতরে মুছে যাবে এবং ৮টি দল ০ পয়েন্ট থেকে শুরু করবে।';
+            document.getElementById('btn-reset-next').textContent = 'চূড়ান্তভাবে মুছুন';
+            return;
+          }
+          resetModal.classList.add('hidden');
+          state = buildInitialState();
+          renderUI();
+          await saveToCloud(false);
+          toast('🔄 সব ডেটা সফলভাবে রিসেট করা হয়েছে!', 'success');
+        });
+      }
+
+      // =========================================================
+      // 9. BOOTSTRAP & 5-SECOND LIVE POLLING
+      // =========================================================
+      loadFromLocal();
+      initEventListeners();
+      renderUI();
+      fetchFromCloud(true);
+
+      setInterval(() => {
+        const activeTag = document.activeElement ? document.activeElement.tagName : '';
+        const isTyping = activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT';
+        const isModalOpen =
+          !document.getElementById('modal-admin-panel').classList.contains('hidden') ||
+          !document.getElementById('modal-admin-pin').classList.contains('hidden');
+
+        if (!isTyping && !isModalOpen) {
+          fetchFromCloud(false);
+        }
+      }, 5000);
+    })();
+  </script>
+</body>
+</html>
