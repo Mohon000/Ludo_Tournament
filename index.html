@@ -853,9 +853,59 @@
               </div>
 
               <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
-                <button id="reset-all-matches-btn" type="button" class="w-full py-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 font-bold text-xs">
-                  🔄 সব ম্যাচ রিসেট করুন (০ পয়েন্ট করুন)
+                <button id="reset-all-matches-btn" type="button" class="w-full py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-bold text-xs hover:bg-rose-100 transition">
+                  🗑️ সব তথ্য মুছে ফেলুন (Reset All Data)
                 </button>
+
+                <!-- Double-Confirmation Safety Box for Reset -->
+                <div id="double-confirm-reset-box" class="hidden p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/70 border-2 border-rose-400 dark:border-rose-700 space-y-2.5 fade-up">
+                  <div class="flex items-start gap-2">
+                    <span class="text-base">⚠️</span>
+                    <div class="text-xs text-rose-800 dark:text-rose-200 leading-relaxed">
+                      <p class="font-extrabold">সতর্কতা: সব ম্যাচের ফলাফল ও পয়েন্ট মুছে যাবে!</p>
+                      <p class="mt-0.5">নিশ্চিত করতে নিচের ঘরে <strong class="underline">DELETE</strong> লিখুন অথবা আপনার অ্যাডমিন পিন দিন:</p>
+                    </div>
+                  </div>
+                  <input
+                    type="text"
+                    id="reset-verify-input"
+                    placeholder="DELETE অথবা পিন লিখুন"
+                    autocomplete="off"
+                    class="w-full px-3 py-2 rounded-lg border border-rose-300 dark:border-rose-700 bg-white dark:bg-slate-900 text-xs font-extrabold text-center tracking-wider uppercase focus:outline-none focus:ring-2 focus:ring-rose-500"
+                  />
+                  <div class="flex items-center gap-2">
+                    <button id="cancel-double-reset-btn" type="button" class="flex-1 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs">
+                      বাতিল
+                    </button>
+                    <button id="execute-double-reset-btn" type="button" class="flex-1 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs shadow-xs">
+                      চূড়ান্তভাবে মুছুন
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Backup & Data Protection Card -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border-2 border-emerald-200 dark:border-emerald-900/70 p-4 sm:p-5 shadow-xs space-y-3.5">
+              <div class="flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                <span class="text-xl">💾</span>
+                <div>
+                  <h3 class="font-bold text-base text-slate-900 dark:text-white">ব্যাকআপ ও ডেটা সুরক্ষা (Backup & Restore)</h3>
+                  <p class="text-[11px] text-slate-500">সব ফলাফল, ছবি ও কমেন্ট ফোনে সেভ রাখুন এবং যেকোনো সময় ফেরত আনুন</p>
+                </div>
+              </div>
+
+              <!-- Export JSON Backup -->
+              <button id="export-json-backup-btn" type="button" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-2 transition active:scale-[0.99]">
+                <span>📥 ব্যাকআপ ডাউনলোড করুন (JSON)</span>
+              </button>
+
+              <!-- Restore JSON Backup -->
+              <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-dashed border-emerald-300 dark:border-emerald-700 space-y-2">
+                <label class="block text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                  📤 পূর্বের ব্যাকআপ ফাইল (.json) থেকে সব তথ্য ফেরত আনুন:
+                </label>
+                <input type="file" id="restore-json-backup-input" accept=".json,application/json" class="w-full text-xs text-slate-600 dark:text-slate-300" />
               </div>
             </div>
 
@@ -2519,14 +2569,107 @@
       });
 
       document.getElementById('reset-all-matches-btn').addEventListener('click', () => {
-        openConfirm('সব ম্যাচ রিসেট করুন', 'সব ম্যাচের ফলাফল মুছে গিয়ে পয়েন্ট টেবিল ০ হবে (দল ও পোস্ট ঠিক থাকবে)। নিশ্চিত?', async () => {
-          await pushState({
-            ...appState,
-            matches: [],
-            knockout: { sf1WinnerId: '', sf2WinnerId: '', championId: '' }
-          });
-          showToast('পয়েন্ট টেবিল ০ করা হয়েছে।', 'info');
+        const box = document.getElementById('double-confirm-reset-box');
+        const inp = document.getElementById('reset-verify-input');
+        box.classList.remove('hidden');
+        inp.value = '';
+        inp.focus();
+      });
+
+      document.getElementById('cancel-double-reset-btn').addEventListener('click', () => {
+        document.getElementById('double-confirm-reset-box').classList.add('hidden');
+        document.getElementById('reset-verify-input').value = '';
+      });
+
+      document.getElementById('execute-double-reset-btn').addEventListener('click', async () => {
+        const entered = document.getElementById('reset-verify-input').value.trim();
+        const currentPin = String(appState.adminPin || '1234').trim();
+        if (entered.toUpperCase() !== 'DELETE' && entered !== currentPin) {
+          showToast('❌ সঠিক কোড মেলেনি! বক্সে DELETE অথবা আপনার পিন লিখুন।', 'error');
+          return;
+        }
+        document.getElementById('double-confirm-reset-box').classList.add('hidden');
+        document.getElementById('reset-verify-input').value = '';
+        await pushState({
+          ...appState,
+          matches: [],
+          knockout: { sf1WinnerId: '', sf2WinnerId: '', championId: '' }
         });
+        showToast('🗑️ ডাবল যাচাই শেষে সব ম্যাচের ফলাফল রিসেট করা হয়েছে।', 'info');
+      });
+
+      // =========================================================
+      // 10B. BACKUP EXPORT & RESTORE (JSON)
+      // =========================================================
+      document.getElementById('export-json-backup-btn').addEventListener('click', () => {
+        try {
+          const today = new Date();
+          const yyyy = today.getFullYear();
+          const mm = String(today.getMonth() + 1).padStart(2, '0');
+          const dd = String(today.getDate()).padStart(2, '0');
+          const fileName = `ludo_tournament_backup_${yyyy}-${mm}-${dd}.json`;
+
+          const backupPayload = {
+            backupVersion: '1.0',
+            exportedAt: new Date().toISOString(),
+            data: appState
+          };
+
+          const jsonStr = JSON.stringify(backupPayload, null, 2);
+          const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast(`📥 ব্যাকআপ ফাইল (${fileName}) ডাউনলোড হয়েছে!`, 'success');
+        } catch (err) {
+          showToast('ব্যাকআপ ডাউনলোড করা যায়নি।', 'error');
+        }
+      });
+
+      document.getElementById('restore-json-backup-input').addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const parsed = JSON.parse(ev.target.result);
+            const candidate = parsed && parsed.data ? parsed.data : parsed;
+
+            if (!candidate || !Array.isArray(candidate.teams) || candidate.teams.length === 0) {
+              showToast('❌ এটি সঠিক লুডু টুর্নামেন্ট ব্যাকআপ ফাইল নয়!', 'error');
+              e.target.value = '';
+              return;
+            }
+
+            const restoredState = normalizeState(candidate);
+            const matchCount = restoredState.matches.length;
+            const postCount = restoredState.posts.length;
+
+            openConfirm(
+              'ব্যাকআপ রিস্টোর করুন',
+              `এই ব্যাকআপ ফাইলে ${toBn(matchCount)}টি ম্যাচ এবং ${toBn(postCount)}টি গ্যালারি পোস্ট রয়েছে। আপনি কি বর্তমান ডেটা বদলে এই ব্যাকআপটি রিস্টোর করতে চান?`,
+              async () => {
+                await pushState(restoredState);
+                e.target.value = '';
+                showToast('✅ ব্যাকআপ থেকে সব ফলাফল, ছবি ও কমেন্ট সফলভাবে ফেরত এসেছে!', 'success');
+              }
+            );
+          } catch (err) {
+            showToast('❌ ব্যাকআপ ফাইলটি পড়া যায়নি (Invalid JSON)।', 'error');
+            e.target.value = '';
+          }
+        };
+        reader.onerror = () => {
+          showToast('ফাইল লোড করতে সমস্যা হয়েছে।', 'error');
+          e.target.value = '';
+        };
+        reader.readAsText(file);
       });
 
       // Copy Links & WhatsApp Scorecard
