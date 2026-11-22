@@ -4,481 +4,1076 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>লুডু চ্যাম্পিয়নশিপ ২০২৬ - লাইভ স্কোরবোর্ড</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Hind Siliguri & Noto Sans Bengali -->
+  <!-- Google Fonts: Hind Siliguri (Crystal Clear Bangla Typography) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Hind Siliguri"', '"Noto Sans Bengali"', 'sans-serif'],
-          },
-        },
-      },
-    };
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    body {
-      font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+    :root {
+      --bg-page: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-subtle: #f8fafc;
+      --bg-input: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-color: #e2e8f0;
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --green-bg: rgba(16, 185, 129, 0.12);
+      --green-text: #059669;
+      --red-text: #e11d48;
+      --amber-bg: #fef3c7;
+      --amber-text: #92400e;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    html.dark {
+      --bg-page: #020617;
+      --bg-card: #0f172a;
+      --bg-subtle: #1e293b;
+      --bg-input: #0f172a;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #1e293b;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --green-bg: rgba(16, 185, 129, 0.16);
+      --green-text: #34d399;
+      --red-text: #fb7185;
+      --amber-bg: rgba(245, 158, 11, 0.18);
+      --amber-text: #fcd34d;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.65);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Hind Siliguri', sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
-    @keyframes marqueeAnim {
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 72px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Layout Containers */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 12px;
+    }
+
+    /* Sticky Header */
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .ludo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #0f172a;
+      padding: 5px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .ludo-icon span:nth-child(1) { background: #ef4444; border-radius: 3px; }
+    .ludo-icon span:nth-child(2) { background: #10b981; border-radius: 3px; }
+    .ludo-icon span:nth-child(3) { background: #f59e0b; border-radius: 3px; }
+    .ludo-icon span:nth-child(4) { background: #0ea5e9; border-radius: 3px; }
+
+    .brand-title {
+      font-size: 1.12rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+    }
+
+    .sync-badge {
+      font-size: 0.76rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sync-live { color: var(--green-text); }
+    .sync-wait { color: #d97706; }
+    .sync-err { color: var(--red-text); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    /* Buttons & Inputs */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 13px;
+      border-radius: 11px;
+      border: 1px solid transparent;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.15s ease, background-color 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn:active { transform: scale(0.96); }
+    .btn-primary { background: var(--accent); color: #ffffff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-pink { background: linear-gradient(135deg, #e11d48, #db2777); color: #ffffff; }
+    .btn-green { background: #059669; color: #ffffff; }
+    .btn-amber { background: #f59e0b; color: #0f172a; }
+    .btn-danger { background: #e11d48; color: #ffffff; }
+    .btn-subtle {
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      border-color: var(--border-color);
+    }
+    .btn-sm { padding: 6px 10px; font-size: 0.78rem; border-radius: 9px; }
+    .btn-full { width: 100%; }
+
+    .input, .select, .textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 11px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-input);
+      color: var(--text-main);
+      font-size: 0.92rem;
+      font-weight: 500;
+      outline: none;
+    }
+
+    .input:focus, .select:focus, .textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    /* Live Notice Marquee */
+    .notice-bar {
+      background: linear-gradient(90deg, #dc2626, #e11d48, #d97706);
+      color: #ffffff;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .notice-pill {
+      background: rgba(15, 23, 42, 0.88);
+      color: #fde047;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .marquee-wrap {
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .marquee-text {
+      display: inline-block;
+      white-space: nowrap;
+      animation: scrollLeft 24s linear infinite;
+    }
+
+    @keyframes scrollLeft {
       0% { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
     }
-    .marquee-track {
-      display: inline-block;
+
+    /* Section Cards */
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: var(--shadow-sm);
+      margin-top: 16px;
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: 12px 15px;
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Points Table */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    thead tr {
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 0.82rem;
+    }
+
+    th {
+      padding: 10px 8px;
+      font-weight: 700;
       white-space: nowrap;
-      animation: marqueeAnim 25s linear infinite;
     }
-    .marquee-track:hover {
-      animation-play-state: paused;
+
+    td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.88rem;
+      vertical-align: middle;
     }
-    ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
+
+    tbody tr.team-row {
+      cursor: pointer;
+      transition: background-color 0.15s ease;
     }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.5);
-      border-radius: 9999px;
+
+    tbody tr.team-row:hover {
+      background-color: rgba(79, 70, 229, 0.08);
     }
+
+    tbody tr.qualified-row {
+      background-color: var(--green-bg);
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+    }
+
+    .qualified-row .rank-badge {
+      background: #059669;
+      color: #ffffff;
+      border-color: #059669;
+    }
+
+    .team-cell {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 155px;
+    }
+
+    .dual-avatars {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .avatar-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-card);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #ffffff;
+      overflow: hidden;
+      object-fit: cover;
+      background: #334155;
+    }
+
+    .avatar-circle + .avatar-circle {
+      margin-left: -9px;
+    }
+
+    .pts-pill {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 8px;
+      background: var(--amber-bg);
+      color: var(--amber-text);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .table-foot {
+      padding: 10px 14px;
+      background: var(--bg-subtle);
+      font-size: 0.77rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    /* Match Results */
+    .match-list {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .match-item {
+      padding: 11px 13px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .score-pill {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    /* Collapsible Sections */
+    .collapse-trigger {
+      width: 100%;
+      padding: 14px 16px;
+      background: linear-gradient(135deg, #0f172a, #1e1b4b);
+      color: #ffffff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .collapse-trigger.light-trigger {
+      background: var(--bg-card);
+      color: var(--text-main);
+    }
+
+    .collapse-body {
+      padding: 14px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .hidden { display: none !important; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+
+    .bracket-box {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-subtle);
+    }
+
+    /* Continuous Scroll Photo & Comment Gallery */
+    .gallery-composer {
+      padding: 14px;
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .file-drop {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 12px;
+      border-radius: 11px;
+      border: 2px dashed var(--accent);
+      background: rgba(79, 70, 229, 0.06);
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .preview-box {
+      position: relative;
+      background: #020617;
+      border-radius: 12px;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .preview-box img {
+      max-height: 200px;
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    .feed-list {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .post-card {
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      background: var(--bg-card);
+      overflow: hidden;
+    }
+
+    .post-header {
+      padding: 10px 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .post-author-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .post-img-wrap {
+      background: #020617;
+      display: flex;
+      justify-content: center;
+    }
+
+    .post-img-wrap img {
+      max-height: 340px;
+      width: auto;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .post-body {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .post-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .comment-box {
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .comment-item {
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: var(--bg-subtle);
+      font-size: 0.84rem;
+    }
+
+    .comment-form {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Floating Bottom Admin Lock */
+    .floating-lock {
+      position: fixed;
+      bottom: 14px;
+      right: 14px;
+      z-index: 45;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #0f172a;
+      color: #ffffff;
+      border: 2px solid #334155;
+      box-shadow: var(--shadow-lg);
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(2, 6, 23, 0.78);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .modal-panel {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-head {
+      padding: 13px 16px;
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-body {
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Admin Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 6px;
+      padding: 10px 14px;
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border-color);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 7px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    /* Player Photo Upload Preview in Admin */
+    .player-photo-card {
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .player-photo-lg {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      background: #334155;
+    }
+
+    /* Toast */
+    .toast-wrap {
+      position: fixed;
+      top: 66px;
+      right: 12px;
+      left: 12px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast-msg {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-lg);
+      max-width: 420px;
+      text-align: center;
+    }
+
+    .toast-ok { background: #059669; }
+    .toast-err { background: #e11d48; }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen pb-16 transition-colors duration-200">
+<body>
 
-  <!-- Toast Notification Container -->
-  <div id="toast-box" class="fixed top-16 right-3 left-3 sm:left-auto sm:w-80 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <!-- Toast Container -->
+  <div id="toast-wrap" class="toast-wrap"></div>
 
   <!-- Top Sticky Header -->
-  <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm">
-    <div class="max-w-4xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
-      <!-- Logo & Title -->
-      <div class="flex items-center gap-2.5 min-w-0">
-        <div class="w-10 h-10 rounded-xl bg-slate-900 p-1.5 grid grid-cols-2 gap-1 shrink-0 shadow">
-          <span class="bg-rose-500 rounded-sm"></span>
-          <span class="bg-emerald-500 rounded-sm"></span>
-          <span class="bg-amber-400 rounded-sm"></span>
-          <span class="bg-sky-500 rounded-sm"></span>
+  <header class="top-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="ludo-icon" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
         </div>
-        <div class="min-w-0">
-          <h1 class="text-base sm:text-xl font-bold leading-tight truncate text-slate-900 dark:text-white">
-            লুডু চ্যাম্পিয়নশিপ ২০২৬
-          </h1>
-          <div id="sync-status-pill" class="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
-            🟡 সিঙ্ক হচ্ছে...
-          </div>
+        <div style="min-width:0;">
+          <div class="brand-title">লুডু চ্যাম্পিয়নশিপ ২০২৬</div>
+          <div id="sync-status" class="sync-badge sync-wait">🟡 লাইভ সিঙ্ক সংযোগ হচ্ছে...</div>
         </div>
       </div>
 
-      <!-- Quick Action Buttons -->
-      <div class="flex items-center gap-1.5 shrink-0">
-        <button id="btn-open-gallery" type="button"
-          class="px-3 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition">
-          <span>📸</span>
-          <span>গ্যালারি</span>
-          <span id="post-count-badge" class="bg-white/20 px-1.5 py-0.2 rounded-full text-[10px]">০</span>
-        </button>
-        <button id="btn-theme-toggle" type="button" title="ডার্ক/লাইট মোড"
-          class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-base active:scale-95 transition">
+      <div class="header-actions">
+        <a href="#gallery-section" class="btn btn-pink btn-sm">
+          📸 ছবি ও আড্ডা
+        </a>
+        <button id="btn-theme" type="button" class="btn btn-subtle btn-sm" title="ডার্ক/লাইট মোড">
           🌙
         </button>
       </div>
     </div>
 
-    <!-- Live Scrolling Notice Bar -->
-    <div class="bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white text-xs sm:text-sm py-1.5 px-2 flex items-center overflow-hidden">
-      <span class="bg-slate-950/85 text-amber-300 font-bold px-2 py-0.5 rounded mr-2 shrink-0 text-[11px] flex items-center gap-1">
-        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-        🔴 লাইভ নোটিশ
-      </span>
-      <div class="overflow-hidden flex-1">
-        <div id="live-notice-marquee" class="marquee-track font-semibold">
-          🏆 লুডু চ্যাম্পিয়নশিপ ২০২৬-এ সবাইকে স্বাগতম! প্রথম রাউন্ডের খেলা শীঘ্রই শুরু হবে।
+    <!-- Live Notice Bar -->
+    <div class="notice-bar">
+      <span class="notice-pill">🔴 লাইভ নোটিশ</span>
+      <div class="marquee-wrap">
+        <div id="live-notice-text" class="marquee-text">
+          🏆 লুডু চ্যাম্পিয়নশিপ ২০২৬-এ সবাইকে স্বাগতম!
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Main Content Container -->
-  <main class="max-w-4xl mx-auto px-3 py-4 space-y-5">
+  <!-- Main Content -->
+  <main class="container">
 
-    <!-- Banner Card to Open Gallery -->
-    <div class="rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 p-4 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
-      <div class="text-center sm:text-left">
-        <h2 class="text-base sm:text-lg font-bold">📸 টুর্নামেন্টের সেরা মুহূর্ত ও আড্ডা</h2>
-        <p class="text-xs text-indigo-100">আপনার দলের ছবি পোস্ট করুন এবং সবার পোস্টে লাইক, ডিসলাইক ও কমেন্ট করুন!</p>
-      </div>
-      <button id="btn-banner-gallery" type="button"
-        class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white text-indigo-700 hover:bg-indigo-50 font-extrabold text-xs sm:text-sm shadow active:scale-95 transition shrink-0">
-        📸 ছবি পোস্ট ও কমেন্ট করুন →
-      </button>
-    </div>
-
-    <!-- Round Robin Points Table Card -->
-    <section class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-      <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 bg-slate-50/80 dark:bg-slate-800/40">
+    <!-- Section 1: Round Robin Points Table -->
+    <section class="section-card">
+      <div class="section-head">
         <div>
-          <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-            🏆 রাউন্ড রবিন পয়েন্ট টেবিল
-          </h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400">
-            শীর্ষ ৪ দল সেমিফাইনালে যাবে &bull; জয়: +২ পয়েন্ট &bull; রান রেট: ৮ গুটির ভিত্তিতে (+GF / -GA)
-          </p>
+          <h2 class="section-title">🏆 রাউন্ড রবিন পয়েন্ট টেবিল</h2>
+          <p class="section-sub">শীর্ষ ৪ দল সেমিফাইনালে যাবে • জয়: +২ পয়েন্ট • রান রেট: ৮ গুটির ভিত্তিতে</p>
         </div>
-        <button id="btn-manual-refresh" type="button"
-          class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-xs font-bold flex items-center gap-1 border border-indigo-200 dark:border-indigo-800 active:scale-95 transition">
-          <span>🔄</span>
-          <span>রিফ্রেশ</span>
+        <button id="btn-refresh" type="button" class="btn btn-subtle btn-sm">
+          🔄 রিফ্রেশ
         </button>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
+      <div class="table-wrap">
+        <table>
           <thead>
-            <tr class="bg-slate-900 text-white text-xs sm:text-sm">
-              <th class="py-2.5 px-2.5 text-center w-12">ক্রম</th>
-              <th class="py-2.5 px-3">দলের নাম ও জুটি</th>
-              <th class="py-2.5 px-2 text-center">ম্যাচ</th>
-              <th class="py-2.5 px-2 text-center text-emerald-300">জয়</th>
-              <th class="py-2.5 px-2 text-center text-rose-300">হার</th>
-              <th class="py-2.5 px-2.5 text-center text-amber-300">পয়েন্ট</th>
-              <th class="py-2.5 px-2.5 text-center">রান রেট</th>
+            <tr>
+              <th style="text-align:center; width:44px;">ক্রম</th>
+              <th>দল ও খেলোয়াড়</th>
+              <th style="text-align:center;">ম্যাচ</th>
+              <th style="text-align:center; color:#6ee7b7;">জয়</th>
+              <th style="text-align:center; color:#fda4af;">হার</th>
+              <th style="text-align:center; color:#fde047;">পয়েন্ট</th>
+              <th style="text-align:center;">রান রেট</th>
             </tr>
           </thead>
-          <tbody id="points-table-body" class="divide-y divide-slate-200 dark:divide-slate-800 text-xs sm:text-sm">
-            <!-- Populated dynamically via JS -->
-          </tbody>
+          <tbody id="points-tbody"></tbody>
         </table>
       </div>
 
-      <div class="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600 dark:text-slate-400">
-        <span class="flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
-          সবুজ চিহ্নিত ১ম–৪র্থ স্থান = সেমিফাইনাল জোন
-        </span>
-        <span>👆 বিস্তারিত ও খেলার ইতিহাস দেখতে দলের নামে ক্লিক করুন</span>
+      <div class="table-foot">
+        <span>🟢 সবুজ চিহ্নিত ১ম–৪র্থ স্থান = সেমিফাইনাল জোন</span>
+        <span>👆 খেলোয়াড়দের বড় ছবি ও ইতিহাস দেখতে দলের নামে ক্লিক করুন</span>
       </div>
     </section>
 
-    <!-- Recent Match Results Card -->
-    <section class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-      <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/40">
-        <h2 class="text-base sm:text-lg font-bold flex items-center gap-1.5">
-          🎲 সাম্প্রতিক ম্যাচের ফলাফল
-        </h2>
-        <span id="matches-count-pill" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800">
-          ০টি ম্যাচ
-        </span>
+    <!-- Section 2: Recent Match Results -->
+    <section class="section-card">
+      <div class="section-head">
+        <h2 class="section-title">🎲 সাম্প্রতিক ম্যাচের ফলাফল</h2>
+        <span id="match-count-badge" class="btn btn-subtle btn-sm" style="cursor:default;">০টি ম্যাচ</span>
       </div>
-      <div id="recent-matches-container" class="p-3 sm:p-4 space-y-2.5">
-        <!-- Populated dynamically via JS -->
-      </div>
+      <div id="matches-container" class="match-list"></div>
     </section>
 
-    <!-- Collapsible Semifinal & Grand Final Bracket -->
-    <section class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-      <button id="btn-toggle-knockout" type="button"
-        class="w-full p-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex items-center justify-between text-left">
-        <div class="flex items-center gap-3">
-          <span class="text-2xl">🏆</span>
-          <div>
-            <div class="font-bold text-sm sm:text-base">সেমিফাইনাল ও গ্র্যান্ড ফাইনাল ব্র্যাকেট</div>
-            <div class="text-xs text-slate-300">সেরা ৪ দলের নকআউট পর্ব ও চ্যাম্পিয়ন ট্রফি</div>
-          </div>
+    <!-- Section 3: Semifinal & Grand Final Bracket -->
+    <section class="section-card">
+      <button id="btn-toggle-bracket" type="button" class="collapse-trigger">
+        <div>
+          <div style="font-size:1rem; font-weight:700;">🏆 সেমিফাইনাল ও গ্র্যান্ড ফাইনাল ব্র্যাকেট</div>
+          <div style="font-size:0.78rem; color:#cbd5e1;">সেরা ৪ দলের নকআউট পর্ব ও চ্যাম্পিয়ন ট্রফি</div>
         </div>
-        <span id="knockout-toggle-badge" class="px-3 py-1 rounded-xl bg-amber-400 text-slate-950 font-extrabold text-xs shrink-0">
-          দেখুন ▾
-        </span>
+        <span id="badge-bracket" class="btn btn-amber btn-sm">দেখুন ▾</span>
       </button>
 
-      <div id="knockout-panel-body" class="hidden p-4 space-y-4 border-t border-slate-200 dark:border-slate-800">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-          <!-- Semi Final 1 -->
-          <div class="p-3.5 rounded-2xl border border-indigo-200 dark:border-indigo-900 bg-indigo-50/50 dark:bg-indigo-950/20 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-indigo-700 dark:text-indigo-300">সেমিফাইনাল ১ (১ম বনাম ৪র্থ)</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-indigo-600 text-white font-bold">SF-1</span>
+      <div id="panel-bracket" class="collapse-body hidden">
+        <div class="grid-2">
+          <div class="bracket-box">
+            <div style="font-size:0.8rem; font-weight:700; color:var(--accent); margin-bottom:6px;">
+              সেমিফাইনাল ১ (১ম স্থান বনাম ৪র্থ স্থান)
             </div>
-            <div id="sf1-card" class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-bold space-y-1.5"></div>
+            <div id="sf1-display" style="font-size:0.92rem; font-weight:700;"></div>
           </div>
 
-          <!-- Semi Final 2 -->
-          <div class="p-3.5 rounded-2xl border border-purple-200 dark:border-purple-900 bg-purple-50/50 dark:bg-purple-950/20 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-bold text-purple-700 dark:text-purple-300">সেমিফাইনাল ২ (২য় বনাম ৩য়)</span>
-              <span class="text-[10px] px-2 py-0.5 rounded bg-purple-600 text-white font-bold">SF-2</span>
+          <div class="bracket-box">
+            <div style="font-size:0.8rem; font-weight:700; color:var(--accent); margin-bottom:6px;">
+              সেমিফাইনাল ২ (২য় স্থান বনাম ৩য় স্থান)
             </div>
-            <div id="sf2-card" class="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-800 text-xs sm:text-sm font-bold space-y-1.5"></div>
+            <div id="sf2-display" style="font-size:0.92rem; font-weight:700;"></div>
           </div>
         </div>
 
-        <!-- Grand Final -->
-        <div class="p-4 rounded-2xl border-2 border-amber-400 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-slate-900 space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-sm font-extrabold text-amber-700 dark:text-amber-300">👑 গ্র্যান্ড ফাইনাল ২০২৬</span>
-            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950">ফাইনাল</span>
+        <div class="bracket-box" style="margin-top:12px; border-color:#f59e0b;">
+          <div style="font-size:0.95rem; font-weight:700; color:#d97706; margin-bottom:6px;">
+            👑 গ্র্যান্ড ফাইনাল ২০২৬
           </div>
-          <div id="final-card" class="bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-amber-200 dark:border-amber-800 text-xs sm:text-sm font-bold"></div>
+          <div id="final-display" style="font-size:0.95rem; font-weight:700;"></div>
         </div>
       </div>
     </section>
 
-    <!-- Collapsible Rules Accordion -->
-    <section class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-      <button id="btn-toggle-rules" type="button"
-        class="w-full px-4 py-3.5 flex items-center justify-between text-left font-bold text-sm sm:text-base hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-        <span>📜 টুর্নামেন্টের নিয়মাবলি ও পয়েন্ট হিসাব</span>
-        <span id="rules-toggle-badge" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">দেখুন ▾</span>
+    <!-- Section 4: Tournament Rules -->
+    <section class="section-card">
+      <button id="btn-toggle-rules" type="button" class="collapse-trigger light-trigger">
+        <span style="font-size:0.98rem; font-weight:700;">📜 টুর্নামেন্টের নিয়মাবলি ও পয়েন্ট হিসাব</span>
+        <span id="badge-rules" style="font-size:0.82rem; font-weight:700; color:var(--accent);">দেখুন ▾</span>
       </button>
-      <div id="rules-panel-body" class="hidden px-4 pb-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-2">
-        <p>১. <strong>লিগ পর্ব:</strong> ৮টি দলের মধ্যে রাউন্ড রবিন পদ্ধতিতে খেলা অনুষ্ঠিত হবে।</p>
-        <p>২. <strong>পয়েন্ট হিসাব:</strong> প্রতিটি জয়ের জন্য <strong>+২ পয়েন্ট</strong> এবং পরাজয়ের জন্য <strong>০ পয়েন্ট</strong>।</p>
-        <p>৩. <strong>রান রেট (+GF / -GA):</strong> প্রতি দলে ২ জন খেলোয়াড়ের মোট ৮টি গুটি থাকে। বিজয়ী দল ৮টি গুটি ঘরে তুললে এবং প্রতিপক্ষের যে কয়টি গুটি বাকি থাকে, তার ব্যবধান অনুযায়ী রান রেট নির্ধারিত হয়।</p>
-        <p>৪. <strong>সেমিফাইনাল ও ফাইনাল:</strong> পয়েন্ট টেবিলের শীর্ষ ৪টি দল সেমিফাইনালে উঠবে (১ম বনাম ৪র্থ এবং ২য় বনাম ৩য়)।</p>
+      <div id="panel-rules" class="collapse-body hidden" style="font-size:0.88rem; color:var(--text-muted);">
+        <p style="margin-bottom:6px;">১. <strong>লিগ পর্ব:</strong> ৮টি দলের মধ্যে রাউন্ড রবিন পদ্ধতিতে খেলা অনুষ্ঠিত হবে।</p>
+        <p style="margin-bottom:6px;">২. <strong>পয়েন্ট হিসাব:</strong> প্রতিটি জয়ের জন্য <strong>+২ পয়েন্ট</strong> এবং পরাজয়ের জন্য <strong>০ পয়েন্ট</strong>।</p>
+        <p style="margin-bottom:6px;">৩. <strong>রান রেট:</strong> প্রতি দলে ২ জন খেলোয়াড়ের মোট ৮টি গুটি থাকে। বিজয়ী ও পরাজিত দলের গুটির ব্যবধানের গড় অনুযায়ী রান রেট হিসাব করা হয়।</p>
+        <p>৪. <strong>সেমিফাইনাল ও ফাইনাল:</strong> পয়েন্ট টেবিলের শীর্ষ ৪টি দল সেমিফাইনালে উঠবে (১ম বনাম ৪র্থ এবং ২য় বনাম ৩য়)।</p>
       </div>
     </section>
+
+    <!-- Section 5: CONTINUOUS BOTTOM SCROLL FEED (Photo Post & Public Comment Gallery) -->
+    <section id="gallery-section" class="section-card">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">📸 ছবি পোস্ট ও পাবলিক কমেন্ট গ্যালারি</h2>
+          <p class="section-sub">নতুন পোস্ট সবার উপরে দেখাবে • সবার ফোনে তাৎক্ষণিক লাইভ সিঙ্ক</p>
+        </div>
+        <span id="post-count-pill" class="btn btn-subtle btn-sm" style="cursor:default;">০টি পোস্ট</span>
+      </div>
+
+      <!-- Inline Post Composer -->
+      <form id="form-create-post" class="gallery-composer">
+        <div class="grid-2">
+          <input type="text" id="post-author" class="input" required maxlength="30" placeholder="আপনার নাম লিখুন (যেমন: মোহন)" />
+          <label class="file-drop">
+            <span>🖼️ গ্যালারি থেকে ছবি বাছাই করুন</span>
+            <input type="file" id="post-image-input" accept="image/*" class="hidden" />
+          </label>
+        </div>
+
+        <div id="post-preview-wrap" class="preview-box hidden">
+          <img id="post-preview-img" src="" alt="ছবির প্রিভিউ" />
+          <button type="button" id="btn-remove-preview" class="btn btn-danger btn-sm" style="position:absolute; top:10px; right:10px;">✕ বাদ দিন</button>
+        </div>
+
+        <textarea id="post-caption" class="textarea" rows="2" required maxlength="300" placeholder="আপনার দলের জন্য শুভকামনা বা খেলার অনুভূতি লিখুন..."></textarea>
+
+        <button type="submit" id="btn-submit-post" class="btn btn-primary btn-full">
+          🚀 পোস্ট করুন
+        </button>
+      </form>
+
+      <!-- Reverse Chronological Feed (Newest First at Top) -->
+      <div id="posts-feed-container" class="feed-list"></div>
+    </section>
+
   </main>
 
-  <!-- Fixed Bottom Public Message Ticker + Admin Lock Button -->
-  <footer class="fixed bottom-0 inset-x-0 z-30 bg-slate-900 text-white border-t border-slate-800 h-10 flex items-center">
-    <span class="bg-purple-600 text-white font-bold px-2.5 h-full flex items-center text-xs shrink-0">
-      💬 পাবলিক মেসেজ
-    </span>
-    <div class="overflow-hidden flex-1 px-2 text-xs">
-      <div id="bottom-public-marquee" class="marquee-track text-slate-200">
-        এখনো কোনো পাবলিক মেসেজ নেই — গ্যালারি থেকে প্রথম মেসেজ বা ছবি পোস্ট করুন!
-      </div>
-    </div>
-    <button id="btn-admin-lock" type="button" title="অ্যাডমিন প্যানেল (পিন: 1234)"
-      class="h-full px-3.5 bg-slate-800 hover:bg-indigo-600 border-l border-slate-700 flex items-center justify-center text-sm transition shrink-0">
-      🔒
-    </button>
-  </footer>
+  <!-- Floating Bottom-Right Admin Lock -->
+  <button id="btn-open-pin" type="button" class="floating-lock" title="অ্যাডমিন প্যানেল (পিন: 1234)">
+    🔒
+  </button>
 
   <!-- ========================================================= -->
-  <!-- MODAL 1: PUBLIC PHOTO & COMMENT GALLERY                   -->
+  <!-- MODAL 1: TEAM DETAILS & LARGE PLAYER PHOTOS               -->
   <!-- ========================================================= -->
-  <div id="modal-gallery" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white dark:bg-slate-900 w-full max-w-2xl h-[92vh] sm:h-[85vh] rounded-t-3xl sm:rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
-      <!-- Modal Header -->
-      <div class="px-4 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 shrink-0">
-        <div>
-          <h3 class="text-base sm:text-lg font-bold">📸 টুর্নামেন্ট গ্যালারি ও লাইভ আড্ডা</h3>
-          <p class="text-[11px] text-slate-500">ছবি ও মতামত পোস্ট করলে সবার ফোনে লাইভ দেখাবে</p>
-        </div>
-        <button id="btn-close-gallery" type="button" class="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 font-bold text-sm">✕</button>
+  <div id="modal-team" class="modal-backdrop hidden">
+    <div class="modal-panel">
+      <div class="modal-head">
+        <h3 id="team-modal-title" style="font-size:1.05rem; font-weight:700;">দলের বিস্তারিত</h3>
+        <button id="btn-close-team" type="button" class="btn btn-subtle btn-sm">✕ বন্ধ</button>
       </div>
-
-      <!-- Modal Scrollable Content -->
-      <div class="flex-1 overflow-y-auto p-4 space-y-4">
-        <!-- Create New Post Form -->
-        <form id="form-new-post" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <input type="text" id="input-post-author" required maxlength="30" placeholder="আপনার নাম লিখুন (যেমন: মোহন)"
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-            <label class="flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border-2 border-dashed border-indigo-400 bg-indigo-50/60 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-300 text-xs sm:text-sm font-bold cursor-pointer hover:bg-indigo-100/70 transition">
-              <span>🖼️ ছবি সংযুক্ত করুন (ঐচ্ছিক)</span>
-              <input type="file" id="input-post-file" accept="image/*" class="hidden" />
-            </label>
-          </div>
-
-          <div id="preview-container" class="hidden relative rounded-xl overflow-hidden bg-slate-900 p-2">
-            <img id="preview-img" src="" alt="Preview" class="max-h-48 mx-auto rounded-lg object-contain" />
-            <button type="button" id="btn-clear-img" class="absolute top-3 right-3 w-7 h-7 rounded-full bg-rose-600 text-white text-xs font-bold shadow">✕</button>
-          </div>
-
-          <textarea id="input-post-text" rows="2" required maxlength="300" placeholder="আপনার দলের জন্য শুভকামনা বা খেলার অনুভূতি লিখুন..."
-            class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-
-          <button type="submit" id="btn-publish-post"
-            class="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-sm shadow active:scale-[0.99] transition">
-            🚀 সবার সাথে শেয়ার করুন
-          </button>
-        </form>
-
-        <!-- Feed List -->
-        <div id="gallery-posts-feed" class="space-y-4"></div>
-      </div>
+      <div id="team-modal-body" class="modal-body"></div>
     </div>
   </div>
 
   <!-- ========================================================= -->
-  <!-- MODAL 2: TEAM DETAILS & MATCH HISTORY                     -->
+  <!-- MODAL 2: ADMIN PIN LOGIN                                  -->
   <!-- ========================================================= -->
-  <div id="modal-team-details" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-5 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[85vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-        <h3 id="team-modal-heading" class="text-lg font-bold">দলের বিস্তারিত</h3>
-        <button id="btn-close-team-modal" type="button" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 font-bold text-sm">✕</button>
+  <div id="modal-pin" class="modal-backdrop hidden">
+    <div class="modal-panel" style="max-width:340px;">
+      <div class="modal-head">
+        <h3 style="font-size:1rem; font-weight:700;">🔐 অ্যাডমিন লগইন</h3>
+        <button id="btn-close-pin" type="button" class="btn btn-subtle btn-sm">✕</button>
       </div>
-      <div id="team-modal-content" class="space-y-3 text-sm"></div>
-    </div>
-  </div>
-
-  <!-- ========================================================= -->
-  <!-- MODAL 3: ADMIN PIN LOGIN                                  -->
-  <!-- ========================================================= -->
-  <div id="modal-admin-pin" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-xs w-full p-5 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
-      <div class="text-center space-y-1">
-        <div class="text-3xl">🔐</div>
-        <h3 class="text-lg font-bold">অ্যাডমিন লগইন</h3>
-        <p class="text-xs text-slate-500">ফলাফল ও তথ্য নিয়ন্ত্রণ করতে পিন দিন</p>
-      </div>
-      <form id="form-admin-pin" class="space-y-3">
-        <input type="password" inputmode="numeric" id="input-admin-pin" maxlength="6" required placeholder="••••"
-          class="w-full text-center text-2xl tracking-widest py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        <div class="flex gap-2">
-          <button type="button" id="btn-cancel-pin" class="flex-1 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold">বাতিল</button>
-          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold">প্রবেশ করুন</button>
-        </div>
+      <form id="form-pin" class="modal-body">
+        <p style="font-size:0.85rem; color:var(--text-muted); text-align:center;">
+          স্কোর, খেলোয়াড়দের ছবি ও নোটিশ নিয়ন্ত্রণ করতে অ্যাডমিন পিন দিন
+        </p>
+        <input type="password" inputmode="numeric" id="input-pin" class="input" maxlength="6" required placeholder="••••"
+          style="text-align:center; font-size:1.4rem; letter-spacing:6px; font-weight:700;" />
+        <button type="submit" class="btn btn-primary btn-full">প্রবেশ করুন</button>
       </form>
     </div>
   </div>
 
   <!-- ========================================================= -->
-  <!-- MODAL 4: FULL PIN-PROTECTED ADMIN PANEL                   -->
+  <!-- MODAL 3: ADMIN CONTROL PANEL (3 TABS)                     -->
   <!-- ========================================================= -->
-  <div id="modal-admin-panel" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white dark:bg-slate-900 w-full max-w-3xl h-[94vh] sm:h-[88vh] rounded-t-3xl sm:rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
-      <!-- Admin Header -->
-      <div class="px-4 py-3.5 bg-indigo-950 text-white flex items-center justify-between shrink-0">
+  <div id="modal-admin" class="modal-backdrop hidden">
+    <div class="modal-panel" style="max-width:680px; height:90vh;">
+      <div class="modal-head" style="background:#1e1b4b; color:#ffffff;">
         <div>
-          <h3 class="text-base sm:text-lg font-bold flex items-center gap-2">🛡️ অ্যাডমিন কন্ট্রোল প্যানেল</h3>
-          <p class="text-[11px] text-indigo-200">প্রতিটি পরিবর্তন সরাসরি সবার ফোনে লাইভ আপডেট হবে</p>
+          <div style="font-size:1.05rem; font-weight:700;">🛡️ অ্যাডমিন কন্ট্রোল প্যানেল</div>
+          <div style="font-size:0.75rem; color:#c7d2fe;">সব পরিবর্তন সরাসরি npoint.io-তে সংরক্ষিত হবে</div>
         </div>
-        <button id="btn-close-admin" type="button" class="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-xs font-bold">বন্ধ করুন ✕</button>
+        <button id="btn-close-admin" type="button" class="btn btn-danger btn-sm">বন্ধ করুন ✕</button>
       </div>
 
-      <!-- Admin Scrollable Body -->
-      <div class="flex-1 overflow-y-auto p-4 space-y-5">
+      <!-- Admin Navigation Tabs -->
+      <div class="tab-bar">
+        <button type="button" class="tab-btn active" data-tab="tab-matches">🎲 ম্যাচ ফলাফল</button>
+        <button type="button" class="tab-btn" data-tab="tab-players">👤 দল ও খেলোয়াড় ছবি</button>
+        <button type="button" class="tab-btn" data-tab="tab-notice">📢 লাইভ নোটিশ ও ব্যাকআপ</button>
+      </div>
 
-        <!-- 1. Record Match Result -->
-        <div class="p-4 rounded-2xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50/40 dark:bg-emerald-950/20 space-y-3">
-          <h4 class="font-bold text-base text-emerald-700 dark:text-emerald-400">➕ নতুন ম্যাচের ফলাফল যুক্ত করুন</h4>
-          <form id="form-add-match" class="space-y-3">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="modal-body">
+        <!-- TAB 1: MATCH RESULTS -->
+        <div id="tab-matches" class="admin-tab-pane" style="display:flex; flex-direction:column; gap:14px;">
+          <form id="form-add-match" style="padding:13px; border-radius:14px; border:1px solid var(--border-color); background:var(--bg-subtle); display:flex; flex-direction:column; gap:10px;">
+            <div style="font-weight:700; color:var(--green-text);">➕ নতুন ম্যাচের ফলাফল যুক্ত করুন</div>
+            <div class="grid-2">
               <div>
-                <label class="block text-xs font-bold mb-1">দল ১ (প্রথম জুটি)</label>
-                <select id="select-team-a" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-bold"></select>
+                <label style="font-size:0.8rem; font-weight:700;">দল ১ নির্বাচন করুন</label>
+                <select id="admin-team-1" class="select" required></select>
               </div>
               <div>
-                <label class="block text-xs font-bold mb-1">দল ২ (দ্বিতীয় জুটি)</label>
-                <select id="select-team-b" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm font-bold"></select>
+                <label style="font-size:0.8rem; font-weight:700;">দল ২ নির্বাচন করুন</label>
+                <select id="admin-team-2" class="select" required></select>
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid-2">
               <div>
-                <label class="block text-xs font-bold mb-1">দল ১-এর পাকা গুটি (০–৮)</label>
-                <input type="number" id="input-score-a" min="0" max="8" value="8" required
-                  class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-base font-extrabold text-center" />
+                <label style="font-size:0.8rem; font-weight:700;">দল ১-এর পাকা গুটি (০–৮)</label>
+                <input type="number" id="admin-score-1" class="input" min="0" max="8" value="8" required style="text-align:center; font-weight:700;" />
               </div>
               <div>
-                <label class="block text-xs font-bold mb-1">দল ২-এর পাকা গুটি (০–৮)</label>
-                <input type="number" id="input-score-b" min="0" max="8" value="5" required
-                  class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-base font-extrabold text-center" />
+                <label style="font-size:0.8rem; font-weight:700;">দল ২-এর পাকা গুটি (০–৮)</label>
+                <input type="number" id="admin-score-2" class="input" min="0" max="8" value="5" required style="text-align:center; font-weight:700;" />
               </div>
             </div>
 
-            <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow transition">
-              ✅ ফলাফল সেভ ও লাইভ পাবলিশ করুন
-            </button>
+            <div>
+              <label style="font-size:0.8rem; font-weight:700;">বিজয়ী দল (স্বয়ংক্রিয় বা ম্যানুয়াল)</label>
+              <select id="admin-winner-select" class="select">
+                <option value="auto">বেশি গুটির ভিত্তিতে স্বয়ংক্রিয় বিজয়ী</option>
+                <option value="team1">দল ১ বিজয়ী</option>
+                <option value="team2">দল ২ বিজয়ী</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-green btn-full">✅ ফলাফল সেভ ও লাইভ করুন</button>
           </form>
+
+          <div>
+            <div style="font-weight:700; font-size:0.9rem; margin-bottom:8px;">🗑️ পূর্বের ম্যাচ তালিকা (ডিলিট করলে পয়েন্ট পুনরায় হিসাব হবে)</div>
+            <div id="admin-matches-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+          </div>
         </div>
 
-        <!-- 2. Update Live Notice -->
-        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2.5">
-          <h4 class="font-bold text-sm sm:text-base text-amber-600 dark:text-amber-400">📢 লাইভ নোটিশ পরিবর্তন করুন</h4>
-          <div class="flex flex-col sm:flex-row gap-2">
-            <input type="text" id="input-admin-notice" placeholder="নতুন নোটিশ লিখুন..."
-              class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm" />
-            <button id="btn-update-notice" type="button" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm shrink-0">
-              নোটিশ আপডেট
+        <!-- TAB 2: TEAM & PLAYER PHOTOS -->
+        <div id="tab-players" class="admin-tab-pane hidden" style="display:flex; flex-direction:column; gap:12px;">
+          <div>
+            <label style="font-size:0.85rem; font-weight:700;">কোন দলের তথ্য ও ছবি আপডেট করবেন তা বাছাই করুন:</label>
+            <select id="admin-edit-team-select" class="select" style="margin-top:4px;"></select>
+          </div>
+
+          <div style="padding:13px; border-radius:14px; border:1px solid var(--border-color); background:var(--bg-subtle); display:flex; flex-direction:column; gap:12px;">
+            <div>
+              <label style="font-size:0.8rem; font-weight:700;">দলের নাম</label>
+              <input type="text" id="edit-team-name" class="input" maxlength="35" />
+            </div>
+
+            <div class="grid-2">
+              <!-- Player 1 Card -->
+              <div class="player-photo-card">
+                <div style="font-size:0.8rem; font-weight:700; color:var(--accent);">খেলোয়াড় ১</div>
+                <div id="preview-p1-avatar" class="player-photo-lg">১</div>
+                <input type="text" id="edit-p1-name" class="input" placeholder="খেলোয়াড় ১-এর নাম" />
+                <label class="btn btn-primary btn-sm btn-full">
+                  📷 খেলোয়াড় ১-এর ছবি
+                  <input type="file" id="upload-p1-photo" accept="image/*" class="hidden" />
+                </label>
+                <button type="button" id="btn-clear-p1-photo" class="btn btn-subtle btn-sm btn-full">ছবি মুছুন</button>
+              </div>
+
+              <!-- Player 2 Card -->
+              <div class="player-photo-card">
+                <div style="font-size:0.8rem; font-weight:700; color:var(--accent);">খেলোয়াড় ২</div>
+                <div id="preview-p2-avatar" class="player-photo-lg">২</div>
+                <input type="text" id="edit-p2-name" class="input" placeholder="খেলোয়াড় ২-এর নাম" />
+                <label class="btn btn-primary btn-sm btn-full">
+                  📷 খেলোয়াড় ২-এর ছবি
+                  <input type="file" id="upload-p2-photo" accept="image/*" class="hidden" />
+                </label>
+                <button type="button" id="btn-clear-p2-photo" class="btn btn-subtle btn-sm btn-full">ছবি মুছুন</button>
+              </div>
+            </div>
+
+            <button type="button" id="btn-save-team-profile" class="btn btn-green btn-full">
+              💾 দলের নাম ও খেলোয়াড়দের ছবি সেভ করুন
             </button>
           </div>
         </div>
 
-        <!-- 3. Knockout Overrides -->
-        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
-          <h4 class="font-bold text-sm sm:text-base text-purple-600 dark:text-purple-400">👑 সেমিফাইনাল ও ফাইনাল বিজয়ী নির্ধারণ</h4>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-            <div>
-              <label class="block text-xs font-bold mb-1">সেমিফাইনাল ১ বিজয়ী</label>
-              <select id="select-sf1-win" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold"></select>
+        <!-- TAB 3: LIVE NOTICE, POST MODERATION & BACKUP -->
+        <div id="tab-notice" class="admin-tab-pane hidden" style="display:flex; flex-direction:column; gap:14px;">
+          <div style="padding:13px; border-radius:14px; border:1px solid var(--border-color); background:var(--bg-subtle); display:flex; flex-direction:column; gap:8px;">
+            <div style="font-weight:700;">📢 লাইভ স্ক্রলিং নোটিশ পরিবর্তন করুন</div>
+            <input type="text" id="admin-notice-input" class="input" placeholder="নতুন নোটিশ লিখুন..." />
+            <button type="button" id="btn-save-notice" class="btn btn-amber btn-full">নোটিশ আপডেট করুন</button>
+          </div>
+
+          <div style="padding:13px; border-radius:14px; border:1px solid var(--border-color); background:var(--bg-subtle); display:flex; flex-direction:column; gap:8px;">
+            <div style="font-weight:700;">💾 ডেটা ব্যাকআপ ও রিস্টোর</div>
+            <div class="grid-2">
+              <button type="button" id="btn-export-json" class="btn btn-primary btn-sm">⬇️ ব্যাকআপ ডাউনলোড (.json)</button>
+              <label class="btn btn-subtle btn-sm">
+                ⬆️ ব্যাকআপ রিস্টোর করুন
+                <input type="file" id="input-import-json" accept=".json,application/json" class="hidden" />
+              </label>
             </div>
-            <div>
-              <label class="block text-xs font-bold mb-1">সেমিফাইনাল ২ বিজয়ী</label>
-              <select id="select-sf2-win" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold"></select>
-            </div>
-            <div>
-              <label class="block text-xs font-bold mb-1">🏆 চ্যাম্পিয়ন ২০২৬</label>
-              <select id="select-champion-win" class="w-full px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold"></select>
-            </div>
           </div>
-          <button id="btn-save-knockout" type="button" class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs sm:text-sm">
-            নকআউট তথ্য সেভ করুন
-          </button>
-        </div>
 
-        <!-- 4. Edit Team Names / Players -->
-        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
-          <h4 class="font-bold text-sm sm:text-base">✏️ দলের নাম ও খেলোয়াড় সম্পাদনা</h4>
-          <div id="admin-teams-editor" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
-          <button id="btn-save-teams" type="button" class="w-full py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm">
-            দলের তথ্য সেভ করুন
-          </button>
-        </div>
-
-        <!-- 5. Undo Matches & Moderate Posts -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
-            <h4 class="font-bold text-sm text-rose-600">🗑️ ম্যাচ ফলাফল ডিলিট করুন</h4>
-            <div id="admin-match-list" class="space-y-2 max-h-52 overflow-y-auto text-xs"></div>
-          </div>
-          <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
-            <h4 class="font-bold text-sm text-rose-600">🧹 পাবলিক পোস্ট ও কমেন্ট নিয়ন্ত্রণ</h4>
-            <div id="admin-post-list" class="space-y-2 max-h-52 overflow-y-auto text-xs"></div>
+          <div style="padding:13px; border-radius:14px; border:1px solid var(--border-color); background:var(--bg-subtle); display:flex; flex-direction:column; gap:8px;">
+            <div style="font-weight:700; color:var(--red-text);">🧹 গ্যালারি পোস্ট নিয়ন্ত্রণ</div>
+            <div id="admin-posts-list" style="display:flex; flex-direction:column; gap:6px;"></div>
           </div>
         </div>
-
-        <!-- 6. Backup, Restore & Double-Confirm Reset -->
-        <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
-          <h4 class="font-bold text-sm sm:text-base">💾 ডেটা ব্যাকআপ, রিস্টোর ও রিসেট</h4>
-          <div class="flex flex-wrap gap-2">
-            <button id="btn-download-backup" type="button" class="flex-1 py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">
-              ⬇️ ব্যাকআপ ডাউনলোড (.json)
-            </button>
-            <label class="flex-1 py-2.5 px-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold text-center cursor-pointer">
-              ⬆️ ব্যাকআপ রিস্টোর
-              <input type="file" id="input-restore-file" accept=".json,application/json" class="hidden" />
-            </label>
-            <button id="btn-trigger-reset" type="button" class="w-full sm:w-auto py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold">
-              ⚠️ সব ডেটা রিসেট
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========================================================= -->
-  <!-- MODAL 5: DOUBLE-CONFIRMATION RESET DIALOG                 -->
-  <!-- ========================================================= -->
-  <div id="modal-reset-confirm" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-rose-400 space-y-4">
-      <h3 id="reset-dialog-title" class="text-lg font-bold text-rose-600">⚠️ প্রথম ধাপ: নিশ্চিত করুন</h3>
-      <p id="reset-dialog-desc" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-        আপনি কি সত্যিই টুর্নামেন্টের সব ম্যাচের ফলাফল ও গ্যালারি পোস্ট মুছে ফেলতে চান?
-      </p>
-      <div class="flex gap-2">
-        <button id="btn-reset-cancel" type="button" class="flex-1 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold">বাতিল</button>
-        <button id="btn-reset-next" type="button" class="flex-1 py-2.5 rounded-xl bg-rose-600 text-white text-xs font-bold">নিশ্চিত করুন</button>
       </div>
     </div>
   </div>
@@ -488,64 +1083,41 @@
       'use strict';
 
       // =========================================================
-      // 1. CLOUD ENDPOINT & DEFAULT CRASH-PROOF DATA
+      // 1. CLOUD ENDPOINT & BACKWARD-COMPATIBLE SCHEMA
       // =========================================================
-      const API_ENDPOINT = 'https://api.npoint.io/7e14215e2d4abb1e570d';
-      const STORAGE_KEY = 'ludo_championship_2026_v4';
+      const API_URL = 'https://api.npoint.io/7e14215e2d4abb1e570d';
+      const LOCAL_CACHE_KEY = 'ludo_2026_safe_cache_v5';
       const ADMIN_PIN = '1234';
 
-      const DEFAULT_TEAMS = [
-        { id: 1, name: 'চেল্লু ও গালিব', p1: 'চেল্লু', p2: 'গালিব', c1: '#ef4444', c2: '#334155' },
-        { id: 2, name: 'নওশাদ ও ছোটন', p1: 'নওশাদ', p2: 'ছোটন', c1: '#22c55e', c2: '#1e293b' },
-        { id: 3, name: 'নয়ন ও নাঈম', p1: 'নয়ন', p2: 'নাঈম', c1: '#eab308', c2: '#0f172a' },
-        { id: 4, name: 'মারুফ ও মাসুম', p1: 'মারুফ', p2: 'মাসুম', c1: '#3b82f6', c2: '#334155' },
-        { id: 5, name: 'মোহন ও নান্টু', p1: 'মোহন', p2: 'নান্টু', c1: '#a855f7', c2: '#1e293b' },
-        { id: 6, name: 'রনি ও মিন্টু', p1: 'রনি', p2: 'মিন্টু', c1: '#ec4899', c2: '#0f172a' },
-        { id: 7, name: 'রাবু ও মিলন', p1: 'রাবু', p2: 'মিলন', c1: '#f97316', c2: '#334155' },
-        { id: 8, name: 'রোমান ও তনু', p1: 'রোমান', p2: 'তনু', c1: '#06b6d4', c2: '#1e293b' },
+      const FALLBACK_TEAMS = [
+        { id: 1, name: 'চেল্লু ও গালিব', p1: 'চেল্লু', p2: 'গালিব', c1: '#ef4444', c2: '#334155', m: 0, w: 0, l: 0, pts: 0, gf: 0, ga: 0, img1: '', img2: '' },
+        { id: 2, name: 'নওশাদ ও ছোটন', p1: 'নওশাদ', p2: 'ছোটন', c1: '#22c55e', c2: '#1e293b', m: 0, w: 0, l: 0, pts: 0, gf: 0, ga: 0, img1: '', img2: '' },
+        { id: 3, name: 'নয়ন ও নাঈম', p1: 'নয়ন', p2: 'নাঈম', c1: '#eab308', c2: '#0f172a', m: 0, w: 0, l: 0, pts: 0, gf: 0, ga: 0, img1: '', img2: '' },
+        { id: 4, name: 'মারুফ ও মাসুম', p1: 'মারুফ', p2: 'মাসুম', c1: '#3b82f6', c2: '#334155', m: 0, w: 0, l: 0, pts: 0, gf: 0, ga: 0, img1: '', img2: '' },
+        { id: 5, name: 'মোহন ও নান্টু', p1: 'মোহন', p2: 'নান্টু', c1: '#a855f7', c2: '#1e293b', m: 0, w: 0, l: 0, pts: 0, gf: 0, ga: 0, img1: '', img2: '' },
+        { id: 6, name: 'রনি ও মিন্টু', p1: 'রনি', p2: 'মিন্টু', c1: '#ec4899', c2: '#0f172a', m: 0, w: 0, l: 0, pts: 0, gf: 0, ga: 0, img1: '', img2: '' },
+        { id: 7, name: 'রাবু ও মিলন', p1: 'রাবু', p2: 'মিলন', c1: '#f97316', c2: '#334155', m: 0, w: 0, l: 0, pts: 0, gf: 0, ga: 0, img1: '', img2: '' },
+        { id: 8, name: 'রোমান ও তনু', p1: 'রোমান', p2: 'তনু', c1: '#06b6d4', c2: '#1e293b', m: 0, w: 0, l: 0, pts: 0, gf: 0, ga: 0, img1: '', img2: '' },
       ];
 
-      function buildInitialState() {
-        return {
-          teams: JSON.parse(JSON.stringify(DEFAULT_TEAMS)),
-          matches: [],
-          posts: [],
-          notice: '🏆 লুডু চ্যাম্পিয়নশিপ ২০২৬-এ সবাইকে স্বাগতম! প্রথম রাউন্ডের খেলা শীঘ্রই শুরু হবে।',
-          knockout: { sf1WinnerId: null, sf2WinnerId: null, championId: null },
-          updatedAt: Date.now(),
-        };
-      }
+      let appData = {
+        teams: JSON.parse(JSON.stringify(FALLBACK_TEAMS)),
+        matches: [],
+        posts: [],
+        notice: '🏆 লুডু চ্যাম্পিয়নশিপ ২০২৬-এ সবাইকে স্বাগতম!',
+      };
 
-      function sanitizeState(raw) {
-        const fallback = buildInitialState();
-        if (!raw || typeof raw !== 'object') return fallback;
-        return {
-          teams: Array.isArray(raw.teams) && raw.teams.length > 0 ? raw.teams : fallback.teams,
-          matches: Array.isArray(raw.matches) ? raw.matches : [],
-          posts: Array.isArray(raw.posts) ? raw.posts : [],
-          notice: typeof raw.notice === 'string' && raw.notice.trim() ? raw.notice : fallback.notice,
-          knockout: raw.knockout && typeof raw.knockout === 'object'
-            ? {
-                sf1WinnerId: raw.knockout.sf1WinnerId || null,
-                sf2WinnerId: raw.knockout.sf2WinnerId || null,
-                championId: raw.knockout.championId || null,
-              }
-            : fallback.knockout,
-          updatedAt: raw.updatedAt || Date.now(),
-        };
-      }
-
-      let state = buildInitialState();
-      let isSyncBusy = false;
-      let compressedImageBase64 = '';
-      let resetConfirmStage = 1;
+      let isSaving = false;
+      let pendingPostImage = '';
+      let draftImg1 = '';
+      let draftImg2 = '';
 
       // =========================================================
-      // 2. HELPERS (BENGALI NUMERALS, ESCAPE, TOAST)
+      // 2. UTILITIES (BENGALI DIGITS, ESCAPING, TOAST)
       // =========================================================
-      const bnNums = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+      const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
       function toBn(val) {
-        return String(val).replace(/\d/g, (d) => bnNums[Number(d)]);
+        return String(val).replace(/\d/g, (d) => bnDigits[Number(d)]);
       }
 
       function esc(str) {
@@ -556,532 +1128,223 @@
           .replace(/"/g, '&quot;');
       }
 
-      function toast(text, variant = 'info') {
-        const box = document.getElementById('toast-box');
-        if (!box) return;
-        const styles = {
-          success: 'bg-emerald-600 text-white',
-          error: 'bg-rose-600 text-white',
-          info: 'bg-slate-900 text-white dark:bg-indigo-600',
-        };
-        const item = document.createElement('div');
-        item.className = `${styles[variant] || styles.info} px-4 py-2.5 rounded-xl shadow-lg text-xs sm:text-sm font-bold transition-opacity duration-300`;
-        item.textContent = text;
-        box.appendChild(item);
+      function showToast(msg, type = 'info') {
+        const wrap = document.getElementById('toast-wrap');
+        const el = document.createElement('div');
+        el.className = `toast-msg ${type === 'ok' ? 'toast-ok' : type === 'err' ? 'toast-err' : ''}`;
+        el.textContent = msg;
+        wrap.appendChild(el);
         setTimeout(() => {
-          item.style.opacity = '0';
-          setTimeout(() => item.remove(), 300);
+          el.style.opacity = '0';
+          setTimeout(() => el.remove(), 250);
         }, 3000);
       }
 
-      function updateSyncPill(mode) {
-        const pill = document.getElementById('sync-status-pill');
-        if (!pill) return;
-        if (mode === 'live') {
-          pill.className = 'text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1';
-          pill.textContent = '🟢 লাইভ সিঙ্ক সক্রিয়';
-        } else if (mode === 'syncing') {
-          pill.className = 'text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1';
-          pill.textContent = '🟡 সিঙ্ক হচ্ছে...';
+      function setSyncStatus(state) {
+        const el = document.getElementById('sync-status');
+        if (state === 'live') {
+          el.className = 'sync-badge sync-live';
+          el.textContent = '🟢 লাইভ সিঙ্ক সক্রিয়';
+        } else if (state === 'wait') {
+          el.className = 'sync-badge sync-wait';
+          el.textContent = '🟡 সিঙ্ক হচ্ছে...';
         } else {
-          pill.className = 'text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1';
-          pill.textContent = '🔴 অফলাইন ব্যাকআপ';
+          el.className = 'sync-badge sync-err';
+          el.textContent = '🔴 অফলাইন ক্যাশ সক্রিয়';
         }
       }
 
-      // =========================================================
-      // 3. CRASH-PROOF CLOUD SYNC (NPOINT.IO)
-      // =========================================================
-      function saveToLocal() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        } catch (e) {
-          console.warn('LocalStorage error:', e);
+      // Preserve backward compatibility with existing match/team fields
+      function normalizeServerData(raw) {
+        if (!raw || typeof raw !== 'object' || !Array.isArray(raw.teams) || raw.teams.length === 0) {
+          return null;
         }
-      }
-
-      function loadFromLocal() {
-        try {
-          const cached = localStorage.getItem(STORAGE_KEY);
-          if (cached) {
-            state = sanitizeState(JSON.parse(cached));
-          }
-        } catch (e) {
-          state = buildInitialState();
-        }
-      }
-
-      async function saveToCloud(silent = false) {
-        if (isSyncBusy) return;
-        isSyncBusy = true;
-        state.updatedAt = Date.now();
-        saveToLocal();
-        updateSyncPill('syncing');
-
-        try {
-          const response = await fetch(API_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(state),
-          });
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          updateSyncPill('live');
-          if (!silent) toast('✅ সবার ফোনে লাইভ আপডেট হয়েছে!', 'success');
-        } catch (err) {
-          console.error('Save error:', err);
-          updateSyncPill('offline');
-          if (!silent) toast('⚠️ অফলাইন ব্যাকআপে সেভ হয়েছে (নেটওয়ার্ক চেক করুন)।', 'error');
-        } finally {
-          isSyncBusy = false;
-        }
-      }
-
-      async function fetchFromCloud(isFirstLoad = false) {
-        if (isSyncBusy) return;
-        if (isFirstLoad) updateSyncPill('syncing');
-
-        try {
-          const response = await fetch(`${API_ENDPOINT}?nocache=${Date.now()}`, { cache: 'no-store' });
-          if (!response.ok) throw new Error('HTTP ' + response.status);
-          const remoteData = await response.json();
-
-          // If npoint.io returns {} or missing/empty teams array, initialize and immediately POST default state
-          if (!remoteData || !Array.isArray(remoteData.teams) || remoteData.teams.length === 0) {
-            state = buildInitialState();
-            saveToLocal();
-            updateSyncPill('live');
-            renderUI();
-            await saveToCloud(true);
-            return;
-          }
-
-          state = sanitizeState(remoteData);
-          saveToLocal();
-          updateSyncPill('live');
-          renderUI();
-        } catch (err) {
-          console.warn('Fetch error:', err);
-          updateSyncPill('offline');
-          if (isFirstLoad) renderUI();
-        }
-      }
-
-      // =========================================================
-      // 4. STANDINGS & RUN RATE ENGINE (+GF / -GA OVER 8 PIECES)
-      // =========================================================
-      function computeStandings() {
-        const map = {};
-        state.teams.forEach((team) => {
-          map[team.id] = {
-            ...team,
-            m: 0,
-            w: 0,
-            l: 0,
-            pts: 0,
-            gf: 0,
-            ga: 0,
-            diff: 0,
+        const normalizedTeams = raw.teams.map((t, idx) => {
+          const fb = FALLBACK_TEAMS[idx] || FALLBACK_TEAMS[0];
+          return {
+            id: Number(t.id) || idx + 1,
+            name: t.name || fb.name,
+            p1: t.p1 || fb.p1,
+            p2: t.p2 || fb.p2,
+            c1: t.c1 || fb.c1,
+            c2: t.c2 || fb.c2,
+            m: Number(t.m) || 0,
+            w: Number(t.w) || 0,
+            l: Number(t.l) || 0,
+            pts: Number(t.pts) || 0,
+            gf: Number(t.gf) || 0,
+            ga: Number(t.ga) || 0,
+            img1: typeof t.img1 === 'string' ? t.img1 : '',
+            img2: typeof t.img2 === 'string' ? t.img2 : '',
           };
         });
 
-        state.matches.forEach((match) => {
-          const a = map[match.teamAId];
-          const b = map[match.teamBId];
-          if (!a || !b) return;
+        return {
+          teams: normalizedTeams,
+          matches: Array.isArray(raw.matches) ? raw.matches : [],
+          posts: Array.isArray(raw.posts) ? raw.posts : [],
+          notice: typeof raw.notice === 'string' && raw.notice.trim()
+            ? raw.notice
+            : '🏆 লুডু চ্যাম্পিয়নশিপ ২০২৬-এ সবাইকে স্বাগতম!',
+        };
+      }
 
-          const sA = Number(match.scoreA) || 0;
-          const sB = Number(match.scoreB) || 0;
+      // Recalculate team stats from matches array if matches exist
+      function syncTeamStatsWithMatches(dataObj) {
+        if (!Array.isArray(dataObj.matches) || dataObj.matches.length === 0) return;
 
-          a.m += 1;
-          b.m += 1;
-          a.gf += sA;
-          a.ga += sB;
-          b.gf += sB;
-          b.ga += sA;
+        const map = {};
+        dataObj.teams.forEach((t) => {
+          t.m = 0;
+          t.w = 0;
+          t.l = 0;
+          t.pts = 0;
+          t.gf = 0;
+          t.ga = 0;
+          map[t.id] = t;
+        });
 
-          if (sA > sB) {
-            a.w += 1;
-            a.pts += 2;
-            b.l += 1;
-          } else if (sB > sA) {
-            b.w += 1;
-            b.pts += 2;
-            a.l += 1;
+        dataObj.matches.forEach((m) => {
+          const id1 = Number(m.teamAId || m.t1 || m.team1Id);
+          const id2 = Number(m.teamBId || m.t2 || m.team2Id);
+          const s1 = Number(m.scoreA ?? m.s1 ?? m.score1 ?? 0);
+          const s2 = Number(m.scoreB ?? m.s2 ?? m.score2 ?? 0);
+          const t1 = map[id1];
+          const t2 = map[id2];
+          if (!t1 || !t2) return;
+
+          t1.m += 1;
+          t2.m += 1;
+          t1.gf += s1;
+          t1.ga += s2;
+          t2.gf += s2;
+          t2.ga += s1;
+
+          const winId = m.winnerId ? Number(m.winnerId) : s1 > s2 ? id1 : s2 > s1 ? id2 : null;
+          if (winId === id1) {
+            t1.w += 1;
+            t1.pts += 2;
+            t2.l += 1;
+          } else if (winId === id2) {
+            t2.w += 1;
+            t2.pts += 2;
+            t1.l += 1;
           } else {
-            a.pts += 1;
-            b.pts += 1;
+            t1.pts += 1;
+            t2.pts += 1;
           }
         });
-
-        const arr = Object.values(map).map((t) => {
-          t.diff = t.gf - t.ga;
-          return t;
-        });
-
-        arr.sort((a, b) => {
-          if (b.pts !== a.pts) return b.pts - a.pts;
-          if (b.diff !== a.diff) return b.diff - a.diff;
-          if (b.w !== a.w) return b.w - a.w;
-          return a.id - b.id;
-        });
-
-        return arr;
       }
 
       // =========================================================
-      // 5. UI RENDERING
+      // 3. CLOUD FETCH & SAVE (NPOINT.IO)
       // =========================================================
-      function renderUI() {
-        const standings = computeStandings();
-
-        // Update Top Notice & Post Count Badge
-        document.getElementById('live-notice-marquee').textContent = state.notice;
-        document.getElementById('post-count-badge').textContent = toBn(state.posts.length);
-        document.getElementById('matches-count-pill').textContent = `${toBn(state.matches.length)}টি ম্যাচ`;
-
-        // Render Points Table
-        const tbody = document.getElementById('points-table-body');
-        tbody.innerHTML = standings
-          .map((t, index) => {
-            const rank = index + 1;
-            const isQualified = rank <= 4;
-            const diffText =
-              t.diff > 0
-                ? `+${toBn(t.diff)}`
-                : t.diff < 0
-                ? `-${toBn(Math.abs(t.diff))}`
-                : '০';
-            const diffColor =
-              t.diff > 0
-                ? 'text-emerald-600 dark:text-emerald-400'
-                : t.diff < 0
-                ? 'text-rose-600 dark:text-rose-400'
-                : 'text-slate-500';
-
-            return `
-              <tr data-team-id="${t.id}" class="team-row cursor-pointer transition hover:bg-indigo-50/70 dark:hover:bg-slate-800/70 ${
-                isQualified ? 'bg-emerald-50/40 dark:bg-emerald-950/20' : ''
-              }">
-                <td class="py-3 px-2.5 text-center font-bold">
-                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs ${
-                    isQualified
-                      ? 'bg-emerald-600 text-white shadow-xs'
-                      : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                  }">
-                    ${toBn(rank)}
-                  </span>
-                </td>
-                <td class="py-3 px-3">
-                  <div class="flex items-center gap-2">
-                    <div class="flex -space-x-1.5 shrink-0">
-                      <span class="w-6 h-6 rounded-full text-[10px] font-bold text-white flex items-center justify-center ring-2 ring-white dark:ring-slate-900" style="background:${t.c1}">${esc(t.p1.charAt(0))}</span>
-                      <span class="w-6 h-6 rounded-full text-[10px] font-bold text-white flex items-center justify-center ring-2 ring-white dark:ring-slate-900" style="background:${t.c2}">${esc(t.p2.charAt(0))}</span>
-                    </div>
-                    <div>
-                      <div class="font-bold text-slate-900 dark:text-white leading-snug">${esc(t.name)}</div>
-                      <div class="text-[11px] text-slate-500 dark:text-slate-400">${esc(t.p1)} ও ${esc(t.p2)}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="py-3 px-2 text-center font-semibold">${toBn(t.m)}</td>
-                <td class="py-3 px-2 text-center font-bold text-emerald-600 dark:text-emerald-400">${toBn(t.w)}</td>
-                <td class="py-3 px-2 text-center font-bold text-rose-600 dark:text-rose-400">${toBn(t.l)}</td>
-                <td class="py-3 px-2.5 text-center">
-                  <span class="inline-block px-2.5 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-extrabold">
-                    ${toBn(t.pts)}
-                  </span>
-                </td>
-                <td class="py-3 px-2.5 text-center font-bold ${diffColor}">
-                  ${diffText} <span class="text-[10px] font-normal text-slate-400">(${toBn(t.gf)}/${toBn(t.ga)})</span>
-                </td>
-              </tr>
-            `;
-          })
-          .join('');
-
-        // Render Recent Matches
-        const matchesBox = document.getElementById('recent-matches-container');
-        if (state.matches.length === 0) {
-          matchesBox.innerHTML = `
-            <div class="py-8 text-center text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              এখনো কোনো ম্যাচ শুরু হয়নি। অ্যাডমিন ফলাফল আপডেট করলে এখানে লাইভ স্কোর দেখা যাবে।
-            </div>
-          `;
-        } else {
-          matchesBox.innerHTML = [...state.matches]
-            .reverse()
-            .map((m, idx) => {
-              const tA = state.teams.find((x) => x.id === m.teamAId) || { name: 'দল ১' };
-              const tB = state.teams.find((x) => x.id === m.teamBId) || { name: 'দল ২' };
-              const aWin = m.scoreA > m.scoreB;
-              const bWin = m.scoreB > m.scoreA;
-              const mNum = state.matches.length - idx;
-              return `
-                <div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700">ম্যাচ #${toBn(mNum)}</span>
-                    <span class="font-bold text-xs sm:text-sm ${aWin ? 'text-emerald-600 dark:text-emerald-400' : ''}">
-                      ${esc(tA.name)} ${aWin ? '🏆' : ''}
-                    </span>
-                    <span class="px-2.5 py-0.5 rounded-lg bg-slate-900 text-white font-extrabold text-xs">
-                      ${toBn(m.scoreA)} - ${toBn(m.scoreB)}
-                    </span>
-                    <span class="font-bold text-xs sm:text-sm ${bWin ? 'text-emerald-600 dark:text-emerald-400' : ''}">
-                      ${esc(tB.name)} ${bWin ? '🏆' : ''}
-                    </span>
-                  </div>
-                  <div class="text-[11px] text-slate-500 dark:text-slate-400">${esc(m.time || '')}</div>
-                </div>
-              `;
-            })
-            .join('');
-        }
-
-        // Render Knockout Bracket
-        renderKnockoutBracket(standings);
-
-        // Render Gallery & Bottom Ticker
-        renderGalleryFeed();
-
-        // Sync Admin Lists if modal open
-        if (!document.getElementById('modal-admin-panel').classList.contains('hidden')) {
-          populateAdminPanel();
+      function saveLocalCache() {
+        try {
+          localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(appData));
+        } catch (e) {
+          console.warn('Cache save warning:', e);
         }
       }
 
-      function renderKnockoutBracket(standings) {
-        const s1 = standings[0] || { name: '১ম স্থান' };
-        const s2 = standings[1] || { name: '২য় স্থান' };
-        const s3 = standings[2] || { name: '৩য় স্থান' };
-        const s4 = standings[3] || { name: '৪র্থ স্থান' };
-
-        const ko = state.knockout || {};
-        const sf1Win = state.teams.find((t) => t.id === Number(ko.sf1WinnerId));
-        const sf2Win = state.teams.find((t) => t.id === Number(ko.sf2WinnerId));
-        const champ = state.teams.find((t) => t.id === Number(ko.championId));
-
-        document.getElementById('sf1-card').innerHTML = `
-          <div class="flex items-center justify-between gap-2">
-            <span>১ম: ${esc(s1.name)}</span>
-            <span class="text-xs text-slate-400">VS</span>
-            <span>৪র্থ: ${esc(s4.name)}</span>
-          </div>
-          ${sf1Win ? `<div class="text-xs text-emerald-600 dark:text-emerald-400 pt-1 border-t border-slate-100 dark:border-slate-800">✅ বিজয়ী: ${esc(sf1Win.name)}</div>` : ''}
-        `;
-
-        document.getElementById('sf2-card').innerHTML = `
-          <div class="flex items-center justify-between gap-2">
-            <span>২য়: ${esc(s2.name)}</span>
-            <span class="text-xs text-slate-400">VS</span>
-            <span>৩য়: ${esc(s3.name)}</span>
-          </div>
-          ${sf2Win ? `<div class="text-xs text-emerald-600 dark:text-emerald-400 pt-1 border-t border-slate-100 dark:border-slate-800">✅ বিজয়ী: ${esc(sf2Win.name)}</div>` : ''}
-        `;
-
-        document.getElementById('final-card').innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <span>${sf1Win ? esc(sf1Win.name) : 'সেমিফাইনাল ১ বিজয়ী'}</span>
-            <span class="px-2 py-0.5 rounded bg-amber-400 text-slate-950 text-xs font-extrabold">VS</span>
-            <span>${sf2Win ? esc(sf2Win.name) : 'সেমিফাইনাল ২ বিজয়ী'}</span>
-          </div>
-          ${
-            champ
-              ? `<div class="mt-2.5 p-2 rounded-xl bg-amber-400/20 border border-amber-400 text-center text-amber-700 dark:text-amber-300 font-extrabold text-base">🏆 চ্যাম্পিয়ন ২০২৬: ${esc(champ.name)} 🎉</div>`
-              : `<div class="mt-2 text-xs text-slate-500">ফাইনাল ম্যাচ শেষে চ্যাম্পিয়নের নাম এখানে প্রদর্শিত হবে।</div>`
+      function loadLocalCache() {
+        try {
+          const raw = localStorage.getItem(LOCAL_CACHE_KEY);
+          if (raw) {
+            const parsed = normalizeServerData(JSON.parse(raw));
+            if (parsed) appData = parsed;
           }
-        `;
-      }
-
-      function renderGalleryFeed() {
-        const feed = document.getElementById('gallery-posts-feed');
-        const bottomTicker = document.getElementById('bottom-public-marquee');
-
-        if (!state.posts || state.posts.length === 0) {
-          bottomTicker.textContent = 'এখনো কোনো পাবলিক মেসেজ নেই — গ্যালারি থেকে প্রথম মেসেজ বা ছবি পোস্ট করুন!';
-          feed.innerHTML = `
-            <div class="p-8 text-center text-xs sm:text-sm text-slate-500 border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl">
-              এখনো কোনো ছবি বা পোস্ট নেই। উপরের ফর্ম থেকে প্রথম পোস্টটি শেয়ার করুন!
-            </div>
-          `;
-          return;
+        } catch (e) {
+          console.warn('Cache read warning:', e);
         }
+      }
 
-        bottomTicker.textContent = [...state.posts]
-          .slice(-6)
-          .reverse()
-          .map((p) => `${p.author}: "${p.text}"`)
-          .join('   ★   ');
+      async function fetchCloudData(isInitial = false) {
+        if (isSaving) return;
+        if (isInitial) setSyncStatus('wait');
 
-        feed.innerHTML = [...state.posts]
-          .reverse()
-          .map((post) => {
-            const comments = Array.isArray(post.comments) ? post.comments : [];
-            return `
-              <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
-                <div class="p-3 flex items-center gap-2.5 border-b border-slate-100 dark:border-slate-800">
-                  <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs">
-                    ${esc((post.author || 'U').charAt(0))}
-                  </div>
-                  <div>
-                    <div class="font-bold text-xs sm:text-sm">${esc(post.author)}</div>
-                    <div class="text-[10px] text-slate-500">${esc(post.time || 'এইমাত্র')}</div>
-                  </div>
-                </div>
+        try {
+          const res = await fetch(`${API_URL}?t=${Date.now()}`, { cache: 'no-store' });
+          if (!res.ok) throw new Error('Network error');
+          const json = await res.json();
+          const normalized = normalizeServerData(json);
 
-                ${
-                  post.image
-                    ? `<div class="bg-slate-950 flex justify-center">
-                        <img src="${post.image}" alt="Tournament Photo" class="max-h-80 w-auto object-contain" loading="lazy" />
-                      </div>`
-                    : ''
-                }
+          if (normalized) {
+            appData = normalized;
+            syncTeamStatsWithMatches(appData);
+            saveLocalCache();
+            setSyncStatus('live');
+            renderAll();
+          } else {
+            // Only initialize server if completely empty ({})
+            setSyncStatus('live');
+            renderAll();
+            await pushCloudData(true);
+          }
+        } catch (err) {
+          console.warn('Fetch failed:', err);
+          setSyncStatus('err');
+          if (isInitial) renderAll();
+        }
+      }
 
-                <div class="p-3.5 space-y-3">
-                  <p class="text-xs sm:text-sm text-slate-800 dark:text-slate-200 whitespace-pre-line">${esc(post.text)}</p>
+      async function pushCloudData(silent = false) {
+        if (isSaving) return;
+        isSaving = true;
+        saveLocalCache();
+        setSyncStatus('wait');
 
-                  <div class="flex items-center gap-2">
-                    <button type="button" data-react="like" data-id="${post.id}"
-                      class="btn-react px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 text-xs font-bold">
-                      👍 লাইক (${toBn(post.likes || 0)})
-                    </button>
-                    <button type="button" data-react="dislike" data-id="${post.id}"
-                      class="btn-react px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 text-xs font-bold">
-                      👎 ডিসলাইক (${toBn(post.dislikes || 0)})
-                    </button>
-                    <span class="ml-auto text-xs text-slate-500 font-semibold">💬 ${toBn(comments.length)} কমেন্ট</span>
-                  </div>
-
-                  <!-- Nested Comments -->
-                  <div class="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
-                    <div class="space-y-1.5 max-h-40 overflow-y-auto">
-                      ${comments
-                        .map(
-                          (c) => `
-                          <div class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs">
-                            <span class="font-bold text-indigo-600 dark:text-indigo-400">${esc(c.author)}:</span>
-                            <span>${esc(c.text)}</span>
-                          </div>
-                        `
-                        )
-                        .join('')}
-                    </div>
-                    <form data-id="${post.id}" class="form-nested-comment flex gap-1.5">
-                      <input type="text" name="cName" required maxlength="20" placeholder="নাম"
-                        class="w-24 px-2.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs" />
-                      <input type="text" name="cBody" required maxlength="150" placeholder="কমেন্ট লিখুন..."
-                        class="flex-1 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs" />
-                      <button type="submit" class="px-3 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold shrink-0">পাঠান</button>
-                    </form>
-                  </div>
-                </div>
-              </article>
-            `;
-          })
-          .join('');
+        try {
+          // npoint.io supports both PUT and POST; using POST for clean full document update
+          const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(appData),
+          });
+          if (!res.ok) throw new Error('Save HTTP ' + res.status);
+          setSyncStatus('live');
+          if (!silent) showToast('✅ সবার ফোনে লাইভ আপডেট হয়েছে!', 'ok');
+        } catch (err) {
+          console.error('Save failed:', err);
+          setSyncStatus('err');
+          if (!silent) showToast('⚠️ ইন্টারনেট সমস্যার কারণে অফলাইনে সেভ হয়েছে।', 'err');
+        } finally {
+          isSaving = false;
+        }
       }
 
       // =========================================================
-      // 6. ADMIN PANEL POPULATION
+      // 4. IMAGE COMPRESSION (HTML5 CANVAS)
       // =========================================================
-      function populateAdminPanel() {
-        const opts = state.teams.map((t) => `<option value="${t.id}">${esc(t.name)}</option>`).join('');
-        const selA = document.getElementById('select-team-a');
-        const selB = document.getElementById('select-team-b');
-        selA.innerHTML = opts;
-        selB.innerHTML = opts;
-        if (state.teams[1]) selB.value = String(state.teams[1].id);
-
-        document.getElementById('input-admin-notice').value = state.notice;
-
-        const koOpts = `<option value="">-- নির্ধারিত নয় --</option>` + opts;
-        const sf1 = document.getElementById('select-sf1-win');
-        const sf2 = document.getElementById('select-sf2-win');
-        const champ = document.getElementById('select-champion-win');
-        sf1.innerHTML = koOpts;
-        sf2.innerHTML = koOpts;
-        champ.innerHTML = koOpts;
-        sf1.value = state.knockout?.sf1WinnerId || '';
-        sf2.value = state.knockout?.sf2WinnerId || '';
-        champ.value = state.knockout?.championId || '';
-
-        // Team Editor
-        document.getElementById('admin-teams-editor').innerHTML = state.teams
-          .map(
-            (t) => `
-            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1.5 text-xs">
-              <div class="font-bold text-indigo-600 dark:text-indigo-400">দল #${toBn(t.id)}</div>
-              <input type="text" data-tid="${t.id}" data-field="name" value="${esc(t.name)}" placeholder="দলের নাম"
-                class="team-edit-input w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 font-bold" />
-              <div class="grid grid-cols-2 gap-1.5">
-                <input type="text" data-tid="${t.id}" data-field="p1" value="${esc(t.p1)}" placeholder="খেলোয়াড় ১"
-                  class="team-edit-input w-full px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900" />
-                <input type="text" data-tid="${t.id}" data-field="p2" value="${esc(t.p2)}" placeholder="খেলোয়াড় ২"
-                  class="team-edit-input w-full px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900" />
-              </div>
-            </div>
-          `
-          )
-          .join('');
-
-        // Matches Delete List
-        const mList = document.getElementById('admin-match-list');
-        mList.innerHTML =
-          state.matches.length === 0
-            ? '<p class="text-slate-500">কোনো ম্যাচ নেই।</p>'
-            : [...state.matches]
-                .reverse()
-                .map((m) => {
-                  const tA = state.teams.find((x) => x.id === m.teamAId) || { name: 'দল ১' };
-                  const tB = state.teams.find((x) => x.id === m.teamBId) || { name: 'দল ২' };
-                  return `
-                    <div class="flex items-center justify-between p-2 rounded-xl bg-slate-100 dark:bg-slate-800 gap-2">
-                      <span class="truncate font-semibold">${esc(tA.name)} (${toBn(m.scoreA)}) vs ${esc(tB.name)} (${toBn(m.scoreB)})</span>
-                      <button type="button" data-mid="${m.id}" class="btn-remove-match px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold shrink-0">মুছুন</button>
-                    </div>
-                  `;
-                })
-                .join('');
-
-        // Posts Moderation List
-        const pList = document.getElementById('admin-post-list');
-        pList.innerHTML =
-          state.posts.length === 0
-            ? '<p class="text-slate-500">কোনো পোস্ট নেই।</p>'
-            : [...state.posts]
-                .reverse()
-                .map(
-                  (p) => `
-                  <div class="flex items-center justify-between p-2 rounded-xl bg-slate-100 dark:bg-slate-800 gap-2">
-                    <span class="truncate"><strong>${esc(p.author)}:</strong> ${esc(p.text)}</span>
-                    <button type="button" data-pid="${p.id}" class="btn-remove-post px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold shrink-0">ডিলিট</button>
-                  </div>
-                `
-                )
-                .join('');
-      }
-
-      // =========================================================
-      // 7. IMAGE COMPRESSION (MAX 600PX, JPEG 0.6)
-      // =========================================================
-      function compressImageToDataUrl(file) {
+      function compressImage(file, maxWidth, quality, squareCrop = false) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
               const canvas = document.createElement('canvas');
-              const MAX_WIDTH = 600;
-              let width = img.width;
-              let height = img.height;
-              if (width > MAX_WIDTH) {
-                height = Math.round((height * MAX_WIDTH) / width);
-                width = MAX_WIDTH;
-              }
-              canvas.width = width;
-              canvas.height = height;
               const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, width, height);
-              resolve(canvas.toDataURL('image/jpeg', 0.6));
+
+              if (squareCrop) {
+                const size = Math.min(img.width, img.height);
+                const sx = (img.width - size) / 2;
+                const sy = (img.height - size) / 2;
+                canvas.width = maxWidth;
+                canvas.height = maxWidth;
+                ctx.drawImage(img, sx, sy, size, size, 0, 0, maxWidth, maxWidth);
+              } else {
+                let w = img.width;
+                let h = img.height;
+                if (w > maxWidth) {
+                  h = Math.round((h * maxWidth) / w);
+                  w = maxWidth;
+                }
+                canvas.width = w;
+                canvas.height = h;
+                ctx.drawImage(img, 0, 0, w, h);
+              }
+
+              resolve(canvas.toDataURL('image/jpeg', quality));
             };
             img.onerror = reject;
             img.src = e.target.result;
@@ -1092,217 +1355,575 @@
       }
 
       // =========================================================
-      // 8. ALL EVENT HANDLERS
+      // 5. RENDERING ENGINE
       // =========================================================
-      function initEventListeners() {
-        // Dark / Light Theme Toggle
-        const themeBtn = document.getElementById('btn-theme-toggle');
-        if (localStorage.getItem('ludo_dark_mode') === '1') {
+      function getSortedStandings() {
+        return [...appData.teams]
+          .map((t) => {
+            const diff = (Number(t.gf) || 0) - (Number(t.ga) || 0);
+            const nrr = t.m > 0 ? diff / t.m : 0;
+            return { ...t, diff, nrr };
+          })
+          .sort((a, b) => {
+            if (b.pts !== a.pts) return b.pts - a.pts;
+            if (b.nrr !== a.nrr) return b.nrr - a.nrr;
+            if (b.w !== a.w) return b.w - a.w;
+            return a.id - b.id;
+          });
+      }
+
+      function renderAvatarHtml(imgData, name, color) {
+        if (imgData) {
+          return `<img src="${imgData}" alt="${esc(name)}" class="avatar-circle" />`;
+        }
+        const initial = esc((name || '?').trim().charAt(0));
+        return `<span class="avatar-circle" style="background:${color || '#334155'}">${initial}</span>`;
+      }
+
+      function renderAll() {
+        const standings = getSortedStandings();
+
+        // 1. Notice & Counters
+        document.getElementById('live-notice-text').textContent = appData.notice;
+        document.getElementById('match-count-badge').textContent = `${toBn(appData.matches.length)}টি ম্যাচ`;
+        document.getElementById('post-count-pill').textContent = `${toBn(appData.posts.length)}টি পোস্ট`;
+
+        // 2. Points Table
+        const tbody = document.getElementById('points-tbody');
+        tbody.innerHTML = standings
+          .map((t, idx) => {
+            const rank = idx + 1;
+            const isTop4 = rank <= 4;
+            const nrrFormatted =
+              t.nrr > 0
+                ? `+${toBn(t.nrr.toFixed(2))}`
+                : t.nrr < 0
+                ? `-${toBn(Math.abs(t.nrr).toFixed(2))}`
+                : '০.০০';
+            const nrrColor = t.nrr > 0 ? 'var(--green-text)' : t.nrr < 0 ? 'var(--red-text)' : 'var(--text-muted)';
+
+            return `
+              <tr class="team-row ${isTop4 ? 'qualified-row' : ''}" data-team-id="${t.id}">
+                <td style="text-align:center;">
+                  <span class="rank-badge">${toBn(rank)}</span>
+                </td>
+                <td>
+                  <div class="team-cell">
+                    <div class="dual-avatars">
+                      ${renderAvatarHtml(t.img1, t.p1, t.c1)}
+                      ${renderAvatarHtml(t.img2, t.p2, t.c2)}
+                    </div>
+                    <div>
+                      <div style="font-weight:700; line-height:1.25;">${esc(t.name)}</div>
+                      <div style="font-size:0.75rem; color:var(--text-muted);">${esc(t.p1)} ও ${esc(t.p2)}</div>
+                    </div>
+                  </div>
+                </td>
+                <td style="text-align:center; font-weight:600;">${toBn(t.m)}</td>
+                <td style="text-align:center; font-weight:700; color:var(--green-text);">${toBn(t.w)}</td>
+                <td style="text-align:center; font-weight:700; color:var(--red-text);">${toBn(t.l)}</td>
+                <td style="text-align:center;"><span class="pts-pill">${toBn(t.pts)}</span></td>
+                <td style="text-align:center; font-weight:700; color:${nrrColor};">
+                  ${nrrFormatted}
+                  <div style="font-size:0.68rem; color:var(--text-muted); font-weight:500;">(${toBn(t.gf)}/${toBn(t.ga)})</div>
+                </td>
+              </tr>
+            `;
+          })
+          .join('');
+
+        // 3. Recent Match Results (Latest First)
+        const matchBox = document.getElementById('matches-container');
+        if (appData.matches.length === 0) {
+          matchBox.innerHTML = `<div style="text-align:center; padding:24px 10px; color:var(--text-muted); font-size:0.88rem;">এখনো কোনো ম্যাচ শুরু হয়নি। অ্যাডমিন ফলাফল আপডেট করলে এখানে লাইভ স্কোর দেখা যাবে।</div>`;
+        } else {
+          matchBox.innerHTML = [...appData.matches]
+            .reverse()
+            .map((m, i) => {
+              const id1 = Number(m.teamAId || m.t1 || m.team1Id);
+              const id2 = Number(m.teamBId || m.t2 || m.team2Id);
+              const s1 = Number(m.scoreA ?? m.s1 ?? m.score1 ?? 0);
+              const s2 = Number(m.scoreB ?? m.s2 ?? m.score2 ?? 0);
+              const t1 = appData.teams.find((x) => x.id === id1) || { name: 'দল ১' };
+              const t2 = appData.teams.find((x) => x.id === id2) || { name: 'দল ২' };
+              const winId = m.winnerId ? Number(m.winnerId) : s1 > s2 ? id1 : s2 > s1 ? id2 : null;
+              const matchNo = appData.matches.length - i;
+
+              return `
+                <div class="match-item">
+                  <div style="display:flex; flex-wrap:wrap; align-items:center; gap:7px;">
+                    <span class="btn btn-subtle btn-sm" style="cursor:default; padding:2px 8px;">ম্যাচ #${toBn(matchNo)}</span>
+                    <span style="font-weight:700; ${winId === id1 ? 'color:var(--green-text);' : ''}">
+                      ${esc(t1.name)} ${winId === id1 ? '🏆' : ''}
+                    </span>
+                    <span class="score-pill">${toBn(s1)} - ${toBn(s2)}</span>
+                    <span style="font-weight:700; ${winId === id2 ? 'color:var(--green-text);' : ''}">
+                      ${esc(t2.name)} ${winId === id2 ? '🏆' : ''}
+                    </span>
+                  </div>
+                  <div style="font-size:0.75rem; color:var(--text-muted);">${esc(m.time || m.date || '')}</div>
+                </div>
+              `;
+            })
+            .join('');
+        }
+
+        // 4. Semifinal & Grand Final Bracket
+        const s1 = standings[0] || { name: '১ম স্থান' };
+        const s2 = standings[1] || { name: '২য় স্থান' };
+        const s3 = standings[2] || { name: '৩য় স্থান' };
+        const s4 = standings[3] || { name: '৪র্থ স্থান' };
+
+        document.getElementById('sf1-display').innerHTML = `${esc(s1.name)} <span style="color:var(--text-muted); margin:0 6px;">VS</span> ${esc(s4.name)}`;
+        document.getElementById('sf2-display').innerHTML = `${esc(s2.name)} <span style="color:var(--text-muted); margin:0 6px;">VS</span> ${esc(s3.name)}`;
+        document.getElementById('final-display').innerHTML = `সেমিফাইনাল ১ বিজয়ী <span style="color:#d97706; margin:0 6px;">VS</span> সেমিফাইনাল ২ বিজয়ী`;
+
+        // 5. Continuous Bottom Feed (Newest Post ALWAYS on Top)
+        renderPostsFeed();
+      }
+
+      function renderPostsFeed() {
+        const container = document.getElementById('posts-feed-container');
+        if (!appData.posts || appData.posts.length === 0) {
+          container.innerHTML = `<div style="text-align:center; padding:26px 12px; border:1px dashed var(--border-color); border-radius:12px; color:var(--text-muted); font-size:0.88rem;">এখনো কোনো ছবি বা পোস্ট নেই। উপরের বক্স থেকে প্রথম পোস্টটি শেয়ার করুন!</div>`;
+          return;
+        }
+
+        // Reverse chronological order: latest post at the very top
+        const newestFirst = [...appData.posts].slice().reverse();
+
+        container.innerHTML = newestFirst
+          .map((post) => {
+            const postId = post.id;
+            const comments = Array.isArray(post.comments) ? post.comments : [];
+            return `
+              <article class="post-card">
+                <div class="post-header">
+                  <div class="post-author-badge">${esc((post.author || 'U').charAt(0))}</div>
+                  <div>
+                    <div style="font-weight:700; font-size:0.95rem; line-height:1.2;">${esc(post.author)}</div>
+                    <div style="font-size:0.74rem; color:var(--text-muted);">${esc(post.time || 'এইমাত্র')}</div>
+                  </div>
+                </div>
+
+                ${
+                  post.image
+                    ? `<div class="post-img-wrap">
+                        <img src="${post.image}" alt="পোস্ট করা ছবি" loading="lazy" />
+                      </div>`
+                    : ''
+                }
+
+                <div class="post-body">
+                  <p style="font-size:0.95rem; white-space:pre-line;">${esc(post.text)}</p>
+
+                  <div class="post-actions">
+                    <button type="button" class="btn btn-subtle btn-sm btn-react" data-type="like" data-id="${postId}">
+                      👍 লাইক (${toBn(post.likes || 0)})
+                    </button>
+                    <button type="button" class="btn btn-subtle btn-sm btn-react" data-type="dislike" data-id="${postId}">
+                      👎 ডিসলাইক (${toBn(post.dislikes || 0)})
+                    </button>
+                    <span style="margin-left:auto; font-size:0.8rem; color:var(--text-muted); font-weight:600;">
+                      💬 ${toBn(comments.length)}টি কমেন্ট
+                    </span>
+                  </div>
+
+                  <div class="comment-box">
+                    ${comments
+                      .map(
+                        (c) => `
+                        <div class="comment-item">
+                          <strong style="color:var(--accent);">${esc(c.author)}:</strong> ${esc(c.text)}
+                        </div>
+                      `
+                      )
+                      .join('')}
+
+                    <form class="comment-form" data-id="${postId}">
+                      <input type="text" name="cAuthor" class="input" required maxlength="20" placeholder="নাম" style="width:92px; padding:7px 9px; font-size:0.82rem;" />
+                      <input type="text" name="cText" class="input" required maxlength="150" placeholder="কমেন্ট লিখুন..." style="flex:1; padding:7px 10px; font-size:0.82rem;" />
+                      <button type="submit" class="btn btn-primary btn-sm">পাঠান</button>
+                    </form>
+                  </div>
+                </div>
+              </article>
+            `;
+          })
+          .join('');
+      }
+
+      // =========================================================
+      // 6. ADMIN PANEL HELPERS
+      // =========================================================
+      function populateAdminControls() {
+        const teamOptions = appData.teams
+          .map((t) => `<option value="${t.id}">${esc(t.name)}</option>`)
+          .join('');
+
+        const sel1 = document.getElementById('admin-team-1');
+        const sel2 = document.getElementById('admin-team-2');
+        sel1.innerHTML = teamOptions;
+        sel2.innerHTML = teamOptions;
+        if (appData.teams[1]) sel2.value = String(appData.teams[1].id);
+
+        // Populate Player Photo Team Selector
+        const editSel = document.getElementById('admin-edit-team-select');
+        const prevSelected = editSel.value;
+        editSel.innerHTML = teamOptions;
+        if (prevSelected && appData.teams.some((t) => String(t.id) === prevSelected)) {
+          editSel.value = prevSelected;
+        }
+        loadTeamIntoPhotoEditor(Number(editSel.value || appData.teams[0].id));
+
+        // Populate Notice
+        document.getElementById('admin-notice-input').value = appData.notice;
+
+        // Populate Matches Delete List
+        const mList = document.getElementById('admin-matches-list');
+        if (appData.matches.length === 0) {
+          mList.innerHTML = `<div style="font-size:0.82rem; color:var(--text-muted);">কোনো ম্যাচ যুক্ত করা হয়নি।</div>`;
+        } else {
+          mList.innerHTML = [...appData.matches]
+            .reverse()
+            .map((m) => {
+              const id1 = Number(m.teamAId || m.t1 || m.team1Id);
+              const id2 = Number(m.teamBId || m.t2 || m.team2Id);
+              const s1 = Number(m.scoreA ?? m.s1 ?? m.score1 ?? 0);
+              const s2 = Number(m.scoreB ?? m.s2 ?? m.score2 ?? 0);
+              const t1 = appData.teams.find((x) => x.id === id1) || { name: 'দল ১' };
+              const t2 = appData.teams.find((x) => x.id === id2) || { name: 'দল ২' };
+              return `
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-radius:10px; background:var(--bg-subtle); border:1px solid var(--border-color); font-size:0.83rem;">
+                  <span><strong>${esc(t1.name)}</strong> (${toBn(s1)}) vs <strong>${esc(t2.name)}</strong> (${toBn(s2)})</span>
+                  <button type="button" class="btn btn-danger btn-sm btn-del-match" data-mid="${m.id}">মুছুন</button>
+                </div>
+              `;
+            })
+            .join('');
+        }
+
+        // Populate Posts Moderation List
+        const pList = document.getElementById('admin-posts-list');
+        if (appData.posts.length === 0) {
+          pList.innerHTML = `<div style="font-size:0.82rem; color:var(--text-muted);">কোনো পোস্ট নেই।</div>`;
+        } else {
+          pList.innerHTML = [...appData.posts]
+            .reverse()
+            .map(
+              (p) => `
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border-radius:10px; background:var(--bg-card); border:1px solid var(--border-color); font-size:0.82rem;">
+                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><strong>${esc(p.author)}:</strong> ${esc(p.text)}</span>
+                <button type="button" class="btn btn-danger btn-sm btn-del-post" data-pid="${p.id}">ডিলিট</button>
+              </div>
+            `
+            )
+            .join('');
+        }
+      }
+
+      function loadTeamIntoPhotoEditor(teamId) {
+        const team = appData.teams.find((t) => t.id === teamId);
+        if (!team) return;
+        document.getElementById('edit-team-name').value = team.name;
+        document.getElementById('edit-p1-name').value = team.p1;
+        document.getElementById('edit-p2-name').value = team.p2;
+        draftImg1 = team.img1 || '';
+        draftImg2 = team.img2 || '';
+        updatePhotoEditorPreviews(team);
+      }
+
+      function updatePhotoEditorPreviews(team) {
+        const p1Box = document.getElementById('preview-p1-avatar');
+        const p2Box = document.getElementById('preview-p2-avatar');
+
+        if (draftImg1) {
+          p1Box.innerHTML = `<img src="${draftImg1}" alt="P1" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
+        } else {
+          p1Box.style.background = team.c1 || '#4f46e5';
+          p1Box.textContent = (team.p1 || '১').charAt(0);
+        }
+
+        if (draftImg2) {
+          p2Box.innerHTML = `<img src="${draftImg2}" alt="P2" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
+        } else {
+          p2Box.style.background = team.c2 || '#334155';
+          p2Box.textContent = (team.p2 || '২').charAt(0);
+        }
+      }
+
+      // =========================================================
+      // 7. EVENT LISTENERS
+      // =========================================================
+      function bindEvents() {
+        // Dark/Light Theme Toggle
+        const themeBtn = document.getElementById('btn-theme');
+        if (localStorage.getItem('ludo_theme_dark') === '1') {
           document.documentElement.classList.add('dark');
           themeBtn.textContent = '☀️';
         }
         themeBtn.addEventListener('click', () => {
-          const dark = document.documentElement.classList.toggle('dark');
-          localStorage.setItem('ludo_dark_mode', dark ? '1' : '0');
-          themeBtn.textContent = dark ? '☀️' : '🌙';
+          const isDark = document.documentElement.classList.toggle('dark');
+          localStorage.setItem('ludo_theme_dark', isDark ? '1' : '0');
+          themeBtn.textContent = isDark ? '☀️' : '🌙';
         });
 
         // Manual Refresh
-        document.getElementById('btn-manual-refresh').addEventListener('click', async () => {
-          toast('🔄 লাইভ ডেটা আপডেট হচ্ছে...', 'info');
-          await fetchFromCloud(true);
-          toast('✅ সর্বশেষ তথ্য লোড হয়েছে!', 'success');
+        document.getElementById('btn-refresh').addEventListener('click', async () => {
+          showToast('🔄 সর্বশেষ স্কোর লোড হচ্ছে...');
+          await fetchCloudData(true);
+          showToast('✅ স্কোরবোর্ড আপডেট হয়েছে!', 'ok');
         });
 
-        // Toggle Knockout Panel
-        document.getElementById('btn-toggle-knockout').addEventListener('click', () => {
-          const panel = document.getElementById('knockout-panel-body');
-          const badge = document.getElementById('knockout-toggle-badge');
+        // Collapsible Bracket & Rules
+        document.getElementById('btn-toggle-bracket').addEventListener('click', () => {
+          const panel = document.getElementById('panel-bracket');
+          const badge = document.getElementById('badge-bracket');
           const hidden = panel.classList.toggle('hidden');
           badge.textContent = hidden ? 'দেখুন ▾' : 'লুকান ▴';
         });
 
-        // Toggle Rules Accordion
         document.getElementById('btn-toggle-rules').addEventListener('click', () => {
-          const panel = document.getElementById('rules-panel-body');
-          const badge = document.getElementById('rules-toggle-badge');
+          const panel = document.getElementById('panel-rules');
+          const badge = document.getElementById('badge-rules');
           const hidden = panel.classList.toggle('hidden');
           badge.textContent = hidden ? 'দেখুন ▾' : 'লুকান ▴';
         });
 
-        // Team Row Click -> Details Modal
-        document.getElementById('points-table-body').addEventListener('click', (e) => {
+        // Team Row Click -> Detail Modal with Large Circular Player Photos
+        document.getElementById('points-tbody').addEventListener('click', (e) => {
           const row = e.target.closest('.team-row');
           if (!row) return;
-          const id = Number(row.getAttribute('data-team-id'));
-          const team = state.teams.find((t) => t.id === id);
+          const teamId = Number(row.getAttribute('data-team-id'));
+          const team = appData.teams.find((t) => t.id === teamId);
           if (!team) return;
 
-          const teamMatches = state.matches.filter((m) => m.teamAId === id || m.teamBId === id);
-          document.getElementById('team-modal-heading').textContent = `🎲 ${team.name}`;
-          document.getElementById('team-modal-content').innerHTML = `
-            <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 flex justify-between text-xs font-bold">
-              <span>খেলোয়াড় ১: ${esc(team.p1)}</span>
-              <span>খেলোয়াড় ২: ${esc(team.p2)}</span>
+          const teamMatches = appData.matches.filter((m) => {
+            const id1 = Number(m.teamAId || m.t1 || m.team1Id);
+            const id2 = Number(m.teamBId || m.t2 || m.team2Id);
+            return id1 === teamId || id2 === teamId;
+          });
+
+          const p1Avatar = team.img1
+            ? `<img src="${team.img1}" alt="${esc(team.p1)}" class="player-photo-lg" />`
+            : `<div class="player-photo-lg" style="background:${team.c1}">${esc(team.p1.charAt(0))}</div>`;
+
+          const p2Avatar = team.img2
+            ? `<img src="${team.img2}" alt="${esc(team.p2)}" class="player-photo-lg" />`
+            : `<div class="player-photo-lg" style="background:${team.c2}">${esc(team.p2.charAt(0))}</div>`;
+
+          document.getElementById('team-modal-title').textContent = `🎲 ${team.name}`;
+          document.getElementById('team-modal-body').innerHTML = `
+            <div class="grid-2">
+              <div class="player-photo-card">
+                ${p1Avatar}
+                <div style="font-weight:700; font-size:0.95rem;">${esc(team.p1)}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">খেলোয়াড় ১</div>
+              </div>
+              <div class="player-photo-card">
+                ${p2Avatar}
+                <div style="font-weight:700; font-size:0.95rem;">${esc(team.p2)}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">খেলোয়াড় ২</div>
+              </div>
             </div>
-            <div class="font-bold text-xs text-slate-500 pt-1">খেলার ইতিহাস (${toBn(teamMatches.length)}টি ম্যাচ)</div>
+
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; text-align:center;">
+              <div class="bracket-box" style="padding:8px;">
+                <div style="font-size:0.72rem; color:var(--text-muted);">ম্যাচ</div>
+                <div style="font-weight:700; font-size:1rem;">${toBn(team.m)}</div>
+              </div>
+              <div class="bracket-box" style="padding:8px;">
+                <div style="font-size:0.72rem; color:var(--text-muted);">জয়</div>
+                <div style="font-weight:700; font-size:1rem; color:var(--green-text);">${toBn(team.w)}</div>
+              </div>
+              <div class="bracket-box" style="padding:8px;">
+                <div style="font-size:0.72rem; color:var(--text-muted);">হার</div>
+                <div style="font-weight:700; font-size:1rem; color:var(--red-text);">${toBn(team.l)}</div>
+              </div>
+              <div class="bracket-box" style="padding:8px;">
+                <div style="font-size:0.72rem; color:var(--text-muted);">পয়েন্ট</div>
+                <div style="font-weight:700; font-size:1rem; color:#d97706;">${toBn(team.pts)}</div>
+              </div>
+            </div>
+
+            <div style="font-weight:700; font-size:0.88rem;">খেলার ইতিহাস (${toBn(teamMatches.length)}টি ম্যাচ)</div>
             ${
               teamMatches.length === 0
-                ? '<p class="text-xs text-slate-500 text-center py-4">এই দল এখনো কোনো ম্যাচ খেলেনি।</p>'
+                ? `<div style="font-size:0.84rem; color:var(--text-muted); text-align:center; padding:12px;">এই দল এখনো কোনো ম্যাচ খেলেনি।</div>`
                 : teamMatches
                     .map((m) => {
-                      const tA = state.teams.find((x) => x.id === m.teamAId) || { name: 'দল ১' };
-                      const tB = state.teams.find((x) => x.id === m.teamBId) || { name: 'দল ২' };
+                      const id1 = Number(m.teamAId || m.t1 || m.team1Id);
+                      const id2 = Number(m.teamBId || m.t2 || m.team2Id);
+                      const s1 = Number(m.scoreA ?? m.s1 ?? m.score1 ?? 0);
+                      const s2 = Number(m.scoreB ?? m.s2 ?? m.score2 ?? 0);
+                      const t1 = appData.teams.find((x) => x.id === id1) || { name: 'দল ১' };
+                      const t2 = appData.teams.find((x) => x.id === id2) || { name: 'দল ২' };
                       return `
-                        <div class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center text-xs font-bold">
-                          <span>${esc(tA.name)} vs ${esc(tB.name)}</span>
-                          <span class="px-2 py-0.5 rounded bg-indigo-600 text-white">${toBn(m.scoreA)} - ${toBn(m.scoreB)}</span>
+                        <div class="match-item" style="padding:8px 10px; font-size:0.84rem;">
+                          <span><strong>${esc(t1.name)}</strong> vs <strong>${esc(t2.name)}</strong></span>
+                          <span class="score-pill">${toBn(s1)} - ${toBn(s2)}</span>
                         </div>
                       `;
                     })
                     .join('')
             }
           `;
-          document.getElementById('modal-team-details').classList.remove('hidden');
+          document.getElementById('modal-team').classList.remove('hidden');
         });
 
-        document.getElementById('btn-close-team-modal').addEventListener('click', () => {
-          document.getElementById('modal-team-details').classList.add('hidden');
+        document.getElementById('btn-close-team').addEventListener('click', () => {
+          document.getElementById('modal-team').classList.add('hidden');
         });
 
-        // Open / Close Gallery Modal
-        const openGallery = () => {
-          renderGalleryFeed();
-          document.getElementById('modal-gallery').classList.remove('hidden');
-        };
-        document.getElementById('btn-open-gallery').addEventListener('click', openGallery);
-        document.getElementById('btn-banner-gallery').addEventListener('click', openGallery);
-        document.getElementById('btn-close-gallery').addEventListener('click', () => {
-          document.getElementById('modal-gallery').classList.add('hidden');
-        });
-
-        // Image Attachment Compression
-        document.getElementById('input-post-file').addEventListener('change', async (e) => {
+        // Post Photo Attachment Compression (Max 450px width, 0.65 JPEG quality)
+        document.getElementById('post-image-input').addEventListener('change', async (e) => {
           const file = e.target.files[0];
           if (!file) return;
           try {
-            toast('🖼️ ছবি সংকুচিত করা হচ্ছে...', 'info');
-            compressedImageBase64 = await compressImageToDataUrl(file);
-            document.getElementById('preview-img').src = compressedImageBase64;
-            document.getElementById('preview-container').classList.remove('hidden');
+            showToast('🖼️ ছবি অপ্টিমাইজ করা হচ্ছে...');
+            pendingPostImage = await compressImage(file, 450, 0.65, false);
+            document.getElementById('post-preview-img').src = pendingPostImage;
+            document.getElementById('post-preview-wrap').classList.remove('hidden');
           } catch (err) {
-            toast('❌ ছবি লোড করতে সমস্যা হয়েছে।', 'error');
+            showToast('❌ ছবি লোড করা যায়নি।', 'err');
           }
         });
 
-        document.getElementById('btn-clear-img').addEventListener('click', () => {
-          compressedImageBase64 = '';
-          document.getElementById('input-post-file').value = '';
-          document.getElementById('preview-container').classList.add('hidden');
+        document.getElementById('btn-remove-preview').addEventListener('click', () => {
+          pendingPostImage = '';
+          document.getElementById('post-image-input').value = '';
+          document.getElementById('post-preview-wrap').classList.add('hidden');
         });
 
-        // Publish New Post
-        document.getElementById('form-new-post').addEventListener('submit', async (e) => {
+        // Create New Post (Newest Appears at Top)
+        document.getElementById('form-create-post').addEventListener('submit', async (e) => {
           e.preventDefault();
-          const author = document.getElementById('input-post-author').value.trim();
-          const text = document.getElementById('input-post-text').value.trim();
+          const author = document.getElementById('post-author').value.trim();
+          const text = document.getElementById('post-caption').value.trim();
           if (!author || !text) return;
 
-          const timeStr = new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
-          state.posts.push({
-            id: 'p_' + Date.now(),
+          const nowStr = new Date().toLocaleString('bn-BD', {
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+
+          appData.posts.push({
+            id: 'post_' + Date.now(),
             author,
             text,
-            image: compressedImageBase64 || '',
+            image: pendingPostImage || '',
             likes: 0,
             dislikes: 0,
             comments: [],
-            time: timeStr,
+            time: nowStr,
           });
 
-          if (state.posts.length > 25) state.posts = state.posts.slice(-25);
+          // Keep latest 30 posts so npoint.io JSON stays fast
+          if (appData.posts.length > 30) {
+            appData.posts = appData.posts.slice(-30);
+          }
 
-          compressedImageBase64 = '';
-          document.getElementById('input-post-text').value = '';
-          document.getElementById('input-post-file').value = '';
-          document.getElementById('preview-container').classList.add('hidden');
+          pendingPostImage = '';
+          document.getElementById('post-caption').value = '';
+          document.getElementById('post-image-input').value = '';
+          document.getElementById('post-preview-wrap').classList.add('hidden');
 
-          renderUI();
-          await saveToCloud(false);
+          renderAll();
+          await pushCloudData(false);
         });
 
-        // Likes, Dislikes & Nested Comments
-        const feedContainer = document.getElementById('gallery-posts-feed');
+        // Likes, Dislikes & Inline Comments
+        const feedContainer = document.getElementById('posts-feed-container');
         feedContainer.addEventListener('click', async (e) => {
           const btn = e.target.closest('.btn-react');
           if (!btn) return;
-          const post = state.posts.find((p) => p.id === btn.getAttribute('data-id'));
+          const post = appData.posts.find((p) => String(p.id) === btn.getAttribute('data-id'));
           if (!post) return;
 
-          if (btn.getAttribute('data-react') === 'like') post.likes = (post.likes || 0) + 1;
+          if (btn.getAttribute('data-type') === 'like') post.likes = (post.likes || 0) + 1;
           else post.dislikes = (post.dislikes || 0) + 1;
 
-          renderGalleryFeed();
-          await saveToCloud(true);
+          renderPostsFeed();
+          await pushCloudData(true);
         });
 
         feedContainer.addEventListener('submit', async (e) => {
-          const form = e.target.closest('.form-nested-comment');
+          const form = e.target.closest('.comment-form');
           if (!form) return;
           e.preventDefault();
-          const post = state.posts.find((p) => p.id === form.getAttribute('data-id'));
+          const post = appData.posts.find((p) => String(p.id) === form.getAttribute('data-id'));
           if (!post) return;
 
-          const cName = form.elements.cName.value.trim();
-          const cBody = form.elements.cBody.value.trim();
-          if (!cName || !cBody) return;
+          const cAuthor = form.elements.cAuthor.value.trim();
+          const cText = form.elements.cText.value.trim();
+          if (!cAuthor || !cText) return;
 
           if (!Array.isArray(post.comments)) post.comments = [];
-          post.comments.push({ author: cName, text: cBody });
+          post.comments.push({ author: cAuthor, text: cText });
 
-          renderGalleryFeed();
-          await saveToCloud(false);
+          renderPostsFeed();
+          await pushCloudData(false);
         });
 
-        // Admin Lock Button -> PIN Modal
-        document.getElementById('btn-admin-lock').addEventListener('click', () => {
-          document.getElementById('input-admin-pin').value = '';
-          document.getElementById('modal-admin-pin').classList.remove('hidden');
-          setTimeout(() => document.getElementById('input-admin-pin').focus(), 100);
+        // Admin PIN Login
+        document.getElementById('btn-open-pin').addEventListener('click', () => {
+          document.getElementById('input-pin').value = '';
+          document.getElementById('modal-pin').classList.remove('hidden');
+          setTimeout(() => document.getElementById('input-pin').focus(), 80);
         });
 
-        document.getElementById('btn-cancel-pin').addEventListener('click', () => {
-          document.getElementById('modal-admin-pin').classList.add('hidden');
+        document.getElementById('btn-close-pin').addEventListener('click', () => {
+          document.getElementById('modal-pin').classList.add('hidden');
         });
 
-        document.getElementById('form-admin-pin').addEventListener('submit', (e) => {
+        document.getElementById('form-pin').addEventListener('submit', (e) => {
           e.preventDefault();
-          if (document.getElementById('input-admin-pin').value.trim() === ADMIN_PIN) {
-            document.getElementById('modal-admin-pin').classList.add('hidden');
-            populateAdminPanel();
-            document.getElementById('modal-admin-panel').classList.remove('hidden');
-            toast('🔓 অ্যাডমিন প্যানেল আনলক হয়েছে!', 'success');
+          if (document.getElementById('input-pin').value.trim() === ADMIN_PIN) {
+            document.getElementById('modal-pin').classList.add('hidden');
+            populateAdminControls();
+            document.getElementById('modal-admin').classList.remove('hidden');
+            showToast('🔓 অ্যাডমিন প্যানেল আনলক হয়েছে!', 'ok');
           } else {
-            toast('❌ ভুল পিন! সঠিক পিন (1234) দিন।', 'error');
+            showToast('❌ ভুল পিন! সঠিক পিন (1234) দিন।', 'err');
           }
         });
 
         document.getElementById('btn-close-admin').addEventListener('click', () => {
-          document.getElementById('modal-admin-panel').classList.add('hidden');
+          document.getElementById('modal-admin').classList.add('hidden');
         });
 
-        // Admin: Add Match Result
+        // Admin Tabs Switching
+        document.querySelectorAll('.tab-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            const targetId = btn.getAttribute('data-tab');
+            document.querySelectorAll('.admin-tab-pane').forEach((pane) => {
+              pane.classList.toggle('hidden', pane.id !== targetId);
+            });
+          });
+        });
+
+        // Admin Tab 1: Add Match Result
         document.getElementById('form-add-match').addEventListener('submit', async (e) => {
           e.preventDefault();
-          const teamAId = Number(document.getElementById('select-team-a').value);
-          const teamBId = Number(document.getElementById('select-team-b').value);
-          const scoreA = Number(document.getElementById('input-score-a').value);
-          const scoreB = Number(document.getElementById('input-score-b').value);
+          const teamAId = Number(document.getElementById('admin-team-1').value);
+          const teamBId = Number(document.getElementById('admin-team-2').value);
+          const scoreA = Number(document.getElementById('admin-score-1').value);
+          const scoreB = Number(document.getElementById('admin-score-2').value);
+          const winnerMode = document.getElementById('admin-winner-select').value;
 
           if (teamAId === teamBId) {
-            toast('⚠️ দুটি ভিন্ন দল নির্বাচন করুন!', 'error');
+            showToast('⚠️ দুটি ভিন্ন দল নির্বাচন করুন!', 'err');
             return;
           }
+
+          let winnerId = null;
+          if (winnerMode === 'team1') winnerId = teamAId;
+          else if (winnerMode === 'team2') winnerId = teamBId;
+          else winnerId = scoreA > scoreB ? teamAId : scoreB > scoreA ? teamBId : null;
 
           const timeStr = new Date().toLocaleString('bn-BD', {
             day: 'numeric',
@@ -1311,153 +1932,163 @@
             minute: '2-digit',
           });
 
-          state.matches.push({
+          appData.matches.push({
             id: 'm_' + Date.now(),
             teamAId,
             teamBId,
             scoreA,
             scoreB,
+            winnerId,
             time: timeStr,
           });
 
-          renderUI();
-          await saveToCloud(false);
+          syncTeamStatsWithMatches(appData);
+          renderAll();
+          populateAdminControls();
+          await pushCloudData(false);
         });
 
-        // Admin: Update Notice
-        document.getElementById('btn-update-notice').addEventListener('click', async () => {
-          const text = document.getElementById('input-admin-notice').value.trim();
-          if (!text) return;
-          state.notice = text;
-          renderUI();
-          await saveToCloud(false);
-        });
-
-        // Admin: Save Knockout Winners
-        document.getElementById('btn-save-knockout').addEventListener('click', async () => {
-          state.knockout = {
-            sf1WinnerId: Number(document.getElementById('select-sf1-win').value) || null,
-            sf2WinnerId: Number(document.getElementById('select-sf2-win').value) || null,
-            championId: Number(document.getElementById('select-champion-win').value) || null,
-          };
-          renderUI();
-          await saveToCloud(false);
-        });
-
-        // Admin: Save Edited Team Names
-        document.getElementById('btn-save-teams').addEventListener('click', async () => {
-          document.querySelectorAll('.team-edit-input').forEach((inp) => {
-            const tid = Number(inp.getAttribute('data-tid'));
-            const field = inp.getAttribute('data-field');
-            const team = state.teams.find((t) => t.id === tid);
-            if (team && inp.value.trim()) {
-              team[field] = inp.value.trim();
-            }
-          });
-          renderUI();
-          await saveToCloud(false);
-        });
-
-        // Admin: Delete Match / Post
-        document.getElementById('admin-match-list').addEventListener('click', async (e) => {
-          const btn = e.target.closest('.btn-remove-match');
+        // Admin Tab 1: Delete Match & Recalculate
+        document.getElementById('admin-matches-list').addEventListener('click', async (e) => {
+          const btn = e.target.closest('.btn-del-match');
           if (!btn) return;
-          state.matches = state.matches.filter((m) => m.id !== btn.getAttribute('data-mid'));
-          renderUI();
-          await saveToCloud(false);
+          const mid = btn.getAttribute('data-mid');
+          appData.matches = appData.matches.filter((m) => String(m.id) !== mid);
+          syncTeamStatsWithMatches(appData);
+          renderAll();
+          populateAdminControls();
+          await pushCloudData(false);
         });
 
-        document.getElementById('admin-post-list').addEventListener('click', async (e) => {
-          const btn = e.target.closest('.btn-remove-post');
+        // Admin Tab 2: Team & Player Photo Editor
+        document.getElementById('admin-edit-team-select').addEventListener('change', (e) => {
+          loadTeamIntoPhotoEditor(Number(e.target.value));
+        });
+
+        document.getElementById('upload-p1-photo').addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          draftImg1 = await compressImage(file, 150, 0.7, true);
+          const team = appData.teams.find((t) => t.id === Number(document.getElementById('admin-edit-team-select').value));
+          if (team) updatePhotoEditorPreviews(team);
+          showToast('📷 খেলোয়াড় ১-এর ছবি প্রস্তুত! নিচের সেভ বাটনে চাপ দিন।');
+        });
+
+        document.getElementById('upload-p2-photo').addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          draftImg2 = await compressImage(file, 150, 0.7, true);
+          const team = appData.teams.find((t) => t.id === Number(document.getElementById('admin-edit-team-select').value));
+          if (team) updatePhotoEditorPreviews(team);
+          showToast('📷 খেলোয়াড় ২-এর ছবি প্রস্তুত! নিচের সেভ বাটনে চাপ দিন।');
+        });
+
+        document.getElementById('btn-clear-p1-photo').addEventListener('click', () => {
+          draftImg1 = '';
+          const team = appData.teams.find((t) => t.id === Number(document.getElementById('admin-edit-team-select').value));
+          if (team) updatePhotoEditorPreviews(team);
+        });
+
+        document.getElementById('btn-clear-p2-photo').addEventListener('click', () => {
+          draftImg2 = '';
+          const team = appData.teams.find((t) => t.id === Number(document.getElementById('admin-edit-team-select').value));
+          if (team) updatePhotoEditorPreviews(team);
+        });
+
+        document.getElementById('btn-save-team-profile').addEventListener('click', async () => {
+          const tid = Number(document.getElementById('admin-edit-team-select').value);
+          const team = appData.teams.find((t) => t.id === tid);
+          if (!team) return;
+
+          const newName = document.getElementById('edit-team-name').value.trim();
+          const newP1 = document.getElementById('edit-p1-name').value.trim();
+          const newP2 = document.getElementById('edit-p2-name').value.trim();
+
+          if (newName) team.name = newName;
+          if (newP1) team.p1 = newP1;
+          if (newP2) team.p2 = newP2;
+          team.img1 = draftImg1;
+          team.img2 = draftImg2;
+
+          renderAll();
+          populateAdminControls();
+          await pushCloudData(false);
+        });
+
+        // Admin Tab 3: Update Live Notice
+        document.getElementById('btn-save-notice').addEventListener('click', async () => {
+          const txt = document.getElementById('admin-notice-input').value.trim();
+          if (!txt) return;
+          appData.notice = txt;
+          renderAll();
+          await pushCloudData(false);
+        });
+
+        // Admin Tab 3: Delete Gallery Post
+        document.getElementById('admin-posts-list').addEventListener('click', async (e) => {
+          const btn = e.target.closest('.btn-del-post');
           if (!btn) return;
-          state.posts = state.posts.filter((p) => p.id !== btn.getAttribute('data-pid'));
-          renderUI();
-          await saveToCloud(false);
+          const pid = btn.getAttribute('data-pid');
+          appData.posts = appData.posts.filter((p) => String(p.id) !== pid);
+          renderAll();
+          populateAdminControls();
+          await pushCloudData(false);
         });
 
-        // Admin: Download JSON Backup
-        document.getElementById('btn-download-backup').addEventListener('click', () => {
-          const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+        // Admin Tab 3: Export & Import JSON Backup
+        document.getElementById('btn-export-json').addEventListener('click', () => {
+          const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
           const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `ludo-championship-2026-backup-${new Date().toISOString().slice(0, 10)}.json`;
-          document.body.appendChild(link);
-          link.click();
-          link.remove();
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `ludo-2026-backup-${new Date().toISOString().slice(0, 10)}.json`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
           URL.revokeObjectURL(url);
-          toast('📥 ব্যাকআপ ফাইল ডাউনলোড হয়েছে!', 'success');
+          showToast('📥 ব্যাকআপ ডাউনলোড হয়েছে!', 'ok');
         });
 
-        // Admin: Restore JSON Backup
-        document.getElementById('input-restore-file').addEventListener('change', (e) => {
+        document.getElementById('input-import-json').addEventListener('change', (e) => {
           const file = e.target.files[0];
           if (!file) return;
           const reader = new FileReader();
           reader.onload = async (ev) => {
             try {
-              state = sanitizeState(JSON.parse(ev.target.result));
-              renderUI();
-              await saveToCloud(false);
-              toast('✅ ব্যাকআপ থেকে সব তথ্য রিস্টোর হয়েছে!', 'success');
+              const normalized = normalizeServerData(JSON.parse(ev.target.result));
+              if (!normalized) throw new Error('Invalid backup');
+              appData = normalized;
+              syncTeamStatsWithMatches(appData);
+              renderAll();
+              populateAdminControls();
+              await pushCloudData(false);
+              showToast('✅ ব্যাকআপ থেকে সব ডেটা রিস্টোর হয়েছে!', 'ok');
             } catch (err) {
-              toast('❌ সঠিক JSON ব্যাকআপ ফাইল দিন।', 'error');
+              showToast('❌ সঠিক JSON ব্যাকআপ ফাইল দিন।', 'err');
             }
           };
           reader.readAsText(file);
         });
-
-        // Admin: Double-Confirmation Reset
-        const resetModal = document.getElementById('modal-reset-confirm');
-        document.getElementById('btn-trigger-reset').addEventListener('click', () => {
-          resetConfirmStage = 1;
-          document.getElementById('reset-dialog-title').textContent = '⚠️ প্রথম ধাপ: নিশ্চিত করুন';
-          document.getElementById('reset-dialog-desc').textContent =
-            'আপনি কি সত্যিই টুর্নামেন্টের সব ম্যাচের ফলাফল ও গ্যালারি পোস্ট মুছে ফেলতে চান?';
-          document.getElementById('btn-reset-next').textContent = 'নিশ্চিত করুন';
-          resetModal.classList.remove('hidden');
-        });
-
-        document.getElementById('btn-reset-cancel').addEventListener('click', () => {
-          resetModal.classList.add('hidden');
-        });
-
-        document.getElementById('btn-reset-next').addEventListener('click', async () => {
-          if (resetConfirmStage === 1) {
-            resetConfirmStage = 2;
-            document.getElementById('reset-dialog-title').textContent = '🚨 দ্বিতীয় ধাপ: চূড়ান্ত সতর্কতা';
-            document.getElementById('reset-dialog-desc').textContent =
-              'সতর্কতা! এই কাজটি করলে আগের সব স্কোর ও পোস্ট চিরতরে মুছে যাবে এবং ৮টি দল ০ পয়েন্ট থেকে শুরু করবে।';
-            document.getElementById('btn-reset-next').textContent = 'চূড়ান্তভাবে মুছুন';
-            return;
-          }
-          resetModal.classList.add('hidden');
-          state = buildInitialState();
-          renderUI();
-          await saveToCloud(false);
-          toast('🔄 সব ডেটা সফলভাবে রিসেট করা হয়েছে!', 'success');
-        });
       }
 
       // =========================================================
-      // 9. BOOTSTRAP & 5-SECOND LIVE POLLING
+      // 8. INITIALIZE & 10-SECOND NON-INTRUSIVE POLLING
       // =========================================================
-      loadFromLocal();
-      initEventListeners();
-      renderUI();
-      fetchFromCloud(true);
+      loadLocalCache();
+      bindEvents();
+      renderAll();
+      fetchCloudData(true);
 
       setInterval(() => {
         const activeTag = document.activeElement ? document.activeElement.tagName : '';
         const isTyping = activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT';
-        const isModalOpen =
-          !document.getElementById('modal-admin-panel').classList.contains('hidden') ||
-          !document.getElementById('modal-admin-pin').classList.contains('hidden');
+        const isAdminOpen = !document.getElementById('modal-admin').classList.contains('hidden');
+        const isPinOpen = !document.getElementById('modal-pin').classList.contains('hidden');
 
-        if (!isTyping && !isModalOpen) {
-          fetchFromCloud(false);
+        if (!isTyping && !isAdminOpen && !isPinOpen) {
+          fetchCloudData(false);
         }
-      }, 5000);
+      }, 10000);
     })();
   </script>
 </body>
